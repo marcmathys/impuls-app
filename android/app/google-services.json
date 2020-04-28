@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "463531903010",
+    "firebase_url": "https://impuls-cffab.firebaseio.com",
+    "project_id": "impuls-cffab",
+    "storage_bucket": "impuls-cffab.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:463531903010:android:51996f8bc1f22235d4e27b",
+        "android_client_info": {
+          "package_name": "de.unimarburg.impuls10"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "463531903010-03be3vnqq7ejdcrmcjkjtioslkvgtgsi.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAMU3dJlWTZh9I9Hiv3ynhw38b2fTuklak"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "463531903010-03be3vnqq7ejdcrmcjkjtioslkvgtgsi.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "463531903010-lal4qmpp92p993ekkk6igsirpsk6b3i6.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "de.unimarburg.impuls10"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
