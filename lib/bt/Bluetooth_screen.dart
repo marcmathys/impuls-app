@@ -7,7 +7,6 @@ import 'package:implulsnew/bt/widgets.dart';
 
 const String ekg_UUID = "00b3b2ae-928b-11e9-bc42-526af7764f64";
 
-
 //void main() {
 //  runApp(FlutterBlueApp());
 //}
@@ -180,11 +179,16 @@ class DeviceScreen extends StatelessWidget {
                     onNotificationPressed: () async {
                       await c.setNotifyValue(!c.isNotifying);
                       await
-                      Text(c.value.toString() + '12');
-                      c.value.listen((value) {
-                        Text(c.value.toString() + '13');
+                      // the next 9 line written by me don't work or show anything
+//                          Text(c.toString() + '12');
+//                      c.value.listen((value) {
+//                       Text(c.value.toString() + '13');
+//                      });
+                          c.read();
+                      c.value.listen((scanResult) {
+//                        Text('$scanResult');
+                        print('${device.name} found! rssi: $scanResult');
                       });
-                      c.read();
                     },
                     descriptorTiles: c.descriptors
                         .map(
@@ -225,6 +229,13 @@ class DeviceScreen extends StatelessWidget {
 //    }
 //    setState(() {});
 //  }
+  // Listen to scan results
+
+//  var subscription = device.charateristic.scanResults.listen((scanResult) {
+// do something with scan result
+//    device = scanResult.device;
+//    print('${device.name} found! rssi: ${scanResult.rssi}');
+//  });
 
   @override
   Widget build(BuildContext context) {
