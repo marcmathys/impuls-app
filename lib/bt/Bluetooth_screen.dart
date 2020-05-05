@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_blue/flutter_blue.dart';
@@ -152,15 +151,19 @@ class DeviceScreen extends StatelessWidget {
 
   final BluetoothDevice device;
 
+
+
   List<int> _getRandomBytes() {
-    final math = Random();
     return [
-      math.nextInt(255),
-      math.nextInt(255),
-      math.nextInt(255),
-      math.nextInt(255)
+      0X6F,
+      0X6E
     ];
   }
+
+
+
+
+
 
   List<Widget> _buildServiceTiles(List<BluetoothService> services) {
     return services
@@ -173,21 +176,28 @@ class DeviceScreen extends StatelessWidget {
                     characteristic: c,
                     onReadPressed: () => c.read(),
                     onWritePressed: () async {
+//                      await c.write(_getRandomBytes(), withoutResponse: true);
                       await c.write(_getRandomBytes(), withoutResponse: true);
+                      print(c.write(_getRandomBytes()));
                       await c.read();
+                      print(c.read());
+                      c.value.listen((scanResult) {
+//                        Text('$scanResult');
+                        print('${device.name} found! rssi2: $scanResult');
+                        print("$scanResult");
+                        print('test listen');
+                      });
                     },
                     onNotificationPressed: () async {
                       await c.setNotifyValue(!c.isNotifying);
-                      await
-                      // the next 9 line written by me don't work or show anything
-//                          Text(c.toString() + '12');
-//                      c.value.listen((value) {
-//                       Text(c.value.toString() + '13');
-//                      });
-                          c.read();
+                      await c.read();
+                      print('test notify read');
                       c.value.listen((scanResult) {
 //                        Text('$scanResult');
                         print('${device.name} found! rssi: $scanResult');
+                        print("$scanResult");
+                        print('test notify listen');
+                        print("$_getRandomBytes()");
                       });
                     },
                     descriptorTiles: c.descriptors
@@ -292,25 +302,27 @@ class DeviceScreen extends StatelessWidget {
                 trailing: StreamBuilder<bool>(
                   stream: device.isDiscoveringServices,
                   initialData: false,
-                  builder: (c, snapshot) => IndexedStack(
-                    index: snapshot.data ? 1 : 0,
-                    children: <Widget>[
-                      IconButton(
-                        icon: Icon(Icons.refresh),
-                        onPressed: () => device.discoverServices(),
-                      ),
-                      IconButton(
-                        icon: SizedBox(
-                          child: CircularProgressIndicator(
-                            valueColor: AlwaysStoppedAnimation(Colors.grey),
-                          ),
-                          width: 18.0,
-                          height: 18.0,
+                  builder: (c, snapshot) {
+                    return IndexedStack(
+                      index: snapshot.data ? 1 : 0,
+                      children: <Widget>[
+                        IconButton(
+                          icon: Icon(Icons.refresh),
+                          onPressed: () => device.discoverServices(),
                         ),
-                        onPressed: null,
-                      ),
-                    ],
-                  ),
+                        IconButton(
+                          icon: SizedBox(
+                            child: CircularProgressIndicator(
+                              valueColor: AlwaysStoppedAnimation(Colors.grey),
+                            ),
+                            width: 18.0,
+                            height: 18.0,
+                          ),
+                          onPressed: null,
+                        ),
+                      ],
+                    );
+                  },
                 ),
               ),
             ),

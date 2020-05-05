@@ -4,6 +4,8 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_blue/flutter_blue.dart';
+import 'package:syncfusion_flutter_charts/charts.dart';
+import 'package:syncfusion_flutter_core/core.dart';
 
 class ScanResultTile extends StatelessWidget {
   const ScanResultTile({Key key, this.result, this.onTap}) : super(key: key);
@@ -148,8 +150,7 @@ class ServiceTile extends StatelessWidget {
     } else {
       return ListTile(
         title: Text('Service'),
-        subtitle:
-            Text('0x${service.uuid.toString()}'),
+        subtitle: Text('0x${service.uuid.toString()}'),
       );
     }
   }
@@ -178,14 +179,21 @@ class CharacteristicTile extends StatelessWidget {
       initialData: characteristic.lastValue,
       builder: (c, snapshot) {
         final value = snapshot.data;
+        dynamic chartData = [
+          MedicalData(DateTime.now(), 0),
+        ];
+        chartData.add(DateTime.now(), value);
         return ExpansionTile(
           title: ListTile(
             title: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
-                Text('Characteristic'),
-                Text('0x${characteristic.uuid.toString()}',
+                Text('$characteristic.uuid.toString()' ==
+                        '00b3b02e-928b-11e9-bc42-526af7764f64'
+                    ? 'EKG'
+                    : '${characteristic.uuid.toString()} not'),
+                Text('${characteristic.uuid.toString()}',
                     style: Theme.of(context).textTheme.bodyText2.copyWith(
                         color: Theme.of(context).textTheme.caption.color))
               ],
@@ -205,28 +213,42 @@ class CharacteristicTile extends StatelessWidget {
               ),
               Text('R'),
               SizedBox(
-                width: 10,
+                width: 20,
               ),
               IconButton(
                 icon: Icon(Icons.edit,
-                    color:
-                        Theme.of(context).iconTheme.color.withOpacity(0.5)),
+                    color: Theme.of(context).iconTheme.color.withOpacity(0.5)),
                 onPressed: onWritePressed,
               ),
               Text('W'),
               SizedBox(
-                width: 10,
+                width: 20,
               ),
               IconButton(
                 icon: Icon(
                     characteristic.isNotifying
                         ? Icons.sync_disabled
                         : Icons.sync,
-                    color:
-                        Theme.of(context).iconTheme.color.withOpacity(0.5)),
+                    color: Theme.of(context).iconTheme.color.withOpacity(0.5)),
                 onPressed: onNotificationPressed,
               ),
-              Text('Notify')
+//              Text('Notify')
+              SfCartesianChart(
+                legend: Legend(isVisible: true),
+                zoomPanBehavior:
+                    ZoomPanBehavior(enablePinching: true, enablePanning: true),
+                primaryXAxis: DateTimeAxis(),
+                series: <ChartSeries<MedicalData, DateTime>>[
+                  LineSeries<MedicalData, DateTime>(
+                    name: 'EKG',
+                    dataSource: chartData,
+                    xValueMapper: (MedicalData medicalData, _) =>
+                        medicalData.dateTime,
+                    yValueMapper: (MedicalData medicalData, _) =>
+                        medicalData.ekg,
+                  ),
+                ],
+              ),
             ],
           ),
           children: descriptorTiles,
@@ -234,6 +256,16 @@ class CharacteristicTile extends StatelessWidget {
       },
     );
   }
+}
+
+class MedicalData {
+  MedicalData(
+    this.dateTime,
+    this.ekg,
+  );
+
+  final DateTime dateTime;
+  final num ekg;
 }
 
 class DescriptorTile extends StatelessWidget {
