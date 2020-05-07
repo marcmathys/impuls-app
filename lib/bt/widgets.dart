@@ -5,7 +5,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_blue/flutter_blue.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
-import 'package:syncfusion_flutter_core/core.dart';
 
 class ScanResultTile extends StatelessWidget {
   const ScanResultTile({Key key, this.result, this.onTap}) : super(key: key);
@@ -156,7 +155,7 @@ class ServiceTile extends StatelessWidget {
   }
 }
 
-class CharacteristicTile extends StatelessWidget {
+class CharacteristicTile extends StatefulWidget {
   final BluetoothCharacteristic characteristic;
   final List<DescriptorTile> descriptorTiles;
   final VoidCallback onReadPressed;
@@ -173,99 +172,140 @@ class CharacteristicTile extends StatelessWidget {
       : super(key: key);
 
   @override
+  _CharacteristicTileState createState() => _CharacteristicTileState();
+}
+
+class _CharacteristicTileState extends State<CharacteristicTile> {
+  final List<MedicalData> _chartData = [
+    MedicalData(DateTime.now(), 0),
+  ];
+
+  @override
   Widget build(BuildContext context) {
     return StreamBuilder<List<int>>(
-      stream: characteristic.value,
-      initialData: characteristic.lastValue,
+      stream: widget.characteristic.value,
+      initialData: widget.characteristic.lastValue,
       builder: (c, snapshot) {
-        final value = snapshot.data;
-        dynamic chartData = [
-          MedicalData(DateTime.now(), 0),
-        ];
-        chartData.add(DateTime.now(), value);
-        return ExpansionTile(
-          title: ListTile(
-            title: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                Text('$characteristic.uuid.toString()' ==
-                        '00b3b02e-928b-11e9-bc42-526af7764f64'
-                    ? 'EKG'
-                    : '${characteristic.uuid.toString()} not'),
-                Text('${characteristic.uuid.toString()}',
-                    style: Theme.of(context).textTheme.bodyText2.copyWith(
-                        color: Theme.of(context).textTheme.caption.color))
-              ],
-            ),
-            subtitle: Text(value.toString()),
-            contentPadding: EdgeInsets.all(0.0),
-          ),
-          trailing: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: <Widget>[
-              IconButton(
-                icon: Icon(
-                  Icons.file_download,
-                  color: Theme.of(context).iconTheme.color.withOpacity(0.5),
+        final List<int> ekgValues = snapshot.data;
+        if (ekgValues.length == 2) {
+          _chartData.add(
+              MedicalData(DateTime.now(), ekgValues[0] | ekgValues[1] << 8));
+        }
+        if (ekgValues.length == 4) {
+          _chartData.add(
+              MedicalData(DateTime.now(), ekgValues[0] | ekgValues[1] << 8));
+        }
+        return Column(
+          children: <Widget>[
+            Chart(chartData: _chartData),
+            ExpansionTile(
+              title: ListTile(
+                title: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    Text(widget.characteristic.uuid
+                            .toString()
+                            .contains('526af7764f64')
+                        ? 'EKG'
+                        : ''),
+                    Text(widget.characteristic.uuid
+                            .toString()
+                            .contains('df60bd72')
+                        ? 'BRS'
+                        : ''),
+                    Text('${widget.characteristic.uuid.toString()}',
+                        style: Theme.of(context).textTheme.bodyText2.copyWith(
+                            color: Theme.of(context).textTheme.caption.color))
+                  ],
                 ),
-                onPressed: onReadPressed,
+                subtitle: Text(ekgValues.toString()),
+                contentPadding: EdgeInsets.all(0.0),
               ),
-              Text('R'),
-              SizedBox(
-                width: 20,
-              ),
-              IconButton(
-                icon: Icon(Icons.edit,
-                    color: Theme.of(context).iconTheme.color.withOpacity(0.5)),
-                onPressed: onWritePressed,
-              ),
-              Text('W'),
-              SizedBox(
-                width: 20,
-              ),
-              IconButton(
-                icon: Icon(
-                    characteristic.isNotifying
-                        ? Icons.sync_disabled
-                        : Icons.sync,
-                    color: Theme.of(context).iconTheme.color.withOpacity(0.5)),
-                onPressed: onNotificationPressed,
-              ),
-//              Text('Notify')
-              SfCartesianChart(
-                legend: Legend(isVisible: true),
-                zoomPanBehavior:
-                    ZoomPanBehavior(enablePinching: true, enablePanning: true),
-                primaryXAxis: DateTimeAxis(),
-                series: <ChartSeries<MedicalData, DateTime>>[
-                  LineSeries<MedicalData, DateTime>(
-                    name: 'EKG',
-                    dataSource: chartData,
-                    xValueMapper: (MedicalData medicalData, _) =>
-                        medicalData.dateTime,
-                    yValueMapper: (MedicalData medicalData, _) =>
-                        medicalData.ekg,
+              trailing: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: <Widget>[
+                  IconButton(
+                    icon: Icon(
+                      Icons.file_download,
+                      color: Theme.of(context).iconTheme.color.withOpacity(0.5),
+                    ),
+                    onPressed: widget.onReadPressed,
+                  ),
+                  Text('R'),
+                  SizedBox(
+                    width: 20,
+                  ),
+                  IconButton(
+                    icon: Icon(Icons.edit,
+                        color:
+                            Theme.of(context).iconTheme.color.withOpacity(0.5)),
+                    onPressed: widget.onWritePressed,
+                  ),
+                  Text('W'),
+                  SizedBox(
+                    width: 20,
+                  ),
+                  IconButton(
+                    icon: Icon(
+                        widget.characteristic.isNotifying
+                            ? Icons.sync_disabled
+                            : Icons.sync,
+                        color:
+                            Theme.of(context).iconTheme.color.withOpacity(0.5)),
+                    onPressed: widget.onNotificationPressed,
                   ),
                 ],
               ),
-            ],
-          ),
-          children: descriptorTiles,
+              children: widget.descriptorTiles,
+            ),
+          ],
         );
       },
     );
   }
 }
 
+class Chart extends StatelessWidget {
+  const Chart({
+    Key key,
+    @required List<MedicalData> chartData,
+  })  : _chartData = chartData,
+        super(key: key);
+
+  final List<MedicalData> _chartData;
+
+  @override
+  Widget build(BuildContext context) {
+    return SfCartesianChart(
+      legend: Legend(isVisible: true),
+      zoomPanBehavior:
+          ZoomPanBehavior(enablePinching: true, enablePanning: true),
+      primaryXAxis: DateTimeAxis(),
+      series: <ChartSeries<MedicalData, DateTime>>[
+        LineSeries<MedicalData, DateTime>(
+          name: 'EKG',
+          dataSource: _chartData,
+          xValueMapper: (MedicalData medicalData, _) => medicalData.dateTime,
+          yValueMapper: (MedicalData medicalData, _) => medicalData.ekgHigh,
+        ),
+      ],
+    );
+  }
+}
+
 class MedicalData {
-  MedicalData(
-    this.dateTime,
-    this.ekg,
-  );
+  MedicalData(this.dateTime, this.ekgHigh);
 
   final DateTime dateTime;
-  final num ekg;
+  final num ekgHigh;
+}
+
+class BRSData {
+  BRSData(this.dateTime, this.brsHigh);
+
+  final DateTime dateTime;
+  final num brsHigh;
 }
 
 class DescriptorTile extends StatelessWidget {
