@@ -3,7 +3,9 @@
 // BSD-style license that can be found in the LICENSE file.
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_blue/flutter_blue.dart';
+import 'package:implulsnew/bt/bytefunctions.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 
 class ScanResultTile extends StatelessWidget {
@@ -187,9 +189,10 @@ class _CharacteristicTileState extends State<CharacteristicTile> {
       initialData: widget.characteristic.lastValue,
       builder: (c, snapshot) {
         final List<int> ekgValues = snapshot.data;
+        final ByteData bytedata = getByteDataFromBitList( twoByteList: ekgValues );
         if (ekgValues.length == 2) {
           _chartData.add(
-              MedicalData(DateTime.now(), ekgValues[0] | ekgValues[1] << 8));
+              MedicalData(DateTime.now(), bytedata.getInt16(0) ));
         }
         if (ekgValues.length == 4) {
           _chartData.add(
