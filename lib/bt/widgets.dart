@@ -189,7 +189,7 @@ class _CharacteristicTileState extends State<CharacteristicTile> {
       initialData: widget.characteristic.lastValue,
       builder: (c, snapshot) {
         final List<int> ekgValues = snapshot.data;
-        final ByteData bytedata = getByteDataFromBitList( twoByteList: ekgValues );
+        final ByteData bytedata = getByteDataFromBitList( ekgValues ); // set is4Byte true for list of 4 bytes float 
         if (ekgValues.length == 2) {
           _chartData.add(
               MedicalData(DateTime.now(), bytedata.getInt16(0) ));

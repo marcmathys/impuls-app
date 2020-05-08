@@ -2,16 +2,16 @@ import 'dart:typed_data';
 
 import 'package:flutter/services.dart';
 
-ByteData getByteDataFromBitList(  { bool is4Bytes = false ,List<int> twoByteList  ,List<double> fourByteList } )
+ByteData getByteDataFromBitList( List<int> intList ,{ bool is4Bytes = false  } )
 {
    if(!is4Bytes)
    {
-    Int16List toObjectForm =  Int16List.fromList(twoByteList);
+    Int16List toObjectForm =  Int16List.fromList(intList);
     return ByteData.sublistView(toObjectForm);
    }
    else
-   {
-     Float32List toObjectform = Float32List.fromList(fourByteList);
+   { var listDouble = intList.map((i) => i.toDouble()).toList();
+     Float32List toObjectform = Float32List.fromList(listDouble);
      return ByteData.sublistView(toObjectform);
    }
 
