@@ -151,19 +151,12 @@ class DeviceScreen extends StatelessWidget {
 
   final BluetoothDevice device;
 
-
-
   List<int> _getRandomBytes() {
     return [
       0X6F,
       0X6E
     ];
   }
-
-
-
-
-
 
   List<Widget> _buildServiceTiles(List<BluetoothService> services) {
     return services
@@ -176,28 +169,17 @@ class DeviceScreen extends StatelessWidget {
                     characteristic: c,
                     onReadPressed: () => c.read(),
                     onWritePressed: () async {
-//                      await c.write(_getRandomBytes(), withoutResponse: true);
                       await c.write(_getRandomBytes(), withoutResponse: true);
-                      print(c.write(_getRandomBytes()));
                       await c.read();
-                      print(c.read());
                       c.value.listen((scanResult) {
-//                        Text('$scanResult');
-                        print('${device.name} found! rssi2: $scanResult');
-                        print("$scanResult");
-                        print('test listen');
+                        print('${device.name} data found! $scanResult');
                       });
                     },
                     onNotificationPressed: () async {
                       await c.setNotifyValue(!c.isNotifying);
                       await c.read();
-                      print('test notify read');
                       c.value.listen((scanResult) {
-//                        Text('$scanResult');
-                        print('${device.name} found! rssi: $scanResult');
-                        print("$scanResult");
-                        print('test notify listen');
-                        print("$_getRandomBytes()");
+                        print('${device.name} datfound! notify: $scanResult');
                       });
                     },
                     descriptorTiles: c.descriptors
@@ -216,36 +198,6 @@ class DeviceScreen extends StatelessWidget {
         )
         .toList();
   }
-
-// Taken from an other older progam using flutter-blue
-//  Map<BluetoothCharacteristicIdentifier, StreamSubscription> valueChangedSubscriptions = {};
-//
-//  _setNotification(BluetoothCharacteristic c) async {
-//    if (c.isNotifying) {
-//      await device.setNotifyValue(c, false);
-//      // Cancel subscription
-//      valueChangedSubscriptions[c.id]?.cancel();
-//      valueChangedSubscriptions.remove(c.id);
-//    } else {
-//      await device.setNotifyValue(c, true);
-//      // ignore: cancel_subscriptions
-//      final sub = device.onValueChanged(c).listen((d) {
-//        setState(() {
-//          print('onValueChanged $d');
-//        });
-//      });
-//      // Add to map
-//      valueChangedSubscriptions[c.id] = sub;
-//    }
-//    setState(() {});
-//  }
-  // Listen to scan results
-
-//  var subscription = device.charateristic.scanResults.listen((scanResult) {
-// do something with scan result
-//    device = scanResult.device;
-//    print('${device.name} found! rssi: ${scanResult.rssi}');
-//  });
 
   @override
   Widget build(BuildContext context) {

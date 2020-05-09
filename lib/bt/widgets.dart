@@ -3,6 +3,7 @@
 // BSD-style license that can be found in the LICENSE file.
 
 import 'package:flutter/material.dart';
+import 'package:flutter/painting.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_blue/flutter_blue.dart';
 import 'package:implulsnew/bt/bytefunctions.dart';
@@ -181,6 +182,7 @@ class _CharacteristicTileState extends State<CharacteristicTile> {
   final List<MedicalData> _chartData = [
     MedicalData(DateTime.now(), 0),
   ];
+  final _listData = [];
 
   @override
   Widget build(BuildContext context) {
@@ -189,18 +191,27 @@ class _CharacteristicTileState extends State<CharacteristicTile> {
       initialData: widget.characteristic.lastValue,
       builder: (c, snapshot) {
         final List<int> ekgValues = snapshot.data;
-        final ByteData bytedata = getByteDataFromBitList( ekgValues ); // set is4Byte true for list of 4 bytes float 
+        final ByteData bytedata = getByteDataFromBitList(
+            ekgValues ); // set is4Byte true for list of 4 bytes float
         if (ekgValues.length == 2) {
-          _chartData.add(
-              MedicalData(DateTime.now(), bytedata.getInt16(0) ));
+          _chartData.add(MedicalData(DateTime.now(), bytedata.getInt16(0) ));
         }
         if (ekgValues.length == 4) {
-          _chartData.add(
-              MedicalData(DateTime.now(), ekgValues[0] | ekgValues[1] << 8));
+          _listData.add(bytedata.getFloat32(0));
         }
         return Column(
           children: <Widget>[
-            Chart(chartData: _chartData),
+            Container(height: 300, child: Chart(chartData: _chartData)),
+            Container(
+              height: 50,
+              child: ListView.builder(
+                  scrollDirection: Axis.horizontal,
+                  itemCount: 30,
+                  reverse: true,
+                  itemBuilder: (BuildContext ctxt, int index) {
+                    return Container(height: 30, child: Text('$_listData[index]'));
+                  }),
+            ),
             ExpansionTile(
               title: ListTile(
                 title: Column(
@@ -237,7 +248,7 @@ class _CharacteristicTileState extends State<CharacteristicTile> {
                   ),
                   Text('R'),
                   SizedBox(
-                    width: 20,
+                    width: 30,
                   ),
                   IconButton(
                     icon: Icon(Icons.edit,
@@ -247,7 +258,7 @@ class _CharacteristicTileState extends State<CharacteristicTile> {
                   ),
                   Text('W'),
                   SizedBox(
-                    width: 20,
+                    width: 30,
                   ),
                   IconButton(
                     icon: Icon(
@@ -302,13 +313,6 @@ class MedicalData {
 
   final DateTime dateTime;
   final num ekgHigh;
-}
-
-class BRSData {
-  BRSData(this.dateTime, this.brsHigh);
-
-  final DateTime dateTime;
-  final num brsHigh;
 }
 
 class DescriptorTile extends StatelessWidget {

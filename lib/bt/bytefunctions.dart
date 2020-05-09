@@ -1,5 +1,4 @@
 import 'dart:typed_data';
-
 import 'package:flutter/services.dart';
 
 ByteData getByteDataFromBitList( List<int> intList ,{ bool is4Bytes = false  } )
