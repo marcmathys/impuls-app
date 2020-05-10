@@ -3,11 +3,10 @@
 // BSD-style license that can be found in the LICENSE file.
 
 import 'package:flutter/material.dart';
-import 'package:flutter/painting.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_blue/flutter_blue.dart';
-import 'package:implulsnew/bt/bytefunctions.dart';
-import 'package:syncfusion_flutter_charts/charts.dart';
+import 'graph.dart';
+import 'bytefunctions.dart';
 
 class ScanResultTile extends StatelessWidget {
   const ScanResultTile({Key key, this.result, this.onTap}) : super(key: key);
@@ -182,36 +181,31 @@ class _CharacteristicTileState extends State<CharacteristicTile> {
   final List<MedicalData> _chartData = [
     MedicalData(DateTime.now(), 0),
   ];
-  final _listData = [];
 
+  final _listData = [];
+  
   @override
   Widget build(BuildContext context) {
     return StreamBuilder<List<int>>(
       stream: widget.characteristic.value,
       initialData: widget.characteristic.lastValue,
       builder: (c, snapshot) {
-        final List<int> ekgValues = snapshot.data;
+        final List<int> _ekgValues = snapshot.data;
+        Swap(_ekgValues);
+        
         final ByteData bytedata = getByteDataFromBitList(
-            ekgValues ); // set is4Byte true for list of 4 bytes float
-        if (ekgValues.length == 2) {
-          _chartData.add(MedicalData(DateTime.now(), bytedata.getInt16(0) ));
+            _ekgValues); // set is4Byte true for list of 4 bytes float
+        if (_ekgValues.length == 2) {
+          _chartData.add(MedicalData(DateTime.now(), bytedata.getInt16(0)));
         }
-        if (ekgValues.length == 4) {
+        if (_ekgValues.length == 4) {
           _listData.add(bytedata.getFloat32(0));
         }
         return Column(
           children: <Widget>[
-            Container(height: 300, child: Chart(chartData: _chartData)),
-            Container(
-              height: 50,
-              child: ListView.builder(
-                  scrollDirection: Axis.horizontal,
-                  itemCount: 30,
-                  reverse: true,
-                  itemBuilder: (BuildContext ctxt, int index) {
-                    return Container(height: 30, child: Text('$_listData[index]'));
-                  }),
-            ),
+            (_ekgValues.length == 2)
+                ? Chart(chartData: _chartData)
+                : ScrollList(listData: _listData),
             ExpansionTile(
               title: ListTile(
                 title: Column(
@@ -233,12 +227,23 @@ class _CharacteristicTileState extends State<CharacteristicTile> {
                             color: Theme.of(context).textTheme.caption.color))
                   ],
                 ),
-                subtitle: Text(ekgValues.toString()),
+                subtitle: Text(_ekgValues.toString()),
                 contentPadding: EdgeInsets.all(0.0),
               ),
               trailing: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: <Widget>[
+                  IconButton(
+                    icon: Icon(
+                      Icons.cancel,
+                      color: Theme.of(context).iconTheme.color.withOpacity(0.5),
+                    ),
+                    onPressed:  _clearLists,
+                  ),
+                  Text('data'),
+                  SizedBox(
+                    width: 40,
+                  ),
                   IconButton(
                     icon: Icon(
                       Icons.file_download,
@@ -248,7 +253,7 @@ class _CharacteristicTileState extends State<CharacteristicTile> {
                   ),
                   Text('R'),
                   SizedBox(
-                    width: 30,
+                    width: 40,
                   ),
                   IconButton(
                     icon: Icon(Icons.edit,
@@ -258,7 +263,7 @@ class _CharacteristicTileState extends State<CharacteristicTile> {
                   ),
                   Text('W'),
                   SizedBox(
-                    width: 30,
+                    width: 40,
                   ),
                   IconButton(
                     icon: Icon(
@@ -278,41 +283,39 @@ class _CharacteristicTileState extends State<CharacteristicTile> {
       },
     );
   }
-}
 
-class Chart extends StatelessWidget {
-  const Chart({
-    Key key,
-    @required List<MedicalData> chartData,
-  })  : _chartData = chartData,
-        super(key: key);
-
-  final List<MedicalData> _chartData;
-
-  @override
-  Widget build(BuildContext context) {
-    return SfCartesianChart(
-      legend: Legend(isVisible: true),
-      zoomPanBehavior:
-          ZoomPanBehavior(enablePinching: true, enablePanning: true),
-      primaryXAxis: DateTimeAxis(),
-      series: <ChartSeries<MedicalData, DateTime>>[
-        LineSeries<MedicalData, DateTime>(
-          name: 'EKG',
-          dataSource: _chartData,
-          xValueMapper: (MedicalData medicalData, _) => medicalData.dateTime,
-          yValueMapper: (MedicalData medicalData, _) => medicalData.ekgHigh,
-        ),
-      ],
-    );
+  void _clearLists() {
+    for (var i = 1; i <= _chartData.length - 1; i++) {
+       _chartData.removeAt(i);
+          };
+    for (var i = 1; i <= _listData.length - 1; i++) {
+      _listData.removeAt(i);
+    };
   }
 }
 
-class MedicalData {
-  MedicalData(this.dateTime, this.ekgHigh);
+class ScrollList extends StatelessWidget {
+  const ScrollList({
+    Key key,
+    @required List listData,
+  })  : _listData = listData,
+        super(key: key);
 
-  final DateTime dateTime;
-  final num ekgHigh;
+  final List _listData;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 50,
+      child: ListView.builder(
+          scrollDirection: Axis.horizontal,
+          itemCount: 30,
+          reverse: true,
+          itemBuilder: (BuildContext ctxt, int index) {
+            return Container(height: 30, child: Text( (_listData != [] ? '$_listData[index]' : '')));
+          }),
+    );
+  }
 }
 
 class DescriptorTile extends StatelessWidget {
@@ -354,13 +357,13 @@ class DescriptorTile extends StatelessWidget {
             ),
             onPressed: onReadPressed,
           ),
-          IconButton(
-            icon: Icon(
-              Icons.file_upload,
-              color: Theme.of(context).iconTheme.color.withOpacity(0.5),
-            ),
-            onPressed: onWritePressed,
-          )
+//          IconButton(
+//            icon: Icon(
+//              Icons.file_upload,
+//              color: Theme.of(context).iconTheme.color.withOpacity(0.5),
+//            ),
+//            onPressed: onWritePressed,
+//          )
         ],
       ),
     );

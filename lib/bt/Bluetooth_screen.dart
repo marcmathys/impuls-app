@@ -1,14 +1,12 @@
 import 'dart:async';
-
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_blue/flutter_blue.dart';
 import 'package:implulsnew/bt/widgets.dart';
+import 'package:implulsnew/styles/button.dart';
 
 const String ekg_UUID = "00b3b2ae-928b-11e9-bc42-526af7764f64";
 
-//void main() {
-//  runApp(FlutterBlueApp());
-//}
 
 class FlutterBlueApp extends StatelessWidget {
   @override
@@ -146,16 +144,16 @@ class FindDevicesScreen extends StatelessWidget {
   }
 }
 
+const AsciiCodec ascii = AsciiCodec();
+var _writeInput = 'on';
+
 class DeviceScreen extends StatelessWidget {
   const DeviceScreen({Key key, this.device}) : super(key: key);
 
   final BluetoothDevice device;
 
-  List<int> _getRandomBytes() {
-    return [
-      0X6F,
-      0X6E
-    ];
+  List<int> _writeToDeviceBytes() {
+    return ascii.encode(_writeInput).toList();
   }
 
   List<Widget> _buildServiceTiles(List<BluetoothService> services) {
@@ -169,25 +167,34 @@ class DeviceScreen extends StatelessWidget {
                     characteristic: c,
                     onReadPressed: () => c.read(),
                     onWritePressed: () async {
-                      await c.write(_getRandomBytes(), withoutResponse: true);
+//                      await c.write(_getRandomBytes(), withoutResponse: true);
+                      await c.write(_writeToDeviceBytes(),
+                          withoutResponse: true);
+                      print(c.write(_writeToDeviceBytes()));
+                      print(_writeToDeviceBytes());
                       await c.read();
+                      print(c.read());
                       c.value.listen((scanResult) {
-                        print('${device.name} data found! $scanResult');
+//                        Text('$scanResult');
+                        print('${device.name} found! write: $scanResult');
                       });
                     },
                     onNotificationPressed: () async {
                       await c.setNotifyValue(!c.isNotifying);
-                      await c.read();
-                      c.value.listen((scanResult) {
-                        print('${device.name} datfound! notify: $scanResult');
-                      });
+//                      await c.read();
+//                      c.value.listen((scanResult) {
+////                        Text('$scanResult');
+//                        print('${device.name} found! notify: $scanResult');
+//                        print("$_getRandomBytes()");
+//                      });
                     },
                     descriptorTiles: c.descriptors
                         .map(
                           (d) => DescriptorTile(
                             descriptor: d,
                             onReadPressed: () => d.read(),
-                            onWritePressed: () => d.write(_getRandomBytes()),
+                            onWritePressed: () =>
+                                d.write(_writeToDeviceBytes()),
                           ),
                         )
                         .toList(),
@@ -299,6 +306,41 @@ class DeviceScreen extends StatelessWidget {
                 );
               },
             ),
+            (device.services != null ? Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+              ButtonButton(
+                onPressed: () { print('pressed'); },
+                child: Container(
+                width: 300,
+                color: Colors.indigo.shade50,
+                child: TextField(
+                  onChanged: (text) { _writeInput = text; },
+                  textAlign: TextAlign.center,
+                  style: TextStyle(color: Colors.black),
+                  decoration: InputDecoration(
+                      labelText: "Choose Characteristic, then write",
+                      border: OutlineInputBorder()),
+                ),
+
+            ),
+              ),
+                SizedBox(
+                  width: 30,
+                ),
+                Builder(
+                  builder: (context) => ButtonButton(
+                    child: Text('CHECK'),
+                    onPressed: () {
+                      Scaffold.of(context).showSnackBar(SnackBar(
+                        content: Text('This is what you will write --- $_writeInput'),
+                        duration: Duration(seconds: 10),
+                      ));
+                    },
+                  ),
+                ),
+              ],
+            ) : (Text(' ')))
           ],
         ),
       ),
