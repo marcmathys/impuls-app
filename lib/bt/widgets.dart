@@ -5,6 +5,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_blue/flutter_blue.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
+import 'dart:io';
+import 'dart:typed_data';
+import 'dart:convert';
 
 class ScanResultTile extends StatelessWidget {
   const ScanResultTile({Key key, this.result, this.onTap}) : super(key: key);
@@ -187,13 +190,14 @@ class _CharacteristicTileState extends State<CharacteristicTile> {
       initialData: widget.characteristic.lastValue,
       builder: (c, snapshot) {
         final List<int> ekgValues = snapshot.data;
+
+
         if (ekgValues.length == 2) {
           _chartData.add(
-              MedicalData(DateTime.now(), ekgValues[0] | ekgValues[1] << 8));
+              MedicalData(DateTime.now(), ekgValues[0]));
         }
         if (ekgValues.length == 4) {
-          _chartData.add(
-              MedicalData(DateTime.now(), ekgValues[0] | ekgValues[1] << 8));
+          _chartData.add(MedicalData(DateTime.now(), ekgValues[0]));
         }
         return Column(
           children: <Widget>[

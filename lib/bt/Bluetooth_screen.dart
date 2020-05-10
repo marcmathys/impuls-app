@@ -176,9 +176,7 @@ class DeviceScreen extends StatelessWidget {
                     characteristic: c,
                     onReadPressed: () => c.read(),
                     onWritePressed: () async {
-//                      await c.write(_getRandomBytes(), withoutResponse: true);
                       await c.write(_getRandomBytes(), withoutResponse: true);
-                      print(c.write(_getRandomBytes()));
                       await c.read();
                       print(c.read());
                       c.value.listen((scanResult) {
