@@ -208,140 +208,142 @@ class DeviceScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(device.name),
-        actions: <Widget>[
-          StreamBuilder<BluetoothDeviceState>(
-            stream: device.state,
-            initialData: BluetoothDeviceState.connecting,
-            builder: (c, snapshot) {
-              VoidCallback onPressed;
-              String text;
-              switch (snapshot.data) {
-                case BluetoothDeviceState.connected:
-                  onPressed = () => device.disconnect();
-                  text = 'DISCONNECT';
-                  break;
-                case BluetoothDeviceState.disconnected:
-                  onPressed = () => device.connect();
-                  text = 'CONNECT';
-                  break;
-                default:
-                  onPressed = null;
-                  text = snapshot.data.toString().substring(21).toUpperCase();
-                  break;
-              }
-              return FlatButton(
-                  onPressed: onPressed,
-                  child: Text(
-                    text,
-                    style: Theme.of(context)
-                        .primaryTextTheme
-                        .button
-                        .copyWith(color: Colors.white),
-                  ));
-            },
-          )
-        ],
-      ),
-      body: SingleChildScrollView(
-        child: Column(
-          children: <Widget>[
+    return SafeArea(
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text(device.name),
+          actions: <Widget>[
             StreamBuilder<BluetoothDeviceState>(
               stream: device.state,
               initialData: BluetoothDeviceState.connecting,
-              builder: (c, snapshot) => ListTile(
-                leading: (snapshot.data == BluetoothDeviceState.connected)
-                    ? Icon(Icons.bluetooth_connected)
-                    : Icon(Icons.bluetooth_disabled),
-                title: Text(
-                    'Device is ${snapshot.data.toString().split('.')[1]}. Push right icon to refesh services'),
-                subtitle: Text('${device.id}'),
-                trailing: StreamBuilder<bool>(
-                  stream: device.isDiscoveringServices,
-                  initialData: false,
-                  builder: (c, snapshot) {
-                    return IndexedStack(
-                      index: snapshot.data ? 1 : 0,
-                      children: <Widget>[
-                        IconButton(
-                          icon: Icon(Icons.refresh),
-                          onPressed: () => device.discoverServices(),
-                        ),
-                        IconButton(
-                          icon: SizedBox(
-                            child: CircularProgressIndicator(
-                              valueColor: AlwaysStoppedAnimation(Colors.grey),
-                            ),
-                            width: 18.0,
-                            height: 18.0,
+              builder: (c, snapshot) {
+                VoidCallback onPressed;
+                String text;
+                switch (snapshot.data) {
+                  case BluetoothDeviceState.connected:
+                    onPressed = () => device.disconnect();
+                    text = 'DISCONNECT';
+                    break;
+                  case BluetoothDeviceState.disconnected:
+                    onPressed = () => device.connect();
+                    text = 'CONNECT';
+                    break;
+                  default:
+                    onPressed = null;
+                    text = snapshot.data.toString().substring(21).toUpperCase();
+                    break;
+                }
+                return FlatButton(
+                    onPressed: onPressed,
+                    child: Text(
+                      text,
+                      style: Theme.of(context)
+                          .primaryTextTheme
+                          .button
+                          .copyWith(color: Colors.white),
+                    ));
+              },
+            )
+          ],
+        ),
+        body: SingleChildScrollView(
+          child: Column(
+            children: <Widget>[
+              StreamBuilder<BluetoothDeviceState>(
+                stream: device.state,
+                initialData: BluetoothDeviceState.connecting,
+                builder: (c, snapshot) => ListTile(
+                  leading: (snapshot.data == BluetoothDeviceState.connected)
+                      ? Icon(Icons.bluetooth_connected)
+                      : Icon(Icons.bluetooth_disabled),
+                  title: Text(
+                      'Device is ${snapshot.data.toString().split('.')[1]}. Push right icon to refesh services'),
+                  subtitle: Text('${device.id}'),
+                  trailing: StreamBuilder<bool>(
+                    stream: device.isDiscoveringServices,
+                    initialData: false,
+                    builder: (c, snapshot) {
+                      return IndexedStack(
+                        index: snapshot.data ? 1 : 0,
+                        children: <Widget>[
+                          IconButton(
+                            icon: Icon(Icons.refresh),
+                            onPressed: () => device.discoverServices(),
                           ),
-                          onPressed: null,
-                        ),
-                      ],
-                    );
-                  },
+                          IconButton(
+                            icon: SizedBox(
+                              child: CircularProgressIndicator(
+                                valueColor: AlwaysStoppedAnimation(Colors.grey),
+                              ),
+                              width: 18.0,
+                              height: 18.0,
+                            ),
+                            onPressed: null,
+                          ),
+                        ],
+                      );
+                    },
+                  ),
                 ),
               ),
-            ),
-            StreamBuilder<int>(
-              stream: device.mtu,
-              initialData: 0,
-              builder: (c, snapshot) => ListTile(
-                title: Text('MTU Size'),
-                subtitle: Text('${snapshot.data} bytes'),
+              StreamBuilder<int>(
+                stream: device.mtu,
+                initialData: 0,
+                builder: (c, snapshot) => ListTile(
+                  title: Text('MTU Size'),
+                  subtitle: Text('${snapshot.data} bytes'),
 //                trailing: IconButton(
 //                  icon: Icon(Icons.edit),
 //                  onPressed: () => device.requestMtu(223),
 //                ),
-              ),
-            ),
-            StreamBuilder<List<BluetoothService>>(
-              stream: device.services,
-              initialData: [],
-              builder: (c, snapshot) {
-                return Column(
-                  children: _buildServiceTiles(snapshot.data),
-                );
-              },
-            ),
-            (device.services != null ? Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-              ButtonButton(
-                onPressed: () { print('pressed'); },
-                child: Container(
-                width: 300,
-                color: Colors.indigo.shade50,
-                child: TextField(
-                  onChanged: (text) { _writeInput = text; },
-                  textAlign: TextAlign.center,
-                  style: TextStyle(color: Colors.black),
-                  decoration: InputDecoration(
-                      labelText: "Choose Characteristic, then write",
-                      border: OutlineInputBorder()),
                 ),
-
-            ),
               ),
-                SizedBox(
-                  width: 30,
-                ),
-                Builder(
-                  builder: (context) => ButtonButton(
-                    child: Text('CHECK'),
-                    onPressed: () {
-                      Scaffold.of(context).showSnackBar(SnackBar(
-                        content: Text('This is what you will write --- $_writeInput'),
-                        duration: Duration(seconds: 10),
-                      ));
-                    },
+              StreamBuilder<List<BluetoothService>>(
+                stream: device.services,
+                initialData: [],
+                builder: (c, snapshot) {
+                  return Column(
+                    children: _buildServiceTiles(snapshot.data),
+                  );
+                },
+              ),
+              (device.services != null ? Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                ButtonButton(
+                  onPressed: () { print('pressed'); },
+                  child: Container(
+                  width: 300,
+                  color: Colors.indigo.shade50,
+                  child: TextField(
+                    onChanged: (text) { _writeInput = text; },
+                    textAlign: TextAlign.center,
+                    style: TextStyle(color: Colors.black),
+                    decoration: InputDecoration(
+                        labelText: "Choose Service, then W",
+                        border: OutlineInputBorder()),
                   ),
+
+              ),
                 ),
-              ],
-            ) : (Text(' ')))
-          ],
+                  SizedBox(
+                    width: 30,
+                  ),
+//                Builder(
+//                  builder: (context) => ButtonButton(
+//                    child: Text('CHECK'),
+//                    onPressed: () {
+//                      Scaffold.of(context).showSnackBar(SnackBar(
+//                        content: Text('This is what you will write --- $_writeInput'),
+//                        duration: Duration(seconds: 10),
+//                      ));
+//                    },
+//                  ),
+//                ),
+                ],
+              ) : (Text(' ')))
+            ],
+          ),
         ),
       ),
     );

@@ -17,7 +17,7 @@ ByteData getByteDataFromBitList( List<int> intList ,{ bool is4Bytes = false  } )
    }
 }
 
-void Swap(List<int> ekgValues) {
+void swapBytes(List<int> ekgValues) {
   if (ekgValues.length == 2) {
     temp = ekgValues[0];
     ekgValues[0] = ekgValues[1];

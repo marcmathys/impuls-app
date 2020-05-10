@@ -191,7 +191,7 @@ class _CharacteristicTileState extends State<CharacteristicTile> {
       initialData: widget.characteristic.lastValue,
       builder: (c, snapshot) {
         final List<int> _ekgValues = snapshot.data;
-        Swap(_ekgValues);
+        swapBytes(_ekgValues);
         
         final ByteData bytedata = getByteDataFromBitList(
             _ekgValues); // set is4Byte true for list of 4 bytes float
@@ -233,17 +233,18 @@ class _CharacteristicTileState extends State<CharacteristicTile> {
               trailing: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: <Widget>[
-                  IconButton(
-                    icon: Icon(
-                      Icons.cancel,
-                      color: Theme.of(context).iconTheme.color.withOpacity(0.5),
-                    ),
-                    onPressed:  _clearLists,
-                  ),
-                  Text('data'),
-                  SizedBox(
-                    width: 40,
-                  ),
+// TODO 1 - create a way to clear the graph and the list
+                  //                  IconButton(
+//                    icon: Icon(
+//                      Icons.cancel,
+//                      color: Theme.of(context).iconTheme.color.withOpacity(0.5),
+//                    ),
+//                    onPressed:  _clearLists,
+//                  ),
+//                  Text('data'),
+//                  SizedBox(
+//                    width: 40,
+//                  ),
                   IconButton(
                     icon: Icon(
                       Icons.file_download,
@@ -284,15 +285,16 @@ class _CharacteristicTileState extends State<CharacteristicTile> {
     );
   }
 
+  // TODO 1 function
   void _clearLists() {
     for (var i = 1; i <= _chartData.length - 1; i++) {
-       _chartData.removeAt(i);
-          };
-    for (var i = 1; i <= _listData.length - 1; i++) {
-      _listData.removeAt(i);
-    };
+      _chartData.removeAt(i);}
+
+      for (var i = 1; i <= _listData.length - 1; i++) {
+        _listData.removeAt(i);
+      }
+    }
   }
-}
 
 class ScrollList extends StatelessWidget {
   const ScrollList({
