@@ -1,8 +1,10 @@
 import 'dart:async';
-
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_blue/flutter_blue.dart';
 import 'package:implulsnew/bt/widgets.dart';
+import 'package:implulsnew/styles/button.dart';
+import 'package:implulsnew/styles/h4.dart';
 
 const String ekg_UUID = "00b3b2ae-928b-11e9-bc42-526af7764f64";
 
@@ -146,24 +148,17 @@ class FindDevicesScreen extends StatelessWidget {
   }
 }
 
+const AsciiCodec ascii = AsciiCodec();
+var _writeInput = TextEditingController(text: "");
+
 class DeviceScreen extends StatelessWidget {
   const DeviceScreen({Key key, this.device}) : super(key: key);
 
   final BluetoothDevice device;
 
-
-
-  List<int> _getRandomBytes() {
-    return [
-      0X6F,
-      0X6E
-    ];
+  List<int> _writeToDeviceBytes() {
+    return ascii.encode("on").toList();
   }
-
-
-
-
-
 
   List<Widget> _buildServiceTiles(List<BluetoothService> services) {
     return services
@@ -177,35 +172,32 @@ class DeviceScreen extends StatelessWidget {
                     onReadPressed: () => c.read(),
                     onWritePressed: () async {
 //                      await c.write(_getRandomBytes(), withoutResponse: true);
-                      await c.write(_getRandomBytes(), withoutResponse: true);
-                      print(c.write(_getRandomBytes()));
+                      await c.write(_writeToDeviceBytes(),
+                          withoutResponse: true);
+                      print(c.write(_writeToDeviceBytes()));
                       await c.read();
                       print(c.read());
                       c.value.listen((scanResult) {
 //                        Text('$scanResult');
-                        print('${device.name} found! rssi2: $scanResult');
-                        print("$scanResult");
-                        print('test listen');
+                        print('${device.name} found! write: $scanResult');
                       });
                     },
                     onNotificationPressed: () async {
                       await c.setNotifyValue(!c.isNotifying);
-                      await c.read();
-                      print('test notify read');
-                      c.value.listen((scanResult) {
-//                        Text('$scanResult');
-                        print('${device.name} found! rssi: $scanResult');
-                        print("$scanResult");
-                        print('test notify listen');
-                        print("$_getRandomBytes()");
-                      });
+//                      await c.read();
+//                      c.value.listen((scanResult) {
+////                        Text('$scanResult');
+//                        print('${device.name} found! notify: $scanResult');
+//                        print("$_getRandomBytes()");
+//                      });
                     },
                     descriptorTiles: c.descriptors
                         .map(
                           (d) => DescriptorTile(
                             descriptor: d,
                             onReadPressed: () => d.read(),
-                            onWritePressed: () => d.write(_getRandomBytes()),
+                            onWritePressed: () =>
+                                d.write(_writeToDeviceBytes()),
                           ),
                         )
                         .toList(),
@@ -216,36 +208,6 @@ class DeviceScreen extends StatelessWidget {
         )
         .toList();
   }
-
-// Taken from an other older progam using flutter-blue
-//  Map<BluetoothCharacteristicIdentifier, StreamSubscription> valueChangedSubscriptions = {};
-//
-//  _setNotification(BluetoothCharacteristic c) async {
-//    if (c.isNotifying) {
-//      await device.setNotifyValue(c, false);
-//      // Cancel subscription
-//      valueChangedSubscriptions[c.id]?.cancel();
-//      valueChangedSubscriptions.remove(c.id);
-//    } else {
-//      await device.setNotifyValue(c, true);
-//      // ignore: cancel_subscriptions
-//      final sub = device.onValueChanged(c).listen((d) {
-//        setState(() {
-//          print('onValueChanged $d');
-//        });
-//      });
-//      // Add to map
-//      valueChangedSubscriptions[c.id] = sub;
-//    }
-//    setState(() {});
-//  }
-  // Listen to scan results
-
-//  var subscription = device.charateristic.scanResults.listen((scanResult) {
-// do something with scan result
-//    device = scanResult.device;
-//    print('${device.name} found! rssi: ${scanResult.rssi}');
-//  });
 
   @override
   Widget build(BuildContext context) {
@@ -346,6 +308,28 @@ class DeviceScreen extends StatelessWidget {
                   children: _buildServiceTiles(snapshot.data),
                 );
               },
+            ),
+            Builder(
+              builder: (Context) => ButtonButton(
+                child: Container(
+                  width: 200,
+                  child: TextFormField(
+                    controller: _writeInput,
+                    validator: (value) => (value.isEmpty) ? "on" : null,
+                    textAlign: TextAlign.center,
+                    style: TextStyle(color: Colors.white),
+                    decoration: InputDecoration(
+                        labelText: "Please write here",
+                        border: OutlineInputBorder()),
+                  ),
+                ),
+                onPressed: () {
+                  Scaffold.of(context).showSnackBar(SnackBar(
+                    content: Text('This is what you will write $_writeInput'),
+                    duration: Duration(seconds: 10),
+                  ));
+                },
+              ),
             ),
           ],
         ),
