@@ -7,7 +7,7 @@ ByteData getByteDataFromBitList( List<int> intList ,{ bool is4Bytes = false  } )
 {
    if(!is4Bytes)
    {
-    Int16List toObjectForm =  Int16List.fromList(intList.reversed.toList());
+    Int16List toObjectForm =  Int16List.fromList(intList);
     return ByteData.sublistView(toObjectForm);
    }
    else
