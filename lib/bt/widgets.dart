@@ -194,7 +194,7 @@ class _CharacteristicTileState extends State<CharacteristicTile> {
         swapBytes(_ekgValues);
         
         final ByteData bytedata = getByteDataFromBitList(
-            _ekgValues); // set is4Byte true for list of 4 bytes float
+            _ekgValues , is4Bytes: _ekgValues.length == 4 ); 
         if (_ekgValues.length == 2) {
           _chartData.add(MedicalData(DateTime.now(), bytedata.getInt16(0)));
         }
