@@ -27,7 +27,8 @@ dependencies:
   provider: ^4.0.4
   flutter_blue: ^0.7.2
   google_sign_in: ^4.4.1
-  syncfusion_flutter_charts: ^18.1.42
+  syncfusion_flutter_charts: ^18.1.52
+
 
 
 dev_dependencies:

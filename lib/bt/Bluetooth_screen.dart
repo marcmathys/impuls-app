@@ -1,3 +1,4 @@
+
 import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/material.dart';
@@ -6,7 +7,6 @@ import 'package:implulsnew/bt/widgets.dart';
 import 'package:implulsnew/styles/button.dart';
 
 const String ekg_UUID = "00b3b2ae-928b-11e9-bc42-526af7764f64";
-
 
 class FlutterBlueApp extends StatelessWidget {
   @override
@@ -165,19 +165,21 @@ class DeviceScreen extends StatelessWidget {
                 .map(
                   (c) => CharacteristicTile(
                     characteristic: c,
-                    onReadPressed: () => c.read(),
+//                    onReadPressed: () => c.read(),
                     onWritePressed: () async {
 //                      await c.write(_getRandomBytes(), withoutResponse: true);
                       await c.write(_writeToDeviceBytes(),
                           withoutResponse: true);
                       print(c.write(_writeToDeviceBytes()));
                       print(_writeToDeviceBytes());
-                      await c.read();
-                      print(c.read());
-                      c.value.listen((scanResult) {
-//                        Text('$scanResult');
-                        print('${device.name} found! write: $scanResult');
-                      });
+//                      await c.read();
+//                      print(c.read());
+//                      c.value.listen(
+//                        (scanResult) {
+////                        Text('$scanResult');
+//                          print('${device.name} found! write: $scanResult');
+//                        },
+//                      );
                     },
                     onNotificationPressed: () async {
                       await c.setNotifyValue(!c.isNotifying);
@@ -192,7 +194,7 @@ class DeviceScreen extends StatelessWidget {
                         .map(
                           (d) => DescriptorTile(
                             descriptor: d,
-                            onReadPressed: () => d.read(),
+//                            onReadPressed: () => d.read(),
                             onWritePressed: () =>
                                 d.write(_writeToDeviceBytes()),
                           ),
@@ -307,28 +309,32 @@ class DeviceScreen extends StatelessWidget {
                   );
                 },
               ),
-              (device.services != null ? Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                ButtonButton(
-                  onPressed: () { print('pressed'); },
-                  child: Container(
-                  width: 300,
-                  color: Colors.indigo.shade50,
-                  child: TextField(
-                    onChanged: (text) { _writeInput = text; },
-                    textAlign: TextAlign.center,
-                    style: TextStyle(color: Colors.black),
-                    decoration: InputDecoration(
-                        labelText: "Choose Service, then W",
-                        border: OutlineInputBorder()),
-                  ),
-
-              ),
-                ),
-                  SizedBox(
-                    width: 30,
-                  ),
+              (device.services != null
+                  ? Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: <Widget>[
+                        ButtonButton(
+                          onPressed: () {
+                            print('pressed');
+                          },
+                          child: Container(
+                            width: 300,
+                            color: Colors.indigo.shade50,
+                            child: TextField(
+                              onChanged: (text) {
+                                _writeInput = text;
+                              },
+                              textAlign: TextAlign.center,
+                              style: TextStyle(color: Colors.black),
+                              decoration: InputDecoration(
+                                  labelText: "Choose Service, then W",
+                                  border: OutlineInputBorder()),
+                            ),
+                          ),
+                        ),
+                        SizedBox(
+                          width: 30,
+                        ),
 //                Builder(
 //                  builder: (context) => ButtonButton(
 //                    child: Text('CHECK'),
@@ -340,8 +346,9 @@ class DeviceScreen extends StatelessWidget {
 //                    },
 //                  ),
 //                ),
-                ],
-              ) : (Text(' ')))
+                      ],
+                    )
+                  : (Text(' ')))
             ],
           ),
         ),
