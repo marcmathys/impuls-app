@@ -1,15 +1,35 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:implulsnew/screens/logged_in_user_screen.dart';
-import 'package:flutter/services.dart';
+import 'package:logger/logger.dart';
 
-void main()  {
+void main() {
   WidgetsFlutterBinding.ensureInitialized();
-  SystemChrome.setPreferredOrientations([DeviceOrientation.landscapeLeft, DeviceOrientation.landscapeRight])
-      .then((_) {
-    runApp(MyApp());
-  });
+  runApp(MyApp());
+//  log();
 }
 
+var logger = Logger(
+  printer: PrettyPrinter(),
+);
+
+var loggerNoStack = Logger(
+  printer: PrettyPrinter(methodCount: 0),
+);
+
+//void log() {
+//  logger.d("Log message with 2 methods");
+//
+//  loggerNoStack.i("Info message");
+//
+//  loggerNoStack.w("Just a warning!");
+//
+//  logger.e("Error! Something bad happened", "Test Error");
+//
+//  loggerNoStack.v({"key": 5, "value": "something"});
+//
+//  Future.delayed(Duration(seconds: 5), log);
+//}
 
 class MyApp extends StatelessWidget {
   @override
@@ -31,21 +51,19 @@ class Home extends StatelessWidget {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
-        body: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Center(
-              child: Padding(
-                padding: const EdgeInsets.all(40.0),
-                child: InkWell(
-                  onTap: () => onLogoPressed(context),
-                  child: Image.asset(
-                    "assets/images/screen-shot-2020-03-14-at-102826-pm.png",
-                  ),
+        body: FractionallySizedBox(
+          heightFactor: 0.9,
+          child: Center(
+            child: Padding(
+              padding: const EdgeInsets.all(40.0),
+              child: InkWell(
+                onTap: () => onLogoPressed(context),
+                child: Image.asset(
+                  "assets/images/logoMPapp.png",
                 ),
               ),
             ),
-          ],
+          ),
         ),
       ),
     );

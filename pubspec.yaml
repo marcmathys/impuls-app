@@ -28,7 +28,7 @@ dependencies:
   flutter_blue: ^0.7.2
   google_sign_in: ^4.4.1
   syncfusion_flutter_charts: ^18.1.52
-
+  logger: ^0.9.1
 
 
 dev_dependencies:

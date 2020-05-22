@@ -4,6 +4,7 @@
 
 //import 'bytefunctions.dart';
 //import 'dart:convert';
+//import 'dart:developer';
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -183,36 +184,60 @@ class _CharacteristicTileState extends State<CharacteristicTile> {
   final List<MedicalData> _chartData = [
     MedicalData(DateTime.now(), 0),
   ];
-
   final _listData = [];
-//  final List<int> _ekgValue = [];
+
   @override
   Widget build(BuildContext context) {
     return StreamBuilder<List<int>>(
       stream: widget.characteristic.value,
       initialData: widget.characteristic.lastValue,
       builder: (c, snapshot) {
-        print(snapshot.data);
-        final _ekgValue = snapshot.data;
-//        swapBytes(_ekgValue);
+        var _charactData = snapshot.data;
+
+        print(_charactData);
 
         if (snapshot.data.length == 2) {
           if (_chartData.length > 300) {
             _chartData.removeAt(0);
           }
-          ByteData bytedata2 = ByteData.sublistView(
-              Int16List.fromList(snapshot.data.reversed.toList()));
-          int _ekgValue = bytedata2.getInt16(0, Endian.little);
-          print(_ekgValue);
-//
-          _chartData.add(
-              MedicalData(DateTime.now(), _ekgValue));
-        }
-//        if (_ekgValue.length == 4) {
-//          _listData.add(bytedata.getFloat32(0));
-//        }
+          ByteData bytedata1 = ByteData.sublistView(
+              Uint8List.fromList(_charactData.reversed.toList()));
+          print(bytedata1);
+          int _ekgPoint = bytedata1.getInt16(0, Endian.big);
+          print(_ekgPoint);
 
-//        print(_chartData[0].dateTime);
+          _chartData.add(MedicalData(DateTime.now(), _ekgPoint));
+        } else
+//          if (widget.characteristic.serviceUuid.toString() ==
+//            '00b3b02e-928b-11e9-bc42-526af7764f64') {
+//          print(widget.characteristic.serviceUuid);
+
+//          { var listDouble = intList.map((i) => i.toDouble()).toList();
+////   Float32List toObjectform = Float32List.fromList(listDouble);
+//     return ByteData.sublistView(toObjectform);
+//   }
+
+        {
+          ByteData hup = ByteData.sublistView(Float32List.fromList(
+              _charactData.map((i) => i.toDouble()).toList()));
+//       Float32 _ibiPoint = hup.getFloat32(0, Endian.little);
+//        print(_ibiPoint);
+
+//        _listData.add(_ibiPoint);
+        }
+//        } else
+//        {
+//          ByteData bytedata3 =
+//              ByteData.sublistView(Uint8List.fromList(_charactData.toList()));
+//          int _timeValue1 = bytedata3.getUint32(0, Endian.little);
+//          print('hello');
+//
+//          print(_timeValue1);
+//          _listData.add(_timeValue1);
+//        }
+        ;
+
+        print(_chartData[0].dateTime);
 //        var _listDouble = _ekgValue.map((i) => i.toDouble()).toList();
 
         return Column(
@@ -234,14 +259,14 @@ class _CharacteristicTileState extends State<CharacteristicTile> {
                     Text(widget.characteristic.uuid
                             .toString()
                             .contains('df60bd72')
-                        ? 'BRS'
+                        ? 'IBI'
                         : ''),
                     Text('${widget.characteristic.uuid.toString()}',
                         style: Theme.of(context).textTheme.bodyText2.copyWith(
                             color: Theme.of(context).textTheme.caption.color))
                   ],
                 ),
-                subtitle: Text(_ekgValue.toString()),
+                subtitle: Text(snapshot.data.toString()),
                 contentPadding: EdgeInsets.all(0.0),
               ),
               trailing: Row(
