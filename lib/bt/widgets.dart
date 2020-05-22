@@ -2,11 +2,13 @@
 // All rights reserved. Use of this source code is governed by a
 // BSD-style license that can be found in the LICENSE file.
 
+//import 'bytefunctions.dart';
+//import 'dart:convert';
+import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_blue/flutter_blue.dart';
-import 'graph.dart';
-import 'bytefunctions.dart';
+import 'package:syncfusion_flutter_charts/charts.dart';
 
 class ScanResultTile extends StatelessWidget {
   const ScanResultTile({Key key, this.result, this.onTap}) : super(key: key);
@@ -160,7 +162,7 @@ class ServiceTile extends StatelessWidget {
 class CharacteristicTile extends StatefulWidget {
   final BluetoothCharacteristic characteristic;
   final List<DescriptorTile> descriptorTiles;
-  final VoidCallback onReadPressed;
+//  final VoidCallback onReadPressed;
   final VoidCallback onWritePressed;
   final VoidCallback onNotificationPressed;
 
@@ -168,7 +170,7 @@ class CharacteristicTile extends StatefulWidget {
       {Key key,
       this.characteristic,
       this.descriptorTiles,
-      this.onReadPressed,
+//      this.onReadPressed,
       this.onWritePressed,
       this.onNotificationPressed})
       : super(key: key);
@@ -183,27 +185,39 @@ class _CharacteristicTileState extends State<CharacteristicTile> {
   ];
 
   final _listData = [];
-  
+//  final List<int> _ekgValue = [];
   @override
   Widget build(BuildContext context) {
     return StreamBuilder<List<int>>(
       stream: widget.characteristic.value,
       initialData: widget.characteristic.lastValue,
       builder: (c, snapshot) {
-        final List<int> _ekgValues = snapshot.data;
-        swapBytes(_ekgValues);
-        
-        final ByteData bytedata = getByteDataFromBitList(
-            _ekgValues , is4Bytes: _ekgValues.length == 4 ); 
-        if (_ekgValues.length == 2) {
-          _chartData.add(MedicalData(DateTime.now(), bytedata.getInt16(0)));
+        print(snapshot.data);
+        final _ekgValue = snapshot.data;
+//        swapBytes(_ekgValue);
+
+        if (snapshot.data.length == 2) {
+          if (_chartData.length > 300) {
+            _chartData.removeAt(0);
+          }
+          ByteData bytedata2 = ByteData.sublistView(
+              Int16List.fromList(snapshot.data.reversed.toList()));
+          int _ekgValue = bytedata2.getInt16(0, Endian.little);
+          print(_ekgValue);
+//
+          _chartData.add(
+              MedicalData(DateTime.now(), _ekgValue));
         }
-        if (_ekgValues.length == 4) {
-          _listData.add(bytedata.getFloat32(0));
-        }
+//        if (_ekgValue.length == 4) {
+//          _listData.add(bytedata.getFloat32(0));
+//        }
+
+//        print(_chartData[0].dateTime);
+//        var _listDouble = _ekgValue.map((i) => i.toDouble()).toList();
+
         return Column(
           children: <Widget>[
-            (_ekgValues.length == 2)
+            (snapshot.data.length == 2)
                 ? Chart(chartData: _chartData)
                 : ScrollList(listData: _listData),
             ExpansionTile(
@@ -227,32 +241,12 @@ class _CharacteristicTileState extends State<CharacteristicTile> {
                             color: Theme.of(context).textTheme.caption.color))
                   ],
                 ),
-                subtitle: Text(_ekgValues.toString()),
+                subtitle: Text(_ekgValue.toString()),
                 contentPadding: EdgeInsets.all(0.0),
               ),
               trailing: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: <Widget>[
-// TODO 1 - create a way to clear the graph and the list
-                  //                  IconButton(
-//                    icon: Icon(
-//                      Icons.cancel,
-//                      color: Theme.of(context).iconTheme.color.withOpacity(0.5),
-//                    ),
-//                    onPressed:  _clearLists,
-//                  ),
-//                  Text('data'),
-//                  SizedBox(
-//                    width: 40,
-//                  ),
-                  IconButton(
-                    icon: Icon(
-                      Icons.file_download,
-                      color: Theme.of(context).iconTheme.color.withOpacity(0.5),
-                    ),
-                    onPressed: widget.onReadPressed,
-                  ),
-                  Text('R'),
                   SizedBox(
                     width: 40,
                   ),
@@ -284,17 +278,51 @@ class _CharacteristicTileState extends State<CharacteristicTile> {
       },
     );
   }
+}
 
-  // TODO 1 function
-  void _clearLists() {
-    for (var i = 1; i <= _chartData.length - 1; i++) {
-      _chartData.removeAt(i);}
+class Chart extends StatefulWidget {
+  const Chart({
+    Key key,
+    @required List<MedicalData> chartData,
+  })  : _chartData = chartData,
+        super(key: key);
 
-      for (var i = 1; i <= _listData.length - 1; i++) {
-        _listData.removeAt(i);
-      }
-    }
+  final List<MedicalData> _chartData;
+
+  @override
+  _ChartState createState() => _ChartState();
+}
+
+class _ChartState extends State<Chart> {
+  @override
+  Widget build(BuildContext context) {
+    return SfCartesianChart(
+      legend: Legend(isVisible: true),
+//      zoomPanBehavior:
+//          ZoomPanBehavior(enablePinching: true, enablePanning: true),
+      primaryXAxis: DateTimeAxis(majorGridLines: MajorGridLines(width: 0)),
+      series: <ChartSeries<MedicalData, DateTime>>[
+        LineSeries<MedicalData, DateTime>(
+          name: 'EKG',
+          dataSource: widget._chartData,
+          xValueMapper: (MedicalData medicalData, _) => medicalData.dateTime,
+          yValueMapper: (MedicalData medicalData, _) =>
+              medicalData.ekgPoint.toDouble(),
+          animationDuration: 0,
+          dataLabelSettings: DataLabelSettings(
+              isVisible: false, labelAlignment: ChartDataLabelAlignment.top),
+        ),
+      ],
+    );
   }
+}
+
+class MedicalData {
+  MedicalData(this.dateTime, this.ekgPoint);
+
+  final DateTime dateTime;
+  final num ekgPoint;
+}
 
 class ScrollList extends StatelessWidget {
   const ScrollList({
@@ -314,7 +342,9 @@ class ScrollList extends StatelessWidget {
           itemCount: 30,
           reverse: true,
           itemBuilder: (BuildContext ctxt, int index) {
-            return Container(height: 30, child: Text( (_listData != [] ? '$_listData[index]' : '')));
+            return Container(
+                height: 30,
+                child: Text((_listData != [] ? '$_listData[index]' : '')));
           }),
     );
   }
@@ -322,11 +352,14 @@ class ScrollList extends StatelessWidget {
 
 class DescriptorTile extends StatelessWidget {
   final BluetoothDescriptor descriptor;
-  final VoidCallback onReadPressed;
+//  final VoidCallback onReadPressed;
   final VoidCallback onWritePressed;
 
   const DescriptorTile(
-      {Key key, this.descriptor, this.onReadPressed, this.onWritePressed})
+      {Key key,
+      this.descriptor,
+//        this.onReadPressed,
+      this.onWritePressed})
       : super(key: key);
 
   @override
@@ -352,13 +385,14 @@ class DescriptorTile extends StatelessWidget {
       trailing: Row(
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
-          IconButton(
-            icon: Icon(
-              Icons.file_download,
-              color: Theme.of(context).iconTheme.color.withOpacity(0.5),
-            ),
-            onPressed: onReadPressed,
-          ),
+//          IconButton(
+//            icon: Icon(
+//              Icons.file_download,
+//              color: Theme.of(context).iconTheme.color.withOpacity(0.5),
+//            ),
+//            onPressed: onReadPressed,
+//          ),
+
 //          IconButton(
 //            icon: Icon(
 //              Icons.file_upload,
