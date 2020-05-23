@@ -2,9 +2,6 @@
 // All rights reserved. Use of this source code is governed by a
 // BSD-style license that can be found in the LICENSE file.
 
-//import 'bytefunctions.dart';
-//import 'dart:convert';
-//import 'dart:developer';
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -192,53 +189,38 @@ class _CharacteristicTileState extends State<CharacteristicTile> {
       stream: widget.characteristic.value,
       initialData: widget.characteristic.lastValue,
       builder: (c, snapshot) {
-        var _charactData = snapshot.data;
+        var _btData = snapshot.data;
 
-        print(_charactData);
+        print(_btData);
 
-        if (snapshot.data.length == 2) {
+        if (_btData.length == 2) {
           if (_chartData.length > 300) {
             _chartData.removeAt(0);
           }
           ByteData bytedata1 = ByteData.sublistView(
-              Uint8List.fromList(_charactData.reversed.toList()));
+              Uint8List.fromList(_btData.reversed.toList()));
           print(bytedata1);
           int _ekgPoint = bytedata1.getInt16(0, Endian.big);
           print(_ekgPoint);
 
           _chartData.add(MedicalData(DateTime.now(), _ekgPoint));
-        } else
-//          if (widget.characteristic.serviceUuid.toString() ==
-//            '00b3b02e-928b-11e9-bc42-526af7764f64') {
-//          print(widget.characteristic.serviceUuid);
-
-//          { var listDouble = intList.map((i) => i.toDouble()).toList();
-////   Float32List toObjectform = Float32List.fromList(listDouble);
-//     return ByteData.sublistView(toObjectform);
-//   }
-
-        {
-          ByteData hup = ByteData.sublistView(Float32List.fromList(
-              _charactData.map((i) => i.toDouble()).toList()));
-//       Float32 _ibiPoint = hup.getFloat32(0, Endian.little);
-//        print(_ibiPoint);
-
-//        _listData.add(_ibiPoint);
+        } else if (_btData.length == 4) {
+          ByteData bytedata2 = ByteData.sublistView(
+              Uint8List.fromList(_btData.reversed.toList()));
+          print(bytedata2);
+          if (widget.characteristic.serviceUuid.toString() ==
+              '00b3b02e-928b-11e9-bc42-526af7764f64') {
+            double _ibiPoint = bytedata2.getFloat32(0, Endian.big);
+            print(_ibiPoint);
+            _listData.add(_ibiPoint);
+          } else {
+            int _countDown = bytedata2.getUint32(0, Endian.big);
+            print(_countDown);
+            _listData.add(_countDown);
+          }
         }
-//        } else
-//        {
-//          ByteData bytedata3 =
-//              ByteData.sublistView(Uint8List.fromList(_charactData.toList()));
-//          int _timeValue1 = bytedata3.getUint32(0, Endian.little);
-//          print('hello');
-//
-//          print(_timeValue1);
-//          _listData.add(_timeValue1);
-//        }
-        ;
 
         print(_chartData[0].dateTime);
-//        var _listDouble = _ekgValue.map((i) => i.toDouble()).toList();
 
         return Column(
           children: <Widget>[
