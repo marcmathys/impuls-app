@@ -1,10 +1,7 @@
-
 import 'dart:async';
-import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_blue/flutter_blue.dart';
 import 'package:implulsnew/bt/widgets.dart';
-import 'package:implulsnew/styles/button.dart';
 
 const String ekg_UUID = "00b3b2ae-928b-11e9-bc42-526af7764f64";
 
@@ -143,18 +140,16 @@ class FindDevicesScreen extends StatelessWidget {
     );
   }
 }
+var writeInput = '111, 110';
 
-const AsciiCodec ascii = AsciiCodec();
-var _writeInput = 'on';
+List<int> writeToDeviceBytes() {
+  return writeInput.split(',').map(int.parse).toList();
+}
 
 class DeviceScreen extends StatelessWidget {
   const DeviceScreen({Key key, this.device}) : super(key: key);
 
   final BluetoothDevice device;
-
-  List<int> _writeToDeviceBytes() {
-    return ascii.encode(_writeInput).toList();
-  }
 
   List<Widget> _buildServiceTiles(List<BluetoothService> services) {
     return services
@@ -168,10 +163,10 @@ class DeviceScreen extends StatelessWidget {
 //                    onReadPressed: () => c.read(),
                     onWritePressed: () async {
 //                      await c.write(_getRandomBytes(), withoutResponse: true);
-                      await c.write(_writeToDeviceBytes(),
+                      await c.write(writeToDeviceBytes(),
                           withoutResponse: true);
-                      print(c.write(_writeToDeviceBytes()));
-                      print(_writeToDeviceBytes());
+                      print(c.write(writeToDeviceBytes()));
+                      print(writeToDeviceBytes());
 //                      await c.read();
 //                      print(c.read());
 //                      c.value.listen(
@@ -196,7 +191,7 @@ class DeviceScreen extends StatelessWidget {
                             descriptor: d,
 //                            onReadPressed: () => d.read(),
                             onWritePressed: () =>
-                                d.write(_writeToDeviceBytes()),
+                                d.write(writeToDeviceBytes()),
                           ),
                         )
                         .toList(),
@@ -249,109 +244,68 @@ class DeviceScreen extends StatelessWidget {
           ],
         ),
         body: SingleChildScrollView(
-          child: Column(
-            children: <Widget>[
-              StreamBuilder<BluetoothDeviceState>(
-                stream: device.state,
-                initialData: BluetoothDeviceState.connecting,
-                builder: (c, snapshot) => ListTile(
-                  leading: (snapshot.data == BluetoothDeviceState.connected)
-                      ? Icon(Icons.bluetooth_connected)
-                      : Icon(Icons.bluetooth_disabled),
-                  title: Text(
-                      'Device is ${snapshot.data.toString().split('.')[1]}. Push right icon to refesh services'),
-                  subtitle: Text('${device.id}'),
-                  trailing: StreamBuilder<bool>(
-                    stream: device.isDiscoveringServices,
-                    initialData: false,
-                    builder: (c, snapshot) {
-                      return IndexedStack(
-                        index: snapshot.data ? 1 : 0,
-                        children: <Widget>[
-                          IconButton(
-                            icon: Icon(Icons.refresh),
-                            onPressed: () => device.discoverServices(),
-                          ),
-                          IconButton(
-                            icon: SizedBox(
-                              child: CircularProgressIndicator(
-                                valueColor: AlwaysStoppedAnimation(Colors.grey),
-                              ),
-                              width: 18.0,
-                              height: 18.0,
+            child: Column(
+          children: <Widget>[
+            StreamBuilder<BluetoothDeviceState>(
+              stream: device.state,
+              initialData: BluetoothDeviceState.connecting,
+              builder: (c, snapshot) => ListTile(
+                leading: (snapshot.data == BluetoothDeviceState.connected)
+                    ? Icon(Icons.bluetooth_connected)
+                    : Icon(Icons.bluetooth_disabled),
+                title: Text(
+                    'Device is ${snapshot.data.toString().split('.')[1]}. Push right icon to refesh services'),
+                subtitle: Text('${device.id}'),
+                trailing: StreamBuilder<bool>(
+                  stream: device.isDiscoveringServices,
+                  initialData: false,
+                  builder: (c, snapshot) {
+                    return IndexedStack(
+                      index: snapshot.data ? 1 : 0,
+                      children: <Widget>[
+                        IconButton(
+                          icon: Icon(Icons.refresh),
+                          onPressed: () => device.discoverServices(),
+                        ),
+                        IconButton(
+                          icon: SizedBox(
+                            child: CircularProgressIndicator(
+                              valueColor: AlwaysStoppedAnimation(Colors.grey),
                             ),
-                            onPressed: null,
+                            width: 18.0,
+                            height: 18.0,
                           ),
-                        ],
-                      );
-                    },
-                  ),
+                          onPressed: null,
+                        ),
+                      ],
+                    );
+                  },
                 ),
               ),
-              StreamBuilder<int>(
-                stream: device.mtu,
-                initialData: 0,
-                builder: (c, snapshot) => ListTile(
-                  title: Text('MTU Size'),
-                  subtitle: Text('${snapshot.data} bytes'),
+            ),
+            StreamBuilder<int>(
+              stream: device.mtu,
+              initialData: 0,
+              builder: (c, snapshot) => ListTile(
+                title: Text('MTU Size'),
+                subtitle: Text('${snapshot.data} bytes'),
 //                trailing: IconButton(
 //                  icon: Icon(Icons.edit),
 //                  onPressed: () => device.requestMtu(223),
 //                ),
-                ),
               ),
-              StreamBuilder<List<BluetoothService>>(
-                stream: device.services,
-                initialData: [],
-                builder: (c, snapshot) {
-                  return Column(
-                    children: _buildServiceTiles(snapshot.data),
-                  );
-                },
-              ),
-              (device.services != null
-                  ? Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: <Widget>[
-                        ButtonButton(
-                          onPressed: () {
-                            print('pressed');
-                          },
-                          child: Container(
-                            width: 300,
-                            color: Colors.indigo.shade50,
-                            child: TextField(
-                              onChanged: (text) {
-                                _writeInput = text;
-                              },
-                              textAlign: TextAlign.center,
-                              style: TextStyle(color: Colors.black),
-                              decoration: InputDecoration(
-                                  labelText: "Choose Service, then W",
-                                  border: OutlineInputBorder()),
-                            ),
-                          ),
-                        ),
-                        SizedBox(
-                          width: 30,
-                        ),
-//                Builder(
-//                  builder: (context) => ButtonButton(
-//                    child: Text('CHECK'),
-//                    onPressed: () {
-//                      Scaffold.of(context).showSnackBar(SnackBar(
-//                        content: Text('This is what you will write --- $_writeInput'),
-//                        duration: Duration(seconds: 10),
-//                      ));
-//                    },
-//                  ),
-//                ),
-                      ],
-                    )
-                  : (Text(' ')))
-            ],
-          ),
-        ),
+            ),
+            StreamBuilder<List<BluetoothService>>(
+              stream: device.services,
+              initialData: [],
+              builder: (c, snapshot) {
+                return Column(
+                  children: _buildServiceTiles(snapshot.data),
+                );
+              },
+            ),
+          ],
+        )),
       ),
     );
   }

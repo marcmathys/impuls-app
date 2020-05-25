@@ -6,7 +6,12 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_blue/flutter_blue.dart';
+import 'package:implulsnew/styles/button.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
+import 'package:implulsnew/bt/Bluetooth_screen.dart';
+
+
+
 
 class ScanResultTile extends StatelessWidget {
   const ScanResultTile({Key key, this.result, this.onTap}) : super(key: key);
@@ -59,6 +64,8 @@ class ScanResultTile extends StatelessWidget {
       ),
     );
   }
+
+
 
   String getNiceHexArray(List<int> bytes) {
     return '[${bytes.map((i) => i.toRadixString(16).padLeft(2, '0')).join(', ')}]'
@@ -139,18 +146,17 @@ class ServiceTile extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
             Text('Service'),
-            Text('0x${service.uuid.toString()}',
-                style: Theme.of(context)
-                    .textTheme
-                    .bodyText2
-                    .copyWith(color: Theme.of(context).textTheme.caption.color))
+            Text(
+              '0x${service.uuid.toString()}',
+//              print('${service.uuid.toString()}'),
+            )
           ],
         ),
         children: characteristicTiles,
       );
     } else {
       return ListTile(
-        title: Text('Service'),
+        title: Text('Service C'),
         subtitle: Text('0x${service.uuid.toString()}'),
       );
     }
@@ -189,39 +195,7 @@ class _CharacteristicTileState extends State<CharacteristicTile> {
       stream: widget.characteristic.value,
       initialData: widget.characteristic.lastValue,
       builder: (c, snapshot) {
-        var _btData = snapshot.data;
-
-        print(_btData);
-
-        if (_btData.length == 2) {
-          if (_chartData.length > 300) {
-            _chartData.removeAt(0);
-          }
-          ByteData bytedata1 = ByteData.sublistView(
-              Uint8List.fromList(_btData.reversed.toList()));
-          print(bytedata1);
-          int _ekgPoint = bytedata1.getInt16(0, Endian.big);
-          print(_ekgPoint);
-
-          _chartData.add(MedicalData(DateTime.now(), _ekgPoint));
-        } else if (_btData.length == 4) {
-          ByteData bytedata2 = ByteData.sublistView(
-              Uint8List.fromList(_btData.reversed.toList()));
-          print(bytedata2);
-          if (widget.characteristic.serviceUuid.toString() ==
-              '00b3b02e-928b-11e9-bc42-526af7764f64') {
-            double _ibiPoint = bytedata2.getFloat32(0, Endian.big);
-            print(_ibiPoint);
-            _listData.add(_ibiPoint);
-          } else {
-            int _countDown = bytedata2.getUint32(0, Endian.big);
-            print(_countDown);
-            _listData.add(_countDown);
-          }
-        }
-
-        print(_chartData[0].dateTime);
-
+        dataFromBytes(snapshot);
         return Column(
           children: <Widget>[
             (snapshot.data.length == 2)
@@ -276,6 +250,26 @@ class _CharacteristicTileState extends State<CharacteristicTile> {
                             Theme.of(context).iconTheme.color.withOpacity(0.5)),
                     onPressed: widget.onNotificationPressed,
                   ),
+                  ButtonButton(
+                    onPressed: () async {
+                      Text('pressed');
+                      Text('$writeToDeviceBytes()');
+                    },
+                    child: Container(
+                      width: 300,
+                      color: Colors.indigo.shade50,
+                      child: TextField(
+                        onChanged: (text) {
+                          writeInput = text;
+                        },
+                        textAlign: TextAlign.center,
+                        style: TextStyle(color: Colors.black),
+                        decoration: InputDecoration(
+                            labelText: "Choose Service, then W",
+                            border: OutlineInputBorder()),
+                      ),
+                    ),
+                  ),
                 ],
               ),
               children: widget.descriptorTiles,
@@ -284,6 +278,34 @@ class _CharacteristicTileState extends State<CharacteristicTile> {
         );
       },
     );
+  }
+
+  void dataFromBytes(AsyncSnapshot<List<int>> snapshot) {
+    var _btData = snapshot.data;
+    if (_btData.length == 2) {
+      if (_chartData.length > 300) {
+        _chartData.removeAt(0);
+      }
+      ByteData bytedata1 =
+          ByteData.sublistView(Uint8List.fromList(_btData.reversed.toList()));
+      int _ekgPoint = bytedata1.getInt16(0, Endian.big);
+      _chartData.add(MedicalData(DateTime.now(), _ekgPoint));
+    } else if (_btData.length == 4) {
+      ByteData bytedata2 =
+          ByteData.sublistView(Uint8List.fromList(_btData.reversed.toList()));
+      print(bytedata2);
+      if (widget.characteristic.serviceUuid.toString() ==
+          '00b3b02e-928b-11e9-bc42-526af7764f64') {
+        double _ibiPoint = bytedata2.getFloat32(0, Endian.big);
+        print(_ibiPoint);
+        _listData.add(_ibiPoint);
+      } else {
+        int _countDown = bytedata2.getUint32(0, Endian.big);
+        print(_countDown);
+        _listData.add(_countDown);
+      }
+    }
+    print(_chartData[0].dateTime);
   }
 }
 
@@ -350,8 +372,7 @@ class ScrollList extends StatelessWidget {
           reverse: true,
           itemBuilder: (BuildContext ctxt, int index) {
             return Container(
-                height: 30,
-                child: Text((_listData != [] ? '$_listData[index]' : '')));
+                height: 30, child: Text((_listData != [] ? '$_listData' : "")));
           }),
     );
   }
@@ -399,7 +420,6 @@ class DescriptorTile extends StatelessWidget {
 //            ),
 //            onPressed: onReadPressed,
 //          ),
-
 //          IconButton(
 //            icon: Icon(
 //              Icons.file_upload,
