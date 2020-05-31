@@ -29,6 +29,8 @@ dependencies:
   google_sign_in: ^4.4.1
   syncfusion_flutter_charts: ^18.1.52
   logger: ^0.9.1
+  flutter_isolate: ^1.0.0+14
+  isolate_handler: ^0.3.0
 
 
 dev_dependencies:

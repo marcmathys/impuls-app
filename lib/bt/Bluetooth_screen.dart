@@ -140,10 +140,11 @@ class FindDevicesScreen extends StatelessWidget {
     );
   }
 }
+
 var writeInput = '111, 110';
 
 List<int> writeToDeviceBytes() {
-  return writeInput.split(',').map(int.parse).toList();
+  return writeInput.split(',').map(int.tryParse).toList();
 }
 
 class DeviceScreen extends StatelessWidget {
@@ -190,8 +191,7 @@ class DeviceScreen extends StatelessWidget {
                           (d) => DescriptorTile(
                             descriptor: d,
 //                            onReadPressed: () => d.read(),
-                            onWritePressed: () =>
-                                d.write(writeToDeviceBytes()),
+                            onWritePressed: () => d.write(writeToDeviceBytes()),
                           ),
                         )
                         .toList(),
@@ -289,10 +289,10 @@ class DeviceScreen extends StatelessWidget {
               builder: (c, snapshot) => ListTile(
                 title: Text('MTU Size'),
                 subtitle: Text('${snapshot.data} bytes'),
-//                trailing: IconButton(
-//                  icon: Icon(Icons.edit),
-//                  onPressed: () => device.requestMtu(223),
-//                ),
+                trailing: IconButton(
+                  icon: Icon(Icons.edit),
+                  onPressed: () => device.requestMtu(223),
+                ),
               ),
             ),
             StreamBuilder<List<BluetoothService>>(
