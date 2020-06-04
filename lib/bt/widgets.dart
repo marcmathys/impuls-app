@@ -142,7 +142,7 @@ class ServiceTile extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
-            Text('Service C'),
+            Text('Service'),
             Text('0x${service.uuid.toString()}',
                 style: Theme.of(context)
                     .textTheme
@@ -180,6 +180,17 @@ class CharacteristicTile extends StatefulWidget {
   @override
   _CharacteristicTileState createState() => _CharacteristicTileState();
 }
+
+
+//StreamBuilder<List<int>>(
+//stream: widget.characteristic.value,
+//initialData: widget.characteristic.lastValue,
+//builder: (c, snapshot) {
+//var _btData = snapshot.data;
+//
+//print(_btData);
+
+
 
 
 class _CharacteristicTileState extends State<CharacteristicTile> {
