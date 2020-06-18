@@ -27,6 +27,7 @@ class FirebaseHandler {
 
   Future signOut() async {
     _auth.signOut();
+    _user = null;
   }
 
   void retrievePatientData() {

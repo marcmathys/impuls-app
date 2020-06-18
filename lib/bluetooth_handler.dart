@@ -16,35 +16,40 @@ class BluetoothHandler {
   FlutterBlue _flutterBlue = FlutterBlue.instance;
   BluetoothDevice _device;
   final List<MedicalData> ekgPoints = [];
-  final _ibiPoints = [];
+  final ibiPoints = [];
   BluetoothCharacteristic ekgSubscription;
 
   /// Scans the environment for bluetooth devices and connects to the SET-device if found.
-  void scanForDevices() async {
+  /// Return codes:
+  /// 0 - Okay.
+  /// 1 - Bluetooth off
+  /// 2 - Already connected
+  /// 3 - Device not found
+  Future<int> scanForDevices() async {
     if (!await _flutterBlue.isOn) {
-      //TODO: Trigger user feedback!
       print('Please turn on bluetooth!');
-      return;
+      return 1;
     }
 
     if (!(this._device == null)) {
       print('Device already connected!');
-      return;
+      return 2;
     }
 
     _flutterBlue.startScan(timeout: Duration(seconds: 4));
+    // ignore: missing_return
     _flutterBlue.scanResults.listen((results) {
       for (ScanResult result in results) {
-        if (result.device.id == DeviceIdentifier('3C:71:BF:AA:92:56')) {
-          // TODO: Hardcoded!
+        if (result.device.id == DeviceIdentifier('3C:71:BF:AA:92:56')) { // TODO: Hardcoded!
           result.device.connect();
           _device = result.device;
           print('Connected!');
           _flutterBlue.stopScan();
-          return;
+          return 0;
         }
       }
     });
+    return 3;
   }
 
   Future sendOnSignal(BluetoothCharacteristic characteristic) async {
@@ -86,7 +91,6 @@ class BluetoothHandler {
     });
   }
 
-  //TODO: Maybe move this to another class?
   void byteConversion(List<int> bluetoothData) {
     if (bluetoothData.length == 2) {
       if (ekgPoints.length >= 300) {
@@ -98,7 +102,7 @@ class BluetoothHandler {
     } else if (bluetoothData.length == 4) {
       ByteData ibiByteData = ByteData.sublistView(Uint8List.fromList(bluetoothData.reversed.toList()));
       double _ibiPoint = ibiByteData.getFloat32(0, Endian.big);
-      _ibiPoints.add(_ibiPoint);
+      ibiPoints.add(_ibiPoint);
     }
   }
 }

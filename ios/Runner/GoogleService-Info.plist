@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CLIENT_ID</key>
+	<string>134162298693-16fkj084su7f4kveoog4srqhr7a7oeaj.apps.googleusercontent.com</string>
+	<key>REVERSED_CLIENT_ID</key>
+	<string>com.googleusercontent.apps.134162298693-16fkj084su7f4kveoog4srqhr7a7oeaj</string>
+	<key>ANDROID_CLIENT_ID</key>
+	<string>134162298693-nhlgi4s254sargm8qrbl8v4sum7cg6q8.apps.googleusercontent.com</string>
+	<key>API_KEY</key>
+	<string>AIzaSyByyLnH4F28J07zTrOWq9hFc5OJxZa1U_Q</string>
+	<key>GCM_SENDER_ID</key>
+	<string>134162298693</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>com.example.impulsrefactor</string>
+	<key>PROJECT_ID</key>
+	<string>impulsrefactor</string>
+	<key>STORAGE_BUCKET</key>
+	<string>impulsrefactor.appspot.com</string>
+	<key>IS_ADS_ENABLED</key>
+	<false></false>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true></true>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:134162298693:ios:adbf48e0e33b3c02c9302c</string>
+	<key>DATABASE_URL</key>
+	<string>https://impulsrefactor.firebaseio.com</string>
+</dict>
+</plist>

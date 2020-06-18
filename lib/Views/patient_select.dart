@@ -25,32 +25,38 @@ class _PatientSelectState extends State<PatientSelect> {
 
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: Components.appBar('Hello'), //TODO:  Add ${user.displayName ?? ''} TODO: Nicen this up!
-      body: Column(
-        children: <Widget>[
-          Text('Please select a patient from the list'),
-          Flexible(
-            child: ListView(
-              children: buildPatientWidgets(context),
-            ),
-          ),
-          Chart(),
-          RaisedButton(
-            color: Colors.amberAccent,
-            onPressed: () => _handler.scanForDevices(),
-            child: Text('Connect'),
-          ),
-          RaisedButton(
-            color: Colors.amberAccent,
-            onPressed: () => _handler.getEKGData(),
-            child: Text('Get Data'),
-          ),
-          RaisedButton(
-            color: Colors.amberAccent,
-            onPressed: () => _handler.sendOffSignal(_handler.ekgSubscription),
-            child: Text('Send stop Signal'),
-          ),
-        ],
+      appBar: Components.appBar('Hello${user != null ? ' ' + user.displayName : ''}'),
+      body: Builder(
+        builder: (BuildContext context) {
+          return Column(
+            children: <Widget>[
+              Text('Please select a patient from the list'),
+              Flexible(
+                child: ListView(
+                  children: buildPatientWidgets(context),
+                ),
+              ),
+              Chart(),
+              RaisedButton(
+                color: Colors.amberAccent,
+                onPressed: () {
+                  _handler.scanForDevices().then((code) => Components.loginErrorSnackBar(context, code));
+                },
+                child: Text('Connect'),
+              ),
+              RaisedButton(
+                color: Colors.amberAccent,
+                onPressed: () => _handler.getEKGData(),
+                child: Text('Get Data'),
+              ),
+              RaisedButton(
+                color: Colors.amberAccent,
+                onPressed: () => _handler.sendOffSignal(_handler.ekgSubscription),
+                child: Text('Send stop Signal'),
+              ),
+            ],
+          );
+        }
       ),
     );
   }
