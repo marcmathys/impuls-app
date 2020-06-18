@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CLIENT_ID</key>
+	<string>463531903010-lal4qmpp92p993ekkk6igsirpsk6b3i6.apps.googleusercontent.com</string>
+	<key>REVERSED_CLIENT_ID</key>
+	<string>com.googleusercontent.apps.463531903010-lal4qmpp92p993ekkk6igsirpsk6b3i6</string>
+	<key>API_KEY</key>
+	<string>AIzaSyA5V-xZI_QSEWmHhCH-3M-ps8Iw8SFu0-o</string>
+	<key>GCM_SENDER_ID</key>
+	<string>463531903010</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>de.unimarburg.impuls10</string>
+	<key>PROJECT_ID</key>
+	<string>impuls-cffab</string>
+	<key>STORAGE_BUCKET</key>
+	<string>impuls-cffab.appspot.com</string>
+	<key>IS_ADS_ENABLED</key>
+	<false></false>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true></true>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:463531903010:ios:a519cb514df6f795d4e27b</string>
+	<key>DATABASE_URL</key>
+	<string>https://impuls-cffab.firebaseio.com</string>
+</dict>
+</plist>
