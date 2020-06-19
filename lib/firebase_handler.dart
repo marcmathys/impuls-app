@@ -30,7 +30,7 @@ class FirebaseHandler {
     _user = null;
   }
 
-  void retrievePatientData() {
+  Future retrievePatientData() async {
     //TODO: Dummy code! Implement
     Patient a = Patient(Icons.add, 'Hans', 'Gretel', '1337');
     Patient b = Patient(Icons.ac_unit, 'Petra', 'Pan', '420');

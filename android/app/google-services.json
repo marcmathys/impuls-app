@@ -38,6 +38,13 @@
             {
               "client_id": "134162298693-ulos7gbbqgs181q3s7naoha46lu7c4oj.apps.googleusercontent.com",
               "client_type": 3
+            },
+            {
+              "client_id": "134162298693-iomnufsl3efieegaqnvpfvep2ucumpv3.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.impulsrefacto"
+              }
             }
           ]
         }
