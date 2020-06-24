@@ -38,6 +38,7 @@ class _DebugState extends State<Debug> {
             Text('Beats per minute: ${Provider.of<BTState>(context).bpm.toStringAsFixed(2)}'),
             Text('Error code: ${Provider.of<BTState>(context).error.toString()}'),
             Text('Baur Reflex Sensitivity: ${Provider.of<BTState>(context).brs.toString()}'),
+            Container(height: 20),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -93,7 +94,7 @@ class _DebugState extends State<Debug> {
                             );
                           });
                     },
-                    child: Text('Send bytes'),
+                    child: Text('Send bytes to stimulation characteristic'),
                   ),
                 ),
                 Flexible(
