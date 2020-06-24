@@ -1,9 +1,11 @@
 import 'dart:async';
 import 'dart:typed_data';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter_blue/flutter_blue.dart';
-import 'package:impulsrefactor/Entities/ibi_point.dart';
 import 'package:impulsrefactor/Entities/medical_data.dart';
+import 'package:impulsrefactor/States/bluetooth_state.dart';
+import 'package:impulsrefactor/app_constants.dart';
 
 class BluetoothHandler {
   static final BluetoothHandler _instance = BluetoothHandler._internal();
@@ -12,16 +14,10 @@ class BluetoothHandler {
 
   BluetoothHandler._internal();
 
-  Guid EKG_SERVICE_UUID = Guid('00b3b02e-928b-11e9-bc42-526af7764f64');
-  Guid EKG_CHARACTERISTIC_UUID = Guid('00b3b2ae-928b-11e9-bc42-526af7764f64');
-  Guid IBI_CHARACTERISTIC_UUID = Guid('df60bd72-ca66-11e9-a32f-2a2ae2dbcce4');
-
   FlutterBlue _flutterBlue = FlutterBlue.instance;
+  BTState _state = BTState();
+  AppConstants _constants = AppConstants();
   BluetoothDevice _device;
-  final List<MedicalData> ekgPoints = [MedicalData(DateTime.now(), 0, 0)];
-  final List<IbiPoint> ibiPoints = [IbiPoint(0, 0)];
-  BluetoothCharacteristic ekgSubscription;
-  StreamSubscription ibiSubscription;
 
   /// Scans the environment for bluetooth devices and connects to the SET-device if found.
   /// Return codes:
@@ -46,9 +42,11 @@ class BluetoothHandler {
       for (ScanResult result in results) {
         if (result.device.id == DeviceIdentifier('3C:71:BF:AA:92:56') || result.device.id == DeviceIdentifier('24:0A:C4:1D:48:42')) {
           // TODO: Hardcoded!
-          result.device.connect();
-          _device = result.device;
-          _flutterBlue.stopScan();
+          result.device.connect().then((value) {
+            _device = result.device;
+            _flutterBlue.stopScan();
+            getCharacteristicReferences();
+          });
           return 0;
         }
       }
@@ -69,6 +67,55 @@ class BluetoothHandler {
     _device = null;
   }
 
+  void getCharacteristicReferences() {
+    if (this._device == null) {
+      print('Device is not connected!');
+      return;
+    }
+    _device.discoverServices().then((services) {
+      services.forEach((service) async {
+        if (service.uuid == _constants.STIMULATION_UUID) {
+          var characteristics = service.characteristics;
+          for (BluetoothCharacteristic characteristic in characteristics) {
+            if (characteristic.uuid == _constants.STIMULATION_CHARACTERISTIC_UUID) {
+              _state.characteristics[_constants.STIMULATION_CHARACTERISTIC_UUID] = characteristic;
+            }
+          }
+        }
+
+        if (service.uuid == _constants.EKG_SERVICE_UUID) {
+          var characteristics = service.characteristics;
+          for (BluetoothCharacteristic characteristic in characteristics) {
+            if (characteristic.uuid == _constants.EKG_CHARACTERISTIC_UUID) {
+              _state.characteristics[_constants.EKG_CHARACTERISTIC_UUID] = characteristic;
+            }
+            if (characteristic.uuid == _constants.BPM_CHARACTERISTIC_UUID) {
+              _state.characteristics[_constants.BPM_CHARACTERISTIC_UUID] = characteristic;
+            }
+          }
+        }
+
+        if (service.uuid == _constants.ERROR_SERVICE) {
+          var characteristics = service.characteristics;
+          for (BluetoothCharacteristic characteristic in characteristics) {
+            if (characteristic.uuid == _constants.ERROR_CHARACTERISTIC_UUID) {
+              _state.characteristics[_constants.ERROR_CHARACTERISTIC_UUID] = characteristic;
+            }
+          }
+        }
+
+        if (service.uuid == _constants.BRS_SERVICE) {
+          var characteristics = service.characteristics;
+          for (BluetoothCharacteristic characteristic in characteristics) {
+            if (characteristic.uuid == _constants.BRS_CHARACTERISTIC_UUID) {
+              _state.characteristics[_constants.BRS_CHARACTERISTIC_UUID] = characteristic;
+            }
+          }
+        }
+      });
+    });
+  }
+
   Future sendOnSignal(BluetoothCharacteristic characteristic) async {
     if (characteristic == null) {
       return;
@@ -83,68 +130,101 @@ class BluetoothHandler {
     await characteristic.write([111, 102, 102]);
   }
 
-  void getEKGData() async {
-    if (this._device == null) {
-      print('Device is not connected!');
+  void sendStimulationBytes(List<int> bytes) async {
+    if (!_state.characteristics.containsKey(_constants.STIMULATION_CHARACTERISTIC_UUID)) {
+      print('Characteristic Stimulation not found!');
       return;
     }
+    BluetoothCharacteristic stimulation = _state.characteristics[_constants.STIMULATION_CHARACTERISTIC_UUID];
 
-    _device.discoverServices().then((services) {
-      services.forEach((service) async {
-        if (service.uuid == EKG_SERVICE_UUID) {
-          var characteristics = service.characteristics;
-          for (BluetoothCharacteristic characteristic in characteristics) {
-            if (characteristic.uuid == EKG_CHARACTERISTIC_UUID) {
-              ekgSubscription = characteristic;
-              await sendOnSignal(characteristic);
-              characteristic.value.listen((event) {
-                ekgPoints.add(ekgByteConversion(event));
-              });
-              await characteristic.setNotifyValue(true);
-            }
-          }
-        }
-      });
+    await stimulation.write(bytes);
+    stimulation.value.listen((event) {
+      if(event.length != 0) {
+        print(event);
+      }
     });
   }
 
-  void getIBIData() async {
+  void getEKGAndBPMData() async {
     if (this._device == null) {
       print('Device is not connected!');
       return;
     }
+    if (!_state.characteristics.containsKey(_constants.EKG_CHARACTERISTIC_UUID)) {
+      print('Characteristic EKG not found!');
+      return;
+    }
 
-    _device.discoverServices().then((services) {
-      services.forEach((service) async {
-        if (service.uuid == EKG_SERVICE_UUID) {
-          var characteristics = service.characteristics;
-          for (BluetoothCharacteristic characteristic in characteristics) {
-            if (characteristic.uuid == IBI_CHARACTERISTIC_UUID) {
-              ibiSubscription = characteristic.value.listen((event) {
-                if (event.length == 4) {
-                  ibiPoints.add(ibiByteConversion(event));
-                }
-              });
-              await characteristic.setNotifyValue(true);
-            }
-          }
-        }
-      });
+    BluetoothCharacteristic ekg = _state.characteristics[_constants.EKG_CHARACTERISTIC_UUID];
+    BluetoothCharacteristic bpm = _state.characteristics[_constants.BPM_CHARACTERISTIC_UUID];
+
+    await sendOnSignal(ekg);
+
+    ekg.value.listen((event) {
+      _state.ekgPoints.add(ekgByteConversion(event));
     });
+    await ekg.setNotifyValue(true);
+
+    bpm.value.listen((event) {
+      if (event.length == 4) {
+        _state.bpm = bpmByteConversion(event);
+      }
+    });
+    await bpm.setNotifyValue(true);
+  }
+
+  void listenForErrors() async {
+    if (this._device == null) {
+      print('Device is not connected!');
+      return;
+    }
+    if (!_state.characteristics.containsKey(_constants.ERROR_CHARACTERISTIC_UUID)) {
+      print('Characteristic Error Code not found!');
+      return;
+    }
+
+    BluetoothCharacteristic error = _state.characteristics[_constants.ERROR_CHARACTERISTIC_UUID];
+    error.value.listen((event) {
+      if (event.length == 1) {
+        ByteData errorByteData = ByteData.sublistView(Uint8List.fromList(event.reversed.toList()));
+        _state.error = errorByteData.getUint8(0);
+      }
+    });
+    await error.setNotifyValue(true);
+  }
+
+  void getBRSData() async {
+    if (this._device == null) {
+      print('Device is not connected!');
+      return;
+    }
+    if (!_state.characteristics.containsKey(_constants.BRS_CHARACTERISTIC_UUID)) {
+      print('Characteristic Error Code not found!');
+      return;
+    }
+
+    BluetoothCharacteristic brs = _state.characteristics[_constants.BRS_CHARACTERISTIC_UUID];
+    await sendOnSignal(brs);
+    brs.value.listen((event) {
+      if (event.length == 4) {
+        ByteData brsByteData = ByteData.sublistView(Uint8List.fromList(event.reversed.toList()));
+        _state.brs = brsByteData.getUint32(0);
+      }
+    });
+    await brs.setNotifyValue(true);
   }
 
   MedicalData ekgByteConversion(List<int> bluetoothData) {
-    if (ekgPoints.length >= 300) {
-      ekgPoints.removeAt(0);
+    if (_state.ekgPoints.length >= 300) {
+      _state.ekgPoints.removeAt(0);
     }
     ByteData ekgByteData = ByteData.sublistView(Uint8List.fromList(bluetoothData.reversed.toList()));
     int _ekgPoint = ekgByteData.getInt16(0, Endian.big);
-    return MedicalData(DateTime.now(), _ekgPoint, ekgPoints.last.xAxis + 1);
+    return MedicalData(DateTime.now(), _ekgPoint, _state.ekgPoints.last.xAxis + 1);
   }
 
-  IbiPoint ibiByteConversion(List<int> bluetoothData) {
-    ByteData ibiByteData = ByteData.sublistView(Uint8List.fromList(bluetoothData.reversed.toList()));
-    double _ibiPoint = ibiByteData.getFloat32(0, Endian.big);
-    return IbiPoint(_ibiPoint, ibiPoints.last.xAxis + 1);
+  double bpmByteConversion(List<int> bluetoothData) {
+    ByteData bpmByteData = ByteData.sublistView(Uint8List.fromList(bluetoothData.reversed.toList()));
+    return bpmByteData.getFloat32(0, Endian.big);
   }
 }

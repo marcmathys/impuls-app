@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:impulsrefactor/States/bluetooth_state.dart';
 import 'package:impulsrefactor/Views/debug_view.dart';
 import 'package:impulsrefactor/Views/patient_select.dart';
+import 'package:provider/provider.dart';
 
 import 'Views/login.dart';
 
@@ -11,7 +13,11 @@ void main() {
     DeviceOrientation.portraitUp,
     DeviceOrientation.portraitDown
   ]);
-  runApp(ImpulsMain());
+  runApp(MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => BTState()),
+      ],
+      child: ImpulsMain()));
 }
 
 class ImpulsMain extends StatelessWidget {

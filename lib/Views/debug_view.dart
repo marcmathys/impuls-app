@@ -1,7 +1,12 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:impulsrefactor/States/bluetooth_state.dart';
 import 'package:impulsrefactor/Views/Components/chart_component.dart';
 import 'package:impulsrefactor/Views/Components/components.dart';
+import 'package:impulsrefactor/app_constants.dart';
 import 'package:impulsrefactor/bluetooth_handler.dart';
+import 'package:provider/provider.dart';
 
 class Debug extends StatefulWidget {
   @override
@@ -10,11 +15,17 @@ class Debug extends StatefulWidget {
 
 class _DebugState extends State<Debug> {
   BluetoothHandler _handler;
+  BTState _state;
+  AppConstants _constants;
+  TextEditingController _textController;
 
   @override
   void initState() {
     super.initState();
     _handler = BluetoothHandler();
+    _state = BTState();
+    _constants = AppConstants();
+    _textController = TextEditingController();
   }
 
   Widget build(BuildContext context) {
@@ -23,12 +34,10 @@ class _DebugState extends State<Debug> {
       body: Builder(builder: (BuildContext context) {
         return ListView(
           children: <Widget>[
-            Row(
-              children: <Widget>[
-                Flexible(child: Chart('EKG')),
-                Flexible(child: Chart('IBI')),
-              ],
-            ),
+            Chart(),
+            Text('Beats per minute: ${Provider.of<BTState>(context).bpm.toStringAsFixed(2)}'),
+            Text('Error code: ${Provider.of<BTState>(context).error.toString()}'),
+            Text('Baur Reflex Sensitivity: ${Provider.of<BTState>(context).brs.toString()}'),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -36,13 +45,13 @@ class _DebugState extends State<Debug> {
                   onPressed: () {
                     _handler.scanForDevices().then((code) => Components.loginErrorSnackBar(context, code));
                   },
-                  child: Text('Connect'),
+                  child: Text('Connect device'),
                 ),
                 RaisedButton(
                   onPressed: () {
                     _handler.disconnectDevice();
                   },
-                  child: Text('Disconnect'),
+                  child: Text('Disconnect device'),
                 ),
               ],
             ),
@@ -51,14 +60,46 @@ class _DebugState extends State<Debug> {
               children: [
                 Flexible(
                   child: RaisedButton(
-                    onPressed: () => _handler.getEKGData(),
-                    child: Text('Get EKG Data'),
+                    onPressed: () async {
+                      await showDialog(
+                          context: context,
+                          builder: (BuildContext context) {
+                            return AlertDialog(
+                              title: Text("Write"),
+                              content: Row(
+                                children: <Widget>[
+                                  Expanded(
+                                    child: TextField(
+                                      controller: _textController,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              actions: <Widget>[
+                                FlatButton(
+                                  child: Text("Send"),
+                                  onPressed: () {
+                                    _handler.sendStimulationBytes(utf8.encode(_textController.value.text));
+                                    Navigator.pop(context);
+                                  },
+                                ),
+                                FlatButton(
+                                  child: Text("Cancel"),
+                                  onPressed: () {
+                                    Navigator.pop(context);
+                                  },
+                                ),
+                              ],
+                            );
+                          });
+                    },
+                    child: Text('Send bytes'),
                   ),
                 ),
                 Flexible(
                   child: RaisedButton(
-                    onPressed: () => _handler.sendOffSignal(_handler.ekgSubscription),
-                    child: Text('Stop EKG'),
+                    onPressed: () => _handler.sendStimulationBytes([113, 117, 105, 116]), // Stands for quit
+                    child: Text('Stop therapy (sends quit)'),
                   ),
                 ),
               ],
@@ -68,14 +109,42 @@ class _DebugState extends State<Debug> {
               children: [
                 Flexible(
                   child: RaisedButton(
-                    onPressed: () => _handler.getIBIData(),
-                    child: Text('Get IBI Data'),
+                    onPressed: () => _handler.getEKGAndBPMData(),
+                    child: Text('Get EKG and BPM data'),
                   ),
                 ),
                 Flexible(
                   child: RaisedButton(
-                    onPressed: () => _handler.ibiSubscription.cancel(),
-                    child: Text('Stop IBI subscription'),
+                    onPressed: () => _handler.sendOffSignal(_state.characteristics[_constants.EKG_CHARACTERISTIC_UUID]),
+                    child: Text('Stop EKG service'),
+                  ),
+                ),
+              ],
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Flexible(
+                  child: RaisedButton(
+                    onPressed: () => _handler.listenForErrors(),
+                    child: Text('Listen for errors'),
+                  ),
+                ),
+              ],
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Flexible(
+                  child: RaisedButton(
+                    onPressed: () => _handler.getBRSData(),
+                    child: Text('Get BRS Data'),
+                  ),
+                ),
+                Flexible(
+                  child: RaisedButton(
+                    onPressed: () => _handler.sendOffSignal(_state.characteristics[_constants.BRS_CHARACTERISTIC_UUID]),
+                    child: Text('Stop BRS Data'),
                   ),
                 ),
               ],
