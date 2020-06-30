@@ -4,6 +4,7 @@ import 'dart:typed_data';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_blue/flutter_blue.dart';
 import 'package:impulsrefactor/Entities/medical_data.dart';
+import 'package:impulsrefactor/Helpers/byte_conversion.dart';
 import 'package:impulsrefactor/States/bluetooth_state.dart';
 import 'package:impulsrefactor/app_constants.dart';
 
@@ -40,7 +41,9 @@ class BluetoothHandler {
     // ignore: missing_return
     _flutterBlue.scanResults.listen((results) {
       for (ScanResult result in results) {
-        if (result.device.id == DeviceIdentifier('3C:71:BF:AA:92:56') || result.device.id == DeviceIdentifier('24:0A:C4:1D:48:42')) {
+        if (result.device.id == DeviceIdentifier('3C:71:BF:AA:92:56') ||
+            result.device.id == DeviceIdentifier('24:0A:C4:1D:48:42') ||
+            result.device.id == DeviceIdentifier('3C:71:BF:60:2D:A2')) {
           // TODO: Hardcoded!
           result.device.connect().then((value) {
             _device = result.device;
@@ -139,7 +142,7 @@ class BluetoothHandler {
 
     await stimulation.write(bytes);
     stimulation.value.listen((event) {
-      if(event.length != 0) {
+      if (event.length != 0) {
         print(event);
       }
     });
@@ -161,13 +164,13 @@ class BluetoothHandler {
     await sendOnSignal(ekg);
 
     ekg.value.listen((event) {
-      _state.ekgPoints.add(ekgByteConversion(event));
+      _state.ekgPoints.add(ByteConversion.ekgByteConversion(event, _state));
     });
     await ekg.setNotifyValue(true);
 
     bpm.value.listen((event) {
       if (event.length == 4) {
-        _state.bpm = bpmByteConversion(event);
+        _state.bpm = ByteConversion.bpmByteConversion(event);
       }
     });
     await bpm.setNotifyValue(true);
@@ -212,19 +215,5 @@ class BluetoothHandler {
       }
     });
     await brs.setNotifyValue(true);
-  }
-
-  MedicalData ekgByteConversion(List<int> bluetoothData) {
-    if (_state.ekgPoints.length >= 300) {
-      _state.ekgPoints.removeAt(0);
-    }
-    ByteData ekgByteData = ByteData.sublistView(Uint8List.fromList(bluetoothData.reversed.toList()));
-    int _ekgPoint = ekgByteData.getInt16(0, Endian.big);
-    return MedicalData(DateTime.now(), _ekgPoint, _state.ekgPoints.last.xAxis + 1);
-  }
-
-  double bpmByteConversion(List<int> bluetoothData) {
-    ByteData bpmByteData = ByteData.sublistView(Uint8List.fromList(bluetoothData.reversed.toList()));
-    return bpmByteData.getFloat32(0, Endian.big);
   }
 }

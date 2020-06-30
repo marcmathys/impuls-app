@@ -1,6 +1,5 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
+import 'package:impulsrefactor/Helpers/byte_conversion.dart';
 import 'package:impulsrefactor/States/bluetooth_state.dart';
 import 'package:impulsrefactor/Views/Components/chart_component.dart';
 import 'package:impulsrefactor/Views/Components/components.dart';
@@ -64,35 +63,40 @@ class _DebugState extends State<Debug> {
                     onPressed: () async {
                       await showDialog(
                           context: context,
-                          builder: (BuildContext context) {
-                            return AlertDialog(
-                              title: Text("Write"),
+                          child: AlertDialog(
+                              title: Text('Input integer data separated by comma:'),
                               content: Row(
                                 children: <Widget>[
                                   Expanded(
                                     child: TextField(
                                       controller: _textController,
+                                      keyboardType: TextInputType.number,
                                     ),
                                   ),
                                 ],
                               ),
                               actions: <Widget>[
                                 FlatButton(
-                                  child: Text("Send"),
+                                  child: Text('Send'),
                                   onPressed: () {
-                                    _handler.sendStimulationBytes(utf8.encode(_textController.value.text));
+                                    List<int> hexList = ByteConversion.stringToHex(_textController.value.text);
+                                    if(hexList.length == 0) {
+                                      Scaffold.of(context).showSnackBar(SnackBar(content: Text('The given numbers are in the wrong format! Example format: 111,110,109')));
+                                    } else {
+                                      _handler.sendStimulationBytes(hexList);
+                                    }
                                     Navigator.pop(context);
                                   },
                                 ),
                                 FlatButton(
-                                  child: Text("Cancel"),
+                                  child: Text('Cancel'),
                                   onPressed: () {
                                     Navigator.pop(context);
                                   },
                                 ),
                               ],
-                            );
-                          });
+                            )
+                          );
                     },
                     child: Text('Send bytes to stimulation characteristic'),
                   ),
