@@ -11,7 +11,7 @@ class ByteConversion {
     }
     ByteData ekgByteData = ByteData.sublistView(Uint8List.fromList(bluetoothData.reversed.toList()));
     int _ekgPoint = ekgByteData.getInt16(0, Endian.big);
-    return MedicalData(DateTime.now(), _ekgPoint, appState.ekgPoints.last.xAxis + 1);
+    return MedicalData(DateTime.now(), _ekgPoint, appState.ekgPoints.last.xAxis + 1 ?? 1);
   }
 
   static double bpmByteConversion(List<int> bluetoothData) {
@@ -34,7 +34,7 @@ class ByteConversion {
 
     List<String> stringList = hex.split(',');
     stringList.forEach((element) {
-      if (element.length != 3) {
+      if (element.length > 3) {
         hexList.add(-1);
       } else {
         hexList.add(int.parse(element));

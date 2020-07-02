@@ -1,9 +1,7 @@
 import 'dart:async';
 import 'dart:typed_data';
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter_blue/flutter_blue.dart';
-import 'package:impulsrefactor/Entities/medical_data.dart';
 import 'package:impulsrefactor/Helpers/byte_conversion.dart';
 import 'package:impulsrefactor/States/bluetooth_state.dart';
 import 'package:impulsrefactor/app_constants.dart';
@@ -142,9 +140,7 @@ class BluetoothHandler {
 
     await stimulation.write(bytes);
     stimulation.value.listen((event) {
-      if (event.length != 0) {
-        print(event);
-      }
+      _state.stimulation = event;
     });
   }
 

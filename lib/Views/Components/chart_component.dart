@@ -14,7 +14,6 @@ class _ChartState extends State<Chart> {
   Timer _timer;
   BTState _state;
 
-
   @override
   void initState() {
     super.initState();

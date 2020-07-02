@@ -4,6 +4,7 @@ import 'package:impulsrefactor/Entities/medical_data.dart';
 
 class BTState extends ChangeNotifier {
   static final BTState _instance = BTState._internal();
+
   factory BTState() => _instance;
 
   BTState._internal();
@@ -13,6 +14,14 @@ class BTState extends ChangeNotifier {
   double _bpm = 0.0;
   int _error;
   int _brs;
+  List<int> _stimulation;
+
+  List<int> get stimulation => _stimulation;
+
+  set stimulation(List<int> value) {
+    _stimulation = value;
+    notifyListeners();
+  }
 
   int get brs => _brs;
 

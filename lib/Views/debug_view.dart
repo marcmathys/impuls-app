@@ -29,11 +29,12 @@ class _DebugState extends State<Debug> {
 
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: Components.appBar('Hello, master!'),
+      appBar: Components.appBar('Debug menu'),
       body: Builder(builder: (BuildContext context) {
         return ListView(
           children: <Widget>[
             Chart(),
+            Text('Stimulation characteristic answer: ${Provider.of<BTState>(context).stimulation.toString()}'),
             Text('Beats per minute: ${Provider.of<BTState>(context).bpm.toStringAsFixed(2)}'),
             Text('Error code: ${Provider.of<BTState>(context).error.toString()}'),
             Text('Baur Reflex Sensitivity: ${Provider.of<BTState>(context).brs.toString()}'),
@@ -64,39 +65,38 @@ class _DebugState extends State<Debug> {
                       await showDialog(
                           context: context,
                           child: AlertDialog(
-                              title: Text('Input integer data separated by comma:'),
-                              content: Row(
-                                children: <Widget>[
-                                  Expanded(
-                                    child: TextField(
-                                      controller: _textController,
-                                      keyboardType: TextInputType.number,
-                                    ),
+                            title: Text('Input integer data separated by comma:'),
+                            content: Row(
+                              children: <Widget>[
+                                Expanded(
+                                  child: TextField(
+                                    controller: _textController,
                                   ),
-                                ],
-                              ),
-                              actions: <Widget>[
-                                FlatButton(
-                                  child: Text('Send'),
-                                  onPressed: () {
-                                    List<int> hexList = ByteConversion.stringToHex(_textController.value.text);
-                                    if(hexList.length == 0) {
-                                      Scaffold.of(context).showSnackBar(SnackBar(content: Text('The given numbers are in the wrong format! Example format: 111,110,109')));
-                                    } else {
-                                      _handler.sendStimulationBytes(hexList);
-                                    }
-                                    Navigator.pop(context);
-                                  },
-                                ),
-                                FlatButton(
-                                  child: Text('Cancel'),
-                                  onPressed: () {
-                                    Navigator.pop(context);
-                                  },
                                 ),
                               ],
-                            )
-                          );
+                            ),
+                            actions: <Widget>[
+                              FlatButton(
+                                child: Text('Send'),
+                                onPressed: () {
+                                  List<int> hexList = ByteConversion.stringToHex(_textController.value.text);
+                                  if (hexList.length == 0) {
+                                    Scaffold.of(context).showSnackBar(
+                                        SnackBar(content: Text('The given numbers are in the wrong format! Example format: 111,110,109')));
+                                  } else {
+                                    _handler.sendStimulationBytes(hexList);
+                                  }
+                                  Navigator.pop(context);
+                                },
+                              ),
+                              FlatButton(
+                                child: Text('Cancel'),
+                                onPressed: () {
+                                  Navigator.pop(context);
+                                },
+                              ),
+                            ],
+                          ));
                     },
                     child: Text('Send bytes to stimulation characteristic'),
                   ),
