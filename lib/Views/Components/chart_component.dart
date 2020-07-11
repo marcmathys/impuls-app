@@ -32,6 +32,7 @@ class _ChartState extends State<Chart> {
   Widget build(BuildContext context) {
     return SfCartesianChart(
       legend: Legend(isVisible: true),
+      primaryYAxis: CategoryAxis(maximum: 20000),
       primaryXAxis: CategoryAxis(),
       series: <ChartSeries<MedicalData, String>>[
         LineSeries<MedicalData, String>(

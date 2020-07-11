@@ -12,9 +12,21 @@ class BTState extends ChangeNotifier {
   List<MedicalData> _ekgPoints = [MedicalData(DateTime.now(), 0, 0)];
   Map<Guid, BluetoothCharacteristic> _characteristics = {};
   double _bpm = 0.0;
-  int _error;
+  List<int> _error = [];
+
   int _brs;
   List<int> _stimulation;
+
+  List<int> get error => _error;
+
+  void addError(int value) {
+    if (_error.length >= 10) {
+      _error.removeAt(0);
+    }
+
+    _error.add(value);
+    notifyListeners();
+  }
 
   List<int> get stimulation => _stimulation;
 
@@ -27,13 +39,6 @@ class BTState extends ChangeNotifier {
 
   set brs(int value) {
     _brs = value;
-    notifyListeners();
-  }
-
-  int get error => _error;
-
-  set error(int value) {
-    _error = value;
     notifyListeners();
   }
 
@@ -54,5 +59,10 @@ class BTState extends ChangeNotifier {
 
   set ekgPoints(List<MedicalData> value) {
     _ekgPoints = value;
+  }
+
+  void resetEkgPoints() {
+    _ekgPoints.clear();
+    _ekgPoints.add(MedicalData(DateTime.now(), 0, 0));
   }
 }

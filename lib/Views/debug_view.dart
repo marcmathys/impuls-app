@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:impulsrefactor/Helpers/byte_conversion.dart';
 import 'package:impulsrefactor/States/bluetooth_state.dart';
@@ -12,6 +14,7 @@ class Debug extends StatefulWidget {
   _DebugState createState() => _DebugState();
 }
 
+/// TODO: Hint! Streams are not closed nor paused in this view! That only happens when the view is disposed!
 class _DebugState extends State<Debug> {
   BluetoothHandler _handler;
   BTState _state;
@@ -25,6 +28,13 @@ class _DebugState extends State<Debug> {
     _state = BTState();
     _constants = AppConstants();
     _textController = TextEditingController();
+  }
+
+
+  @override
+  void dispose() {
+    super.dispose();
+    _handler.cancelSubscriptions();
   }
 
   Widget build(BuildContext context) {
