@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:impulsrefactor/States/bluetooth_state.dart';
-import 'package:impulsrefactor/Views/debug_view.dart';
+import 'package:impulsrefactor/Views/debug.dart';
+import 'package:impulsrefactor/Views/patient_details.dart';
 import 'package:impulsrefactor/Views/patient_select.dart';
+import 'package:impulsrefactor/Views/session.dart';
 import 'package:provider/provider.dart';
 
 import 'Views/login.dart';
@@ -34,6 +36,8 @@ class ImpulsMain extends StatelessWidget {
       routes: {
         '/login': (BuildContext context) => Login(),
         '/patient_select': (BuildContext context) => PatientSelect(),
+        '/patient_details': (BuildContext context) => PatientDetail(),
+        '/session': (BuildContext context) => Session(),
         '/debug': (BuildContext context) => Debug(),
       },
     );

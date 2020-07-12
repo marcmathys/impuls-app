@@ -6,11 +6,11 @@ import 'package:impulsrefactor/States/bluetooth_state.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 
 /// Displays a Chart widget. Mode can be either EKG or IBI.
-class Chart extends StatefulWidget {
-  _ChartState createState() => _ChartState();
+class EKGChart extends StatefulWidget {
+  _EKGChartState createState() => _EKGChartState();
 }
 
-class _ChartState extends State<Chart> {
+class _EKGChartState extends State<EKGChart> {
   Timer _timer;
   BTState _state;
 

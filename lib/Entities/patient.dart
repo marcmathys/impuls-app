@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:impulsrefactor/firebase_handler.dart';
 
 /// The entity class for a patient object. Contains a toWidget()-method mainly used to fill the ListView on PatientSelect
 class Patient {
@@ -14,9 +13,7 @@ class Patient {
   Widget toWidget(BuildContext context) {
     return GestureDetector(
       onTap: () async {
-        // TODO: Dummy code! Replace with Navigation to detailView
-        FirebaseHandler().signOut();
-        Navigator.of(context).pushNamed('/login');
+        Navigator.of(context).pushNamed('/patient_details', arguments: this);
       },
       child: Container(
         margin: EdgeInsets.fromLTRB(10, 5, 10, 5),

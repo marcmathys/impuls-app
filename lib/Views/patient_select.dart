@@ -10,12 +10,13 @@ class PatientSelect extends StatefulWidget {
 }
 
 class _PatientSelectState extends State<PatientSelect> {
-  FirebaseUser user = FirebaseHandler().user;
+  FirebaseHandler _handler;
 
   @override
   void initState() {
     super.initState();
-    FirebaseHandler().retrievePatientData().then((value) => buildPatientWidgets(context));
+    _handler = FirebaseHandler();
+    _handler.retrievePatientData().then((value) => buildPatientWidgets(context));
   }
 
   List<Widget> buildPatientWidgets(BuildContext context) {
@@ -28,7 +29,7 @@ class _PatientSelectState extends State<PatientSelect> {
 
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: Components.appBar('Hello'), //TODO: Implement display name! ${user != null ? ' ' + user.displayName : ''}
+      appBar: Components.appBar('Hello'), //TODO: Implement display name! ${_handler.user != null ? ' ' + user.displayName : ''}
       floatingActionButton: FloatingActionButton(onPressed: () => Navigator.of(context).pushNamed('/debug'), child: Text('Debug')),
       body: Builder(builder: (BuildContext context) {
         return Column(
