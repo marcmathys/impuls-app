@@ -4,6 +4,7 @@ import 'dart:typed_data';
 import 'package:flutter_blue/flutter_blue.dart';
 import 'package:impulsrefactor/Helpers/byte_conversion.dart';
 import 'package:impulsrefactor/States/bluetooth_state.dart';
+import 'package:impulsrefactor/States/message_state.dart';
 import 'package:impulsrefactor/app_constants.dart';
 
 class BluetoothHandler {
@@ -25,44 +26,47 @@ class BluetoothHandler {
 
   /// Cancels all subscriptions and resets their variables.
   void cancelSubscriptions() {
-    _stimulation.cancel();
-    _stimulation = null; //TODO: Necessary?!
-
-    _ekg.cancel();
-    _ekg = null;
-
-    _errors.cancel();
-    _errors = null;
-
-    _brs.cancel();
-    _brs = null;
-
-    _bpm.cancel();
-    _bpm = null;
+    if (_stimulation != null) {
+      _stimulation.cancel();
+    }
+    if (_ekg != null) {
+      _ekg.cancel();
+    }
+    if (_errors != null) {
+      _errors.cancel();
+    }
+    if (_brs != null) {
+      _brs.cancel();
+    }
+    if (_bpm != null) {
+      _bpm.cancel();
+    }
   }
 
   /// Scans the environment for bluetooth devices and connects to the SET-device if found
   /// Return codes:
-  /// 0 - Okay.
+  /// 0 - Okay
   /// 1 - Bluetooth off
   /// 2 - Already connected
   /// 3 - Device not found
-  Future<int> scanForDevices() async {
+  void scanForDevices(MessageState state) async {
     if (!await _flutterBlue.isOn) {
-      print('Please turn on bluetooth!');
-      return 1;
+      state.message = ToastMessages.BluetoothOff;
     }
 
     if (!(this._device == null)) {
-      print('Device already connected!');
-      return 2;
+      state.message = ToastMessages.deviceAlreadyConnected;
     }
 
-    _flutterBlue.startScan(timeout: Duration(seconds: 4));
-    // ignore: missing_return
+    _flutterBlue.startScan(timeout: Duration(seconds: 4)).then((_) {
+      if (_device == null) {
+        state.message = ToastMessages.deviceAlreadyConnected;
+      }
+    });
     _flutterBlue.scanResults.listen((results) {
       for (ScanResult result in results) {
-        if (result.device.id == DeviceIdentifier('3C:71:BF:AA:92:56') ||
+        if (result.device.id == DeviceIdentifier('3C:71:BF:60:2D:CE') ||
+            result.device.id == DeviceIdentifier('3C:71:BF:AA:92:56') ||
             result.device.id == DeviceIdentifier('24:0A:C4:1D:48:42') ||
             result.device.id == DeviceIdentifier('3C:71:BF:60:2D:A2')) {
           // TODO: Hardcoded!
@@ -70,15 +74,9 @@ class BluetoothHandler {
             _device = result.device;
             _flutterBlue.stopScan();
             getCharacteristicReferences();
+            state.message = ToastMessages.deviceSuccessfullyConnected;
           });
-          return 0;
         }
-      }
-    });
-    // ignore: missing_return
-    _flutterBlue.isScanning.listen((event) {
-      if (!event && _device == null) {
-        return 3;
       }
     });
   }

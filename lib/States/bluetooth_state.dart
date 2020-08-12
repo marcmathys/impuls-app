@@ -13,7 +13,6 @@ class BTState extends ChangeNotifier {
   Map<Guid, BluetoothCharacteristic> _characteristics = {};
   double _bpm = 0.0;
   List<int> _error = [];
-
   int _brs;
   List<int> _stimulation;
 

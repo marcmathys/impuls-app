@@ -25,14 +25,14 @@ class _EKGChartState extends State<EKGChart> {
 
   @override
   void dispose() {
-    super.dispose();
     _timer.cancel();
+    super.dispose();
   }
 
   Widget build(BuildContext context) {
     return SfCartesianChart(
       legend: Legend(isVisible: true),
-      primaryYAxis: CategoryAxis(maximum: 20000),
+      primaryYAxis: CategoryAxis(),
       primaryXAxis: CategoryAxis(),
       series: <ChartSeries<MedicalData, String>>[
         LineSeries<MedicalData, String>(

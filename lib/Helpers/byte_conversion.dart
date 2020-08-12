@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'dart:typed_data';
 
 import 'package:impulsrefactor/Entities/medical_data.dart';

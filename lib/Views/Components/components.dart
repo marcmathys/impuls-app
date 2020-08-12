@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:impulsrefactor/States/message_state.dart';
 
 class Components {
   static AppBar appBar(String title) {
@@ -8,31 +9,26 @@ class Components {
     );
   }
 
-  static ScaffoldFeatureController loginErrorSnackBar(BuildContext context, int code) {
+  static String bluetoothErrorMessageText(ToastMessages messageCode) {
     String text = '';
-    switch (code) {
-      case 0: {
+    switch (messageCode) {
+      case ToastMessages.deviceSuccessfullyConnected: {
         text = 'Device successfully connected!';
         break;
       }
-      case 1: {
+      case ToastMessages.BluetoothOff: {
         text = 'Bluetooth is turned off! Please turn it on to connect to the device.';
         break;
       }
-      case 2: {
+      case ToastMessages.deviceAlreadyConnected: {
         text = 'Device is already connected!';
         break;
       }
-      case 3: {
+      case ToastMessages.deviceNotFound: {
         text = 'Device was not found!';
         break;
       }
     }
-
-    return Scaffold.of(context).showSnackBar(
-      SnackBar(
-        content: Text(text),
-      ),
-    );
+    return text;
   }
 }

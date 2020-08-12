@@ -1,8 +1,7 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:impulsrefactor/Helpers/byte_conversion.dart';
 import 'package:impulsrefactor/States/bluetooth_state.dart';
+import 'package:impulsrefactor/States/message_state.dart';
 import 'package:impulsrefactor/Views/Components/ekg_chart_component.dart';
 import 'package:impulsrefactor/Views/Components/components.dart';
 import 'package:impulsrefactor/app_constants.dart';
@@ -14,7 +13,7 @@ class Debug extends StatefulWidget {
   _DebugState createState() => _DebugState();
 }
 
-/// TODO: Hint! Streams are not closed nor paused in this view! That only happens when the view is disposed!
+/// Hint! Streams are not closed nor paused in this view! That only happens when the view is disposed!
 class _DebugState extends State<Debug> {
   BluetoothHandler _handler;
   BTState _state;
@@ -29,7 +28,6 @@ class _DebugState extends State<Debug> {
     _constants = AppConstants();
     _textController = TextEditingController();
   }
-
 
   @override
   void dispose() {
@@ -54,7 +52,7 @@ class _DebugState extends State<Debug> {
               children: [
                 RaisedButton(
                   onPressed: () {
-                    _handler.scanForDevices().then((code) => Components.loginErrorSnackBar(context, code));
+                    _handler.scanForDevices(Provider.of<MessageState>(context, listen: false));
                   },
                   child: Text('Connect device'),
                 ),
@@ -91,8 +89,7 @@ class _DebugState extends State<Debug> {
                                 onPressed: () {
                                   List<int> hexList = ByteConversion.stringToHex(_textController.value.text);
                                   if (hexList.length == 0) {
-                                    Scaffold.of(context).showSnackBar(
-                                        SnackBar(content: Text('The given numbers are in the wrong format! Example format: 111,110,109')));
+                                    Scaffold.of(context).showSnackBar(SnackBar(content: Text('The given numbers are in the wrong format! Example format: 111,110,109')));
                                   } else {
                                     _handler.sendStimulationBytes(hexList);
                                   }
