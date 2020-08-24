@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_blue/flutter_blue.dart';
-import 'package:impulsrefactor/Entities/medical_data.dart';
 
 class BTState extends ChangeNotifier {
   static final BTState _instance = BTState._internal();
@@ -9,7 +8,6 @@ class BTState extends ChangeNotifier {
 
   BTState._internal();
 
-  List<MedicalData> _ekgPoints = [MedicalData(DateTime.now(), 0, 0)];
   Map<Guid, BluetoothCharacteristic> _characteristics = {};
   double _bpm = 0.0;
   List<int> _error = [];
@@ -52,16 +50,5 @@ class BTState extends ChangeNotifier {
   set bpm(double value) {
     _bpm = value;
     notifyListeners();
-  }
-
-  List<MedicalData> get ekgPoints => _ekgPoints;
-
-  set ekgPoints(List<MedicalData> value) {
-    _ekgPoints = value;
-  }
-
-  void resetEkgPoints() {
-    _ekgPoints.clear();
-    _ekgPoints.add(MedicalData(DateTime.now(), 0, 0));
   }
 }

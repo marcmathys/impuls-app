@@ -1,18 +1,6 @@
 import 'dart:typed_data';
 
-import 'package:impulsrefactor/Entities/medical_data.dart';
-import 'package:impulsrefactor/States/bluetooth_state.dart';
-
 class ByteConversion {
-  static MedicalData ekgByteConversion(List<int> bluetoothData, BTState appState) {
-    if (appState.ekgPoints.length >= 300) {
-      appState.ekgPoints.removeAt(0);
-    }
-    ByteData ekgByteData = ByteData.sublistView(Uint8List.fromList(bluetoothData.reversed.toList()));
-    int _ekgPoint = ekgByteData.getInt16(0, Endian.big);
-    return MedicalData(DateTime.now(), _ekgPoint, appState.ekgPoints.last.xAxis + 1 ?? 1);
-  }
-
   static double bpmByteConversion(List<int> bluetoothData) {
     ByteData bpmByteData = ByteData.sublistView(Uint8List.fromList(bluetoothData.reversed.toList()));
     return bpmByteData.getFloat32(0, Endian.big);

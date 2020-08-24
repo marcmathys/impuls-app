@@ -1,10 +1,12 @@
 import 'dart:async';
 import 'dart:typed_data';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter_blue/flutter_blue.dart';
 import 'package:impulsrefactor/Helpers/byte_conversion.dart';
 import 'package:impulsrefactor/States/bluetooth_state.dart';
 import 'package:impulsrefactor/States/message_state.dart';
+import 'package:impulsrefactor/Views/Components/ekg_chart_component.dart';
 import 'package:impulsrefactor/app_constants.dart';
 
 class BluetoothHandler {
@@ -16,7 +18,6 @@ class BluetoothHandler {
 
   FlutterBlue _flutterBlue = FlutterBlue.instance;
   BTState _state = BTState();
-  AppConstants _constants = AppConstants();
   BluetoothDevice _device;
   StreamSubscription _stimulation;
   StreamSubscription _ekg;
@@ -98,41 +99,41 @@ class BluetoothHandler {
     }
     _device.discoverServices().then((services) {
       services.forEach((service) async {
-        if (service.uuid == _constants.STIMULATION_UUID) {
+        if (service.uuid == AppConstants.STIMULATION_UUID) {
           var characteristics = service.characteristics;
           for (BluetoothCharacteristic characteristic in characteristics) {
-            if (characteristic.uuid == _constants.STIMULATION_CHARACTERISTIC_UUID) {
-              _state.characteristics[_constants.STIMULATION_CHARACTERISTIC_UUID] = characteristic;
+            if (characteristic.uuid == AppConstants.STIMULATION_CHARACTERISTIC_UUID) {
+              _state.characteristics[AppConstants.STIMULATION_CHARACTERISTIC_UUID] = characteristic;
             }
           }
         }
 
-        if (service.uuid == _constants.EKG_SERVICE_UUID) {
+        if (service.uuid == AppConstants.EKG_SERVICE_UUID) {
           var characteristics = service.characteristics;
           for (BluetoothCharacteristic characteristic in characteristics) {
-            if (characteristic.uuid == _constants.EKG_CHARACTERISTIC_UUID) {
-              _state.characteristics[_constants.EKG_CHARACTERISTIC_UUID] = characteristic;
+            if (characteristic.uuid == AppConstants.EKG_CHARACTERISTIC_UUID) {
+              _state.characteristics[AppConstants.EKG_CHARACTERISTIC_UUID] = characteristic;
             }
-            if (characteristic.uuid == _constants.BPM_CHARACTERISTIC_UUID) {
-              _state.characteristics[_constants.BPM_CHARACTERISTIC_UUID] = characteristic;
-            }
-          }
-        }
-
-        if (service.uuid == _constants.ERROR_SERVICE) {
-          var characteristics = service.characteristics;
-          for (BluetoothCharacteristic characteristic in characteristics) {
-            if (characteristic.uuid == _constants.ERROR_CHARACTERISTIC_UUID) {
-              _state.characteristics[_constants.ERROR_CHARACTERISTIC_UUID] = characteristic;
+            if (characteristic.uuid == AppConstants.BPM_CHARACTERISTIC_UUID) {
+              _state.characteristics[AppConstants.BPM_CHARACTERISTIC_UUID] = characteristic;
             }
           }
         }
 
-        if (service.uuid == _constants.BRS_SERVICE) {
+        if (service.uuid == AppConstants.ERROR_SERVICE) {
           var characteristics = service.characteristics;
           for (BluetoothCharacteristic characteristic in characteristics) {
-            if (characteristic.uuid == _constants.BRS_CHARACTERISTIC_UUID) {
-              _state.characteristics[_constants.BRS_CHARACTERISTIC_UUID] = characteristic;
+            if (characteristic.uuid == AppConstants.ERROR_CHARACTERISTIC_UUID) {
+              _state.characteristics[AppConstants.ERROR_CHARACTERISTIC_UUID] = characteristic;
+            }
+          }
+        }
+
+        if (service.uuid == AppConstants.BRS_SERVICE) {
+          var characteristics = service.characteristics;
+          for (BluetoothCharacteristic characteristic in characteristics) {
+            if (characteristic.uuid == AppConstants.BRS_CHARACTERISTIC_UUID) {
+              _state.characteristics[AppConstants.BRS_CHARACTERISTIC_UUID] = characteristic;
             }
           }
         }
@@ -160,11 +161,11 @@ class BluetoothHandler {
   /// Note that the stimulation characteristic supports 3 and 7 interger values, and "quit" in integer
   /// Starts listening for values
   void sendStimulationBytes(List<int> bytes) async {
-    if (!_state.characteristics.containsKey(_constants.STIMULATION_CHARACTERISTIC_UUID)) {
+    if (!_state.characteristics.containsKey(AppConstants.STIMULATION_CHARACTERISTIC_UUID)) {
       print('Characteristic Stimulation not found!');
       return;
     }
-    BluetoothCharacteristic stimulation = _state.characteristics[_constants.STIMULATION_CHARACTERISTIC_UUID];
+    BluetoothCharacteristic stimulation = _state.characteristics[AppConstants.STIMULATION_CHARACTERISTIC_UUID];
 
     await stimulation.write(bytes);
 
@@ -184,25 +185,25 @@ class BluetoothHandler {
   }
 
   /// Send "on" to the ekg and bpm characteristic and starts listening for values
-  void getEKGAndBPMData() async {
+  void getEKGAndBPMData(GlobalKey<EKGChartState> ekgChartKey) async {
     if (this._device == null) {
       print('Device is not connected!');
       return;
     }
-    if (!_state.characteristics.containsKey(_constants.EKG_CHARACTERISTIC_UUID)) {
+    if (!_state.characteristics.containsKey(AppConstants.EKG_CHARACTERISTIC_UUID)) {
       print('Characteristic EKG not found!');
       return;
     }
 
-    BluetoothCharacteristic ekg = _state.characteristics[_constants.EKG_CHARACTERISTIC_UUID];
-    BluetoothCharacteristic bpm = _state.characteristics[_constants.BPM_CHARACTERISTIC_UUID];
+    BluetoothCharacteristic ekg = _state.characteristics[AppConstants.EKG_CHARACTERISTIC_UUID];
+    BluetoothCharacteristic bpm = _state.characteristics[AppConstants.BPM_CHARACTERISTIC_UUID];
 
-    _state.resetEkgPoints();
+    ekgChartKey.currentState.resetEkgPoints();
     await sendOnSignal(ekg);
 
     if (_ekg == null) {
       _ekg = ekg.value.listen((event) {
-        _state.ekgPoints.add(ByteConversion.ekgByteConversion(event, _state));
+        ekgChartKey.currentState.updateList(event);
       });
       await ekg.setNotifyValue(true);
     }
@@ -231,12 +232,12 @@ class BluetoothHandler {
       print('Device is not connected!');
       return;
     }
-    if (!_state.characteristics.containsKey(_constants.ERROR_CHARACTERISTIC_UUID)) {
+    if (!_state.characteristics.containsKey(AppConstants.ERROR_CHARACTERISTIC_UUID)) {
       print('Characteristic Error Code not found!');
       return;
     }
 
-    BluetoothCharacteristic error = _state.characteristics[_constants.ERROR_CHARACTERISTIC_UUID];
+    BluetoothCharacteristic error = _state.characteristics[AppConstants.ERROR_CHARACTERISTIC_UUID];
 
     if (_errors == null) {
       _errors = error.value.listen((event) {
@@ -258,12 +259,12 @@ class BluetoothHandler {
       print('Device is not connected!');
       return;
     }
-    if (!_state.characteristics.containsKey(_constants.BRS_CHARACTERISTIC_UUID)) {
+    if (!_state.characteristics.containsKey(AppConstants.BRS_CHARACTERISTIC_UUID)) {
       print('Characteristic Error Code not found!');
       return;
     }
 
-    BluetoothCharacteristic brs = _state.characteristics[_constants.BRS_CHARACTERISTIC_UUID];
+    BluetoothCharacteristic brs = _state.characteristics[AppConstants.BRS_CHARACTERISTIC_UUID];
 
     await sendOnSignal(brs);
 

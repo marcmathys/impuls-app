@@ -17,15 +17,14 @@ class Debug extends StatefulWidget {
 class _DebugState extends State<Debug> {
   BluetoothHandler _handler;
   BTState _state;
-  AppConstants _constants;
   TextEditingController _textController;
+  GlobalKey<EKGChartState> _ekgKey = GlobalKey();
 
   @override
   void initState() {
     super.initState();
     _handler = BluetoothHandler();
     _state = BTState();
-    _constants = AppConstants();
     _textController = TextEditingController();
   }
 
@@ -41,7 +40,7 @@ class _DebugState extends State<Debug> {
       body: Builder(builder: (BuildContext context) {
         return ListView(
           children: <Widget>[
-            EKGChart(),
+            EKGChart(key: _ekgKey),
             Text('Stimulation characteristic answer: ${Provider.of<BTState>(context).stimulation.toString()}'),
             Text('Beats per minute: ${Provider.of<BTState>(context).bpm.toStringAsFixed(2)}'),
             Text('Error code: ${Provider.of<BTState>(context).error.toString()}'),
@@ -121,13 +120,13 @@ class _DebugState extends State<Debug> {
               children: [
                 Flexible(
                   child: RaisedButton(
-                    onPressed: () => _handler.getEKGAndBPMData(),
+                    onPressed: () => _handler.getEKGAndBPMData(_ekgKey),
                     child: Text('Get EKG and BPM data'),
                   ),
                 ),
                 Flexible(
                   child: RaisedButton(
-                    onPressed: () => _handler.sendOffSignal(_state.characteristics[_constants.EKG_CHARACTERISTIC_UUID]),
+                    onPressed: () => _handler.sendOffSignal(_state.characteristics[AppConstants.EKG_CHARACTERISTIC_UUID]),
                     child: Text('Stop EKG service'),
                   ),
                 ),
@@ -155,7 +154,7 @@ class _DebugState extends State<Debug> {
                 ),
                 Flexible(
                   child: RaisedButton(
-                    onPressed: () => _handler.sendOffSignal(_state.characteristics[_constants.BRS_CHARACTERISTIC_UUID]),
+                    onPressed: () => _handler.sendOffSignal(_state.characteristics[AppConstants.BRS_CHARACTERISTIC_UUID]),
                     child: Text('Stop BRS Data'),
                   ),
                 ),

@@ -1,7 +1,6 @@
 class MedicalData {
-  final DateTime dateTime;
   final num ekgPoint;
-  int xAxis;
+  num xAxis;
 
-  MedicalData(this.dateTime, this.ekgPoint, this.xAxis);
+  MedicalData(this.ekgPoint, this.xAxis);
 }
