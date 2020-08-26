@@ -27,12 +27,13 @@ class FirebaseHandler {
 
   Future signOut() async {
     _auth.signOut();
+    _user = null;
   }
 
-  void retrievePatientData() {
+  Future retrievePatientData() async {
     //TODO: Dummy code! Implement
     Patient a = Patient(Icons.add, 'Hans', 'Gretel', '1337');
-    Patient b = Patient(Icons.ac_unit, 'Petra', 'Pan', '420');
+    Patient b = Patient(Icons.ac_unit, 'Petra', 'Pan', '42');
     Patient c = Patient(Icons.access_time, 'Ben', 'Busy', '247');
     PatientList().patients = List();
     PatientList().patients.addAll([a,b,c]);

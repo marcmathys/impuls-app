@@ -83,11 +83,10 @@ class _LoginState extends State<Login> {
                       onPressed: () async {
                         if (_formKey.currentState.validate()) {
                           if (await _firebaseHandler.signIn(_email.text, _password.text)) {
-                            _firebaseHandler.retrievePatientData();
                             Navigator.of(context).pushNamed('/patient_select');
                           } else {
                             _key.currentState.showSnackBar(
-                              SnackBar(content: Text("Could not authenticate user.")),
+                              SnackBar(content: Text("User authentication failed.")),
                             );
                           }
                         }

@@ -1,9 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:impulsrefactor/Views/Components/chart_component.dart';
 import 'package:impulsrefactor/Views/Components/components.dart';
 import 'package:impulsrefactor/Entities/patient.dart';
-import 'package:impulsrefactor/bluetooth_handler.dart';
 import 'package:impulsrefactor/firebase_handler.dart';
 
 class PatientSelect extends StatefulWidget {
@@ -12,8 +10,14 @@ class PatientSelect extends StatefulWidget {
 }
 
 class _PatientSelectState extends State<PatientSelect> {
-  FirebaseUser user = FirebaseHandler().user;
-  BluetoothHandler _handler = BluetoothHandler();
+  FirebaseHandler _handler;
+
+  @override
+  void initState() {
+    super.initState();
+    _handler = FirebaseHandler();
+    _handler.retrievePatientData().then((value) => buildPatientWidgets(context));
+  }
 
   List<Widget> buildPatientWidgets(BuildContext context) {
     List<Widget> patientWidgets = List();
@@ -25,33 +29,20 @@ class _PatientSelectState extends State<PatientSelect> {
 
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: Components.appBar('Hello'), //TODO:  Add ${user.displayName ?? ''} TODO: Nicen this up!
-      body: Column(
-        children: <Widget>[
-          Text('Please select a patient from the list'),
-          Flexible(
-            child: ListView(
-              children: buildPatientWidgets(context),
+      appBar: Components.appBar('Hello'), //TODO: Implement display name! ${_handler.user != null ? ' ' + user.displayName : ''}
+      floatingActionButton: FloatingActionButton(onPressed: () => Navigator.of(context).pushNamed('/debug'), child: Text('Debug')),
+      body: Builder(builder: (BuildContext context) {
+        return Column(
+          children: <Widget>[
+            Text('Please select a patient from the list'),
+            Flexible(
+              child: ListView(
+                children: buildPatientWidgets(context),
+              ),
             ),
-          ),
-          Chart(),
-          RaisedButton(
-            color: Colors.amberAccent,
-            onPressed: () => _handler.scanForDevices(),
-            child: Text('Connect'),
-          ),
-          RaisedButton(
-            color: Colors.amberAccent,
-            onPressed: () => _handler.getEKGData(),
-            child: Text('Get Data'),
-          ),
-          RaisedButton(
-            color: Colors.amberAccent,
-            onPressed: () => _handler.sendOffSignal(_handler.ekgSubscription),
-            child: Text('Send stop Signal'),
-          ),
-        ],
-      ),
+          ],
+        );
+      }),
     );
   }
 }
