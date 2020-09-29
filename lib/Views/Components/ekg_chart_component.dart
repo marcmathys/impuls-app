@@ -5,7 +5,6 @@ import 'package:impulsrefactor/Entities/medical_data.dart';
 import 'package:impulsrefactor/app_constants.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 
-/// Displays a Chart widget. Mode can be either EKG or IBI.
 class EKGChart extends StatefulWidget {
   const EKGChart({Key key}) : super(key: key);
 
@@ -44,7 +43,7 @@ class EKGChartState extends State<EKGChart> {
         );
       } else {
         _controller.updateDataSource(
-          addedDataIndexes: <int>[_ekgPoints.length - 1],
+          addedDataIndexes: <int>[_ekgPoints.length - 1], //TODO: Only updates the last instead of the last 10 points
         );
       }
       updateCounter = 0;

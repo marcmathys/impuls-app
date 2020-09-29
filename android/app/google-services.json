@@ -1,49 +1,113 @@
 {
   "project_info": {
-    "project_number": "134162298693",
-    "firebase_url": "https://impulsrefactor.firebaseio.com",
-    "project_id": "impulsrefactor",
-    "storage_bucket": "impulsrefactor.appspot.com"
+    "project_number": "463531903010",
+    "firebase_url": "https://impuls-cffab.firebaseio.com",
+    "project_id": "impuls-cffab",
+    "storage_bucket": "impuls-cffab.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:134162298693:android:e7d20cfa7e3ea052c9302c",
+        "mobilesdk_app_id": "1:463531903010:android:f190c7933b99e545d4e27b",
         "android_client_info": {
           "package_name": "de.unimarburg.impuls"
         }
       },
       "oauth_client": [
         {
-          "client_id": "134162298693-nhlgi4s254sargm8qrbl8v4sum7cg6q8.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "de.unimarburg.impuls",
-            "certificate_hash": "3858d53f08463f343a165fea35b29c6adb1f765e"
-          }
-        },
-        {
-          "client_id": "134162298693-ulos7gbbqgs181q3s7naoha46lu7c4oj.apps.googleusercontent.com",
+          "client_id": "463531903010-03be3vnqq7ejdcrmcjkjtioslkvgtgsi.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyAmUr-ZSgfIAGdW6onaOZi45qzSH6sk9pY"
+          "current_key": "AIzaSyAMU3dJlWTZh9I9Hiv3ynhw38b2fTuklak"
         }
       ],
       "services": {
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "134162298693-ulos7gbbqgs181q3s7naoha46lu7c4oj.apps.googleusercontent.com",
+              "client_id": "463531903010-03be3vnqq7ejdcrmcjkjtioslkvgtgsi.apps.googleusercontent.com",
               "client_type": 3
             },
             {
-              "client_id": "134162298693-iomnufsl3efieegaqnvpfvep2ucumpv3.apps.googleusercontent.com",
+              "client_id": "463531903010-lal4qmpp92p993ekkk6igsirpsk6b3i6.apps.googleusercontent.com",
               "client_type": 2,
               "ios_info": {
-                "bundle_id": "com.example.impulsrefacto"
+                "bundle_id": "de.unimarburg.impuls10"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:463531903010:android:51996f8bc1f22235d4e27b",
+        "android_client_info": {
+          "package_name": "de.unimarburg.impuls10"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "463531903010-03be3vnqq7ejdcrmcjkjtioslkvgtgsi.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAMU3dJlWTZh9I9Hiv3ynhw38b2fTuklak"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "463531903010-03be3vnqq7ejdcrmcjkjtioslkvgtgsi.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "463531903010-lal4qmpp92p993ekkk6igsirpsk6b3i6.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "de.unimarburg.impuls10"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:463531903010:android:c11fa70055510a39d4e27b",
+        "android_client_info": {
+          "package_name": "me.devdanetra.finapres_app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "463531903010-03be3vnqq7ejdcrmcjkjtioslkvgtgsi.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAMU3dJlWTZh9I9Hiv3ynhw38b2fTuklak"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "463531903010-03be3vnqq7ejdcrmcjkjtioslkvgtgsi.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "463531903010-lal4qmpp92p993ekkk6igsirpsk6b3i6.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "de.unimarburg.impuls10"
               }
             }
           ]

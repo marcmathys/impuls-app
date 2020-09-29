@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:impulsrefactor/Helpers/byte_conversion.dart';
+import 'package:impulsrefactor/Services/bluetooth_handler.dart';
 import 'package:impulsrefactor/States/bluetooth_state.dart';
 import 'package:impulsrefactor/States/message_state.dart';
 import 'package:impulsrefactor/Views/Components/ekg_chart_component.dart';
 import 'package:impulsrefactor/Views/Components/components.dart';
 import 'package:impulsrefactor/app_constants.dart';
-import 'package:impulsrefactor/bluetooth_handler.dart';
 import 'package:provider/provider.dart';
 
 class Debug extends StatefulWidget {

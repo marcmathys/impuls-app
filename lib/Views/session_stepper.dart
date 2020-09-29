@@ -4,7 +4,7 @@ import 'package:impulsrefactor/Views/Components/components.dart';
 import 'package:impulsrefactor/Views/Components/ekg_chart_component.dart';
 import 'package:percent_indicator/linear_percent_indicator.dart';
 
-class Session extends StatefulWidget {
+class SessionStepper extends StatefulWidget {
   bool _attachElectrodes = false;
   bool _turnedOnMachines = false;
   int _currentStep = 0;
@@ -12,10 +12,10 @@ class Session extends StatefulWidget {
   int _painLevel = 200;
 
   @override
-  _SessionState createState() => _SessionState();
+  _SessionStepperState createState() => _SessionStepperState();
 }
 
-class _SessionState extends State<Session> {
+class _SessionStepperState extends State<SessionStepper> {
   @override
   void initState() {
     super.initState();

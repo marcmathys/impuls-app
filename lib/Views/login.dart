@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:impulsrefactor/Services/firebase_handler.dart';
 import 'package:impulsrefactor/Views/Components/components.dart';
-
-import '../firebase_handler.dart';
 
 class Login extends StatefulWidget {
   @override
@@ -14,11 +13,12 @@ class _LoginState extends State<Login> {
   TextEditingController _password;
   final _formKey = GlobalKey<FormState>();
   final _key = GlobalKey<ScaffoldState>();
-  final FirebaseHandler _firebaseHandler = FirebaseHandler();
+  FirebaseHandler _firebaseHandler;
 
   @override
   void initState() {
     super.initState();
+    _firebaseHandler = FirebaseHandler();
     _email = TextEditingController();
     _password = TextEditingController();
   }
@@ -31,6 +31,7 @@ class _LoginState extends State<Login> {
   }
 
   bool validate() {
+    //TODO: Implement
     return true;
   }
 
@@ -50,7 +51,7 @@ class _LoginState extends State<Login> {
                   padding: const EdgeInsets.all(16.0),
                   child: TextFormField(
                     controller: _email,
-                    validator: (value) => (value.isEmpty) ? "Please Enter Email" : null,
+                    validator: (value) => (value.isEmpty) ? "Please enter email" : null,
                     style: style,
                     decoration: InputDecoration(
                       prefixIcon: Icon(Icons.email),
@@ -63,7 +64,7 @@ class _LoginState extends State<Login> {
                   padding: const EdgeInsets.all(16.0),
                   child: TextFormField(
                     controller: _password,
-                    validator: (value) => (value.isEmpty) ? "Please Enter Password" : null,
+                    validator: (value) => (value.isEmpty) ? "Please enter password" : null,
                     style: style,
                     decoration: InputDecoration(
                       prefixIcon: Icon(Icons.lock),
@@ -83,10 +84,15 @@ class _LoginState extends State<Login> {
                       onPressed: () async {
                         if (_formKey.currentState.validate()) {
                           if (await _firebaseHandler.signIn(_email.text, _password.text)) {
-                            Navigator.of(context).pushNamed('/patient_select');
+                            String statusMessage = await _firebaseHandler.loadTherapist();
+                            if (statusMessage == 'OK') {
+                              Navigator.of(context).pushNamed('/patient_select');
+                            } else {
+                              _key.currentState.showSnackBar(SnackBar(content: Text(statusMessage)));
+                            }
                           } else {
                             _key.currentState.showSnackBar(
-                              SnackBar(content: Text("User authentication failed.")),
+                              SnackBar(content: Text("User authentication failed."), duration: Duration(seconds: 5),),
                             );
                           }
                         }

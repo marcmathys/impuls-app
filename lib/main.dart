@@ -1,16 +1,18 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:impulsrefactor/States/bluetooth_state.dart';
 import 'package:impulsrefactor/States/message_state.dart';
 import 'package:impulsrefactor/Views/debug.dart';
 import 'package:impulsrefactor/Views/patient_details.dart';
 import 'package:impulsrefactor/Views/patient_select.dart';
-import 'package:impulsrefactor/Views/session.dart';
+import 'package:impulsrefactor/Views/session_stepper.dart';
 import 'package:provider/provider.dart';
 
 import 'Views/login.dart';
 
-void main() {
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
   runApp(MultiProvider(providers: [
     ChangeNotifierProvider(create: (_) => BTState()),
     ChangeNotifierProvider(create: (_) => MessageState()),
@@ -27,13 +29,13 @@ class ImpulsMain extends StatelessWidget {
       ),
       title: 'Impuls',
       debugShowCheckedModeBanner: false,
-      initialRoute: '/patient_select',
+      initialRoute: '/login',
       //TODO: Debug! Change to /login!
       routes: {
         '/login': (BuildContext context) => Login(),
         '/patient_select': (BuildContext context) => PatientSelect(),
         '/patient_details': (BuildContext context) => PatientDetail(),
-        '/session': (BuildContext context) => Session(),
+        '/session_stepper': (BuildContext context) => SessionStepper(),
         '/debug': (BuildContext context) => Debug(),
       },
     );

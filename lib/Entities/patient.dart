@@ -1,44 +1,25 @@
 import 'package:flutter/material.dart';
+import 'package:impulsrefactor/Entities/session.dart';
 
 /// The entity class for a patient object. Contains a toWidget()-method mainly used to fill the ListView on PatientSelect
 class Patient {
-  //TODO: Negotiate right format. Icon? Custom image?
-  IconData icon = Icons.edit; // Default values
-  String name = '';
-  String surname = '';
-  String patientCode = '';
+  DateTime enrolTime;
+  bool approved;
+  DateTime approvedTime;
+  int birthYear;
+  String currentSessionID;
+  String gender;
+  double kg;
+  String lastSessionID;
+  DateTime lastSessionTime;
+  List<String> sessionIDs;
+  List<String> therapistIDs;
+  List<String> therapistUIDs;
+  String patientCode;
+  IconData icon;
+  List<Session> sessions;
 
-  Patient(this.icon, this.name, this.surname, this.patientCode);
-
-  Widget toWidget(BuildContext context) {
-    return GestureDetector(
-      onTap: () async {
-        Navigator.of(context).pushNamed('/patient_details', arguments: this);
-      },
-      child: Container(
-        margin: EdgeInsets.fromLTRB(10, 5, 10, 5),
-        color: Color(0xD4D4D4FF),
-        height: MediaQuery.of(context).size.height / 15,
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: <Widget>[
-            Flexible(flex: 1, child: Icon(this.icon)),
-            Flexible(flex: 2, child: Text(this.patientCode)),
-            Flexible(flex: 1, child: Icon(Icons.keyboard_arrow_right)),
-          ],
-        ),
-      ),
-    );
-  }
+  Patient({this.enrolTime, this.approved, this.approvedTime, this.birthYear, this.currentSessionID, this.gender, this.kg, this.lastSessionID, this.lastSessionTime, this.sessionIDs,
+      this.therapistIDs, this.therapistUIDs, this.patientCode, this.icon, this.sessions}); // Default values
 }
 
-/// The list of all patients retrieved from firebase.
-class PatientList {
-  static final PatientList _instance = PatientList._internal();
-
-  factory PatientList() => _instance;
-
-  PatientList._internal();
-
-  List<Patient> patients = List();
-}

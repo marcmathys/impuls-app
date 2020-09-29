@@ -1,8 +1,10 @@
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:impulsrefactor/Entities/patient_list.dart';
+import 'package:impulsrefactor/Entities/therapist.dart';
 import 'package:impulsrefactor/Views/Components/components.dart';
 import 'package:impulsrefactor/Entities/patient.dart';
-import 'package:impulsrefactor/firebase_handler.dart';
+import 'package:impulsrefactor/Views/Components/patient_tile_component.dart';
 
 class PatientSelect extends StatefulWidget {
   @override
@@ -10,34 +12,29 @@ class PatientSelect extends StatefulWidget {
 }
 
 class _PatientSelectState extends State<PatientSelect> {
-  FirebaseHandler _handler;
-
-  @override
-  void initState() {
-    super.initState();
-    _handler = FirebaseHandler();
-    _handler.retrievePatientData().then((value) => buildPatientWidgets(context));
-  }
-
-  List<Widget> buildPatientWidgets(BuildContext context) {
-    List<Widget> patientWidgets = List();
-    PatientList().patients.forEach((patient) {
-      patientWidgets.add(patient.toWidget(context));
-    });
-    return patientWidgets;
-  }
-
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: Components.appBar('Hello'), //TODO: Implement display name! ${_handler.user != null ? ' ' + user.displayName : ''}
+      appBar: Components.appBar('Hello, ${Therapist().name}!'),
       floatingActionButton: FloatingActionButton(onPressed: () => Navigator.of(context).pushNamed('/debug'), child: Text('Debug')),
       body: Builder(builder: (BuildContext context) {
         return Column(
           children: <Widget>[
             Text('Please select a patient from the list'),
             Flexible(
-              child: ListView(
-                children: buildPatientWidgets(context),
+              child: StreamBuilder(
+                stream: FirebaseFirestore.instance.collection('patients').where(FieldPath.documentId, whereIn: Therapist().patients).snapshots(), //TODO: Maybe directly get the IDs from the database instead of the in-memory object?!
+                builder: (context, snapshot) {
+                  if (!snapshot.hasData) {
+                    return const Text('Loading');
+                  }
+                  return ListView.builder(
+                    itemCount: snapshot.data.documents.length,
+                    itemBuilder: (context, index) {
+                      Patient patient = PatientList().addPatientFromSnapshot(snapshot.data.documents[index]);
+                      return PatientTile(patient: patient);
+                    },
+                  );
+                },
               ),
             ),
           ],

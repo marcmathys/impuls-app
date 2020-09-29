@@ -1,6 +1,6 @@
 class MedicalData {
   final num ekgPoint;
-  num xAxis;
+  final num xAxis;
 
   MedicalData(this.ekgPoint, this.xAxis);
 }
