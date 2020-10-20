@@ -13,12 +13,12 @@ class _LoginState extends State<Login> {
   TextEditingController _password;
   final _formKey = GlobalKey<FormState>();
   final _key = GlobalKey<ScaffoldState>();
-  FirebaseHandler _firebaseHandler;
+  FirebaseHandler _handler;
 
   @override
   void initState() {
     super.initState();
-    _firebaseHandler = FirebaseHandler();
+    _handler = FirebaseHandler();
     _email = TextEditingController();
     _password = TextEditingController();
   }
@@ -36,6 +36,8 @@ class _LoginState extends State<Login> {
   }
 
   Widget build(BuildContext context) {
+    _handler.getCurrentUser().whenComplete(() => Navigator.of(context).pushNamed('/patient_select'));
+
     return Scaffold(
       key: _key,
       appBar: Components.appBar('Impuls'),
@@ -83,8 +85,8 @@ class _LoginState extends State<Login> {
                     child: MaterialButton(
                       onPressed: () async {
                         if (_formKey.currentState.validate()) {
-                          if (await _firebaseHandler.signIn(_email.text, _password.text)) {
-                            String statusMessage = await _firebaseHandler.loadTherapist();
+                          if (await _handler.signIn(_email.text, _password.text)) {
+                            String statusMessage = await _handler.loadTherapist();
                             if (statusMessage == 'OK') {
                               Navigator.of(context).pushNamed('/patient_select');
                             } else {

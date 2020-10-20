@@ -30,7 +30,6 @@ class ImpulsMain extends StatelessWidget {
       title: 'Impuls',
       debugShowCheckedModeBanner: false,
       initialRoute: '/login',
-      //TODO: Debug! Change to /login!
       routes: {
         '/login': (BuildContext context) => Login(),
         '/patient_select': (BuildContext context) => PatientSelect(),

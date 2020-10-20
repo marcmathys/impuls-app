@@ -15,21 +15,18 @@ class PatientList {
   Patient addPatientFromSnapshot(QueryDocumentSnapshot snapshot) {
     Patient patient = Patient();
 
-    patient.enrolTime = (snapshot.get('enrolTime') as Timestamp).toDate();
     patient.approved = snapshot.get('approved');
-    patient.approvedTime = (snapshot.get('approvedTime') as Timestamp).toDate();
+    patient.approvedDate = (snapshot.get('approvedDate') as Timestamp).toDate();
     patient.birthYear = snapshot.get('birthYear');
-    patient.currentSessionID = snapshot.get('currentSessionID');
+    patient.enrolDate = (snapshot.get('enrolDate') as Timestamp).toDate();
     patient.gender = snapshot.get('gender');
     patient.kg = snapshot.get('kg');
-    patient.lastSessionID = snapshot.get('lastSessionID');
-    patient.lastSessionTime = (snapshot.get('lastSessionTime') as Timestamp).toDate();
-    patient.sessionIDs = List.from(snapshot.get('sessionIDs'));
-    patient.therapistIDs = List.from(snapshot.get('therapistIDs'));
+    patient.lastSessionDate = (snapshot.get('lastSessionDate') as Timestamp).toDate();
+    patient.moodleID = snapshot.get('moodleID');
     patient.therapistUIDs = List.from(snapshot.get('therapistUIDs'));
-    patient.patientCode = snapshot.id;
-    patient.icon = Icons.accessibility;
+    patient.uid = snapshot.id;
     //IconData icon = document.get('icon'); TODO: Get icon! (String?!)
+    patient.icon = Icons.accessibility;
 
     this.patients.add(patient);
     return patient;

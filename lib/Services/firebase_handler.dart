@@ -1,6 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/services.dart';
 import 'package:impulsrefactor/Entities/patient.dart';
+import 'package:impulsrefactor/Entities/session.dart';
 import 'package:impulsrefactor/Entities/therapist.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
@@ -17,6 +17,21 @@ class FirebaseHandler {
   User _user;
 
   User get user => _user;
+
+  /// A method that searches for an already logged-in user and logs that user in
+  Future<bool> getCurrentUser() async {
+    User user = _auth.currentUser;
+    if (user != null) {
+      _user = user;
+      String statusMessage = await loadTherapist();
+      if (statusMessage == 'OK') {
+        return true;
+      } else {
+        return false;
+      }
+    }
+    return false;
+  }
 
   Future<bool> signIn(String email, String password) async {
     try {
@@ -54,11 +69,10 @@ class FirebaseHandler {
       therapist.email = document.get('email');
       therapist.espMac = document.get('espMac');
       therapist.lastName = document.get('lastName');
-      therapist.lastSession = (document.get('lastSession') as Timestamp).toDate();
       therapist.moodleID = document.get('moodleID');
       therapist.name = document.get('name');
-      therapist.patients = List.from(document.get('patients'));
       therapist.phone = document.get('phone');
+      therapist.uid = user.uid;
 
       return 'OK';
     } catch (exception) {
@@ -71,35 +85,40 @@ class FirebaseHandler {
     }
   }
 
-  Future<Patient> loadPatients(String patientID) async {
-    String path = 'patients/$patientID';
-    try {
-      DocumentSnapshot document = await FirebaseFirestore.instance.doc(path).get();
-      Patient patient = Patient();
+  Future<void> addSessionsToPatient(Patient patient) async {
+    ///TODO: implement automatic update?!
+    if (patient.sessions.isNotEmpty) {
+      return;
+    }
 
-      patient.enrolTime = (document.get('enrolTime') as Timestamp).toDate();
-      patient.approved = document.get('approved');
-      patient.approvedTime = (document.get('approvedTime') as Timestamp).toDate();
-      patient.birthYear = document.get('birthYear');
-      patient.currentSessionID = document.get('currentSessionID');
-      patient.gender = document.get('gender');
-      patient.kg = document.get('kg');
-      patient.lastSessionID = document.get('lastSessionID');
-      patient.lastSessionTime = (document.get('lastSessionTime') as Timestamp).toDate();
-      patient.sessionIDs = List.from(document.get('sessionIDs'));
-      patient.therapistIDs = List.from(document.get('therapistIDs'));
-      patient.therapistUIDs = List.from(document.get('therapistUIDs'));
-      patient.patientCode = document.get('patientCode');
-      //IconData icon = document.get('icon'); TODO: Get icon! (String?!)
+    QuerySnapshot querySnapshot =
+        await FirebaseFirestore.instance.collection('sessions').where('patientUID', isEqualTo: patient.uid).orderBy('date').get();
 
-      return patient;
-    } catch (exception) {
-      if (exception is AssertionError) {
-        throw 'Patient with ID $patientID not found!';
-      } else if (exception is PlatformException) {
-        throw 'Access to Database is restricted!';
-      }
-      throw 'An unexpected error occurred: $exception';
+    if (querySnapshot.docs.isNotEmpty) {
+      querySnapshot.docs.forEach((DocumentSnapshot document) {
+        Session session = Session();
+
+        session.prePainRating = document.get('prePainRating');
+        session.confirmed = document.get('confirmed');
+        session.confirmedDate = (document.get('confirmedDate') as Timestamp).toDate();
+        session.date = (document.get('date') as Timestamp).toDate();
+        session.deviceUID = document.get('deviceUID');
+        session.location = document.get('location');
+        session.notes = document.get('notes');
+        session.painThreshold = List.from(document.get('painThreshold'));
+        session.patientUID = document.get('patientUID');
+        session.postPainRating = document.get('postPainRating');
+        session.sensoryThreshold = List.from(document.get('sensoryThreshold'));
+        session.stimRating1 = List.from(document.get('stimRating1'));
+        session.stimRating2 = List.from(document.get('stimRating2'));
+        session.therapistUIDs = List.from(document.get('therapistUIDs'));
+        session.toleranceThreshold = List.from(document.get('toleranceThreshold'));
+        session.uid = document.id;
+
+        if (!patient.sessions.contains(session)) {
+          patient.sessions.add(session);
+        }
+      });
     }
   }
 }

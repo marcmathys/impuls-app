@@ -22,7 +22,7 @@ class _PatientSelectState extends State<PatientSelect> {
             Text('Please select a patient from the list'),
             Flexible(
               child: StreamBuilder(
-                stream: FirebaseFirestore.instance.collection('patients').where(FieldPath.documentId, whereIn: Therapist().patients).snapshots(), //TODO: Maybe directly get the IDs from the database instead of the in-memory object?!
+                stream: FirebaseFirestore.instance.collection('patients').where('therapistUIDs', arrayContains: Therapist().uid).snapshots(),
                 builder: (context, snapshot) {
                   if (!snapshot.hasData) {
                     return const Text('Loading');

@@ -1,21 +1,21 @@
 class Session {
-  DateTime confirmDate;
+  int prePainRating;
   bool confirmed;
+  DateTime confirmedDate;
   DateTime date;
-  String device;
+  String deviceUID;
   String location;
   String notes;
   List<int> painThreshold;
-  int patientID;
-  int patientUID;
+  String patientUID;
   int postPainRating;
-  int prePainRating;
   List<int> sensoryThreshold;
-  List<int> stimRating;
-  String therapistID;
-  String therapistUID;
+  List<int> stimRating1;
+  List<int> stimRating2;
+  List<String> therapistUIDs;
   List<int> toleranceThreshold;
+  String uid;
 
-  Session({this.confirmDate, this.confirmed, this.date, this.device, this.location, this.notes, this.painThreshold, this.patientID, this.patientUID, this.postPainRating,
-      this.prePainRating, this.sensoryThreshold, this.stimRating, this.therapistID, this.therapistUID, this.toleranceThreshold});
+  Session({this.confirmedDate, this.confirmed, this.date, this.deviceUID, this.location, this.notes, this.painThreshold, this.patientUID, this.postPainRating,
+      this.prePainRating, this.sensoryThreshold, this.stimRating1, this.stimRating2, this.therapistUIDs, this.toleranceThreshold});
 }

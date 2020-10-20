@@ -2,7 +2,7 @@ class Therapist {
   static final Therapist _instance = Therapist._internal();
   factory Therapist() => _instance;
 
-  Therapist._internal({this.address, this.approved, this.approvedTimestamp, this.clinicID, this.email, this.lastName, this.lastSession, this.moodleID, this.name, this.patients, this.phone});
+  Therapist._internal({this.address, this.approved, this.approvedTimestamp, this.clinicID, this.email, this.lastName, this.moodleID, this.name, this.phone, this.uid});
 
   String address;
   bool approved;
@@ -11,9 +11,8 @@ class Therapist {
   String email;
   String espMac;
   String lastName;
-  DateTime lastSession;
   String moodleID;
   String name;
-  List<String> patients;
   String phone;
+  String uid;
 }

@@ -1,27 +1,30 @@
 import 'package:flutter/material.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 
-class PainLevelChart extends StatelessWidget {
-  Widget build(BuildContext context) {
-    return SfCartesianChart(primaryXAxis: CategoryAxis(labelRotation: 90), series: <ColumnSeries<MockData, int>>[
-      ColumnSeries<MockData, int>(
-        // Bind data source
-        dataSource: <MockData>[
-          MockData(1, 10),
-          MockData(2, 8),
-          MockData(3, 6),
-          MockData(4, 4),
-        ],
-        xValueMapper: (MockData mock, _) => mock.session,
-        yValueMapper: (MockData mock, _) => mock.level,
-      )
-    ]);
-  }
+class PainLevelChart extends StatefulWidget {
+  final int initialLevel;
+  final int finalLevel;
+
+  PainLevelChart(this.initialLevel, this.finalLevel);
+
+  @override
+  _PainLevelChartState createState() => _PainLevelChartState();
 }
 
-class MockData {
-  int session;
-  int level;
-
-  MockData(this.session, this.level);
+class _PainLevelChartState extends State<PainLevelChart> {
+  Widget build(BuildContext context) {
+    return SfCartesianChart(
+      title: ChartTitle(text: 'Thresholds', textStyle: TextStyle(fontWeight: FontWeight.bold)),
+      primaryXAxis: CategoryAxis(),
+      series: <ColumnSeries>[
+        ColumnSeries<num, String>(
+          dataSource: [widget.initialLevel, widget.finalLevel],
+          xValueMapper: (_, index) {
+            return index == 0 ? 'Initial Level' : 'Final Level';
+          },
+          yValueMapper: (num level, _) => level,
+        )
+      ],
+    );
+  }
 }
