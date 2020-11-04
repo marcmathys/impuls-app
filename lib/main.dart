@@ -5,7 +5,8 @@ import 'package:impulsrefactor/States/message_state.dart';
 import 'package:impulsrefactor/Views/debug.dart';
 import 'package:impulsrefactor/Views/patient_details.dart';
 import 'package:impulsrefactor/Views/patient_select.dart';
-import 'package:impulsrefactor/Views/session_stepper.dart';
+import 'package:impulsrefactor/Views/session_guide.dart';
+import 'package:impulsrefactor/Views/session_stepper_to_be_refactored.dart';
 import 'package:provider/provider.dart';
 
 import 'Views/login.dart';
@@ -29,12 +30,12 @@ class ImpulsMain extends StatelessWidget {
       ),
       title: 'Impuls',
       debugShowCheckedModeBanner: false,
-      initialRoute: '/login',
+      initialRoute: '/session_guide', ///TODO: Back to login
       routes: {
         '/login': (BuildContext context) => Login(),
         '/patient_select': (BuildContext context) => PatientSelect(),
         '/patient_details': (BuildContext context) => PatientDetail(),
-        '/session_stepper': (BuildContext context) => SessionStepper(),
+        '/session_guide': (BuildContext context) => SessionGuide(),
         '/debug': (BuildContext context) => Debug(),
       },
     );
