@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:impulsrefactor/Entities/session.dart';
 
 class ThresholdDetermination extends StatefulWidget {
-  final VoidCallback _nextStep;
-  final Session _session;
+  final Function(Map<int, int>, Map<int, int>, int round) _onDeterminationEnd;
 
-  ThresholdDetermination(this._nextStep, this._session);
+  ThresholdDetermination(this._onDeterminationEnd);
 
   @override
   _ThresholdDeterminationState createState() => _ThresholdDeterminationState();
@@ -65,23 +63,6 @@ class _ThresholdDeterminationState extends State<ThresholdDetermination> {
       _generalButtonLockout = true;
       _stimLockout = false;
     });
-  }
-
-  ///TODO: Move to the callback in order to be able to add to stimRating 1 and 2 and 3 with one widget!
-  saveAndAdvanceStep() {
-    if (_round == 2) {
-      _stimRatingRound1.forEach((key, value) {
-        int average = (value + _stimRatingRound2[key]) ~/ 2;
-        widget._session.stimRating1.add(average);
-      });
-    } else {
-      _stimRatingRound1.forEach((key, value) {
-        widget._session.stimRating1.add(value);
-      });
-    }
-    widget._session.sensoryThreshold.addAll({_stimRatingRound1[0], _stimRatingRound2[0]});
-    widget._session.painThreshold.addAll({_stimRatingRound1[1], _stimRatingRound2[1]});
-    widget._session.toleranceThreshold.addAll({_stimRatingRound1[10], _stimRatingRound2[10]});
   }
 
   @override
@@ -184,7 +165,7 @@ class _ThresholdDeterminationState extends State<ThresholdDetermination> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               RaisedButton(
-                onPressed: _roundInProgress ? null : saveAndAdvanceStep,
+                onPressed: _roundInProgress ? null : widget._onDeterminationEnd(_stimRatingRound1, _stimRatingRound2, _round),
                 child: Text('Start therapy'),
               ),
               RaisedButton(
