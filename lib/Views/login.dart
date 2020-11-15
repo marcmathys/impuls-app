@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:impulsrefactor/Services/firebase_handler.dart';
+import 'package:impulsrefactor/Services/firebase_service.dart';
 import 'package:impulsrefactor/Views/Components/components.dart';
 
 class Login extends StatefulWidget {

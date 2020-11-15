@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 
 class ThresholdDetermination extends StatefulWidget {
   final Function(Map<int, int>, Map<int, int>, int round) _onDeterminationEnd;
+  bool isThirdDetermination;
 
-  ThresholdDetermination(this._onDeterminationEnd);
+  ThresholdDetermination(this._onDeterminationEnd, this.isThirdDetermination);
 
   @override
   _ThresholdDeterminationState createState() => _ThresholdDeterminationState();
@@ -14,9 +15,22 @@ class _ThresholdDeterminationState extends State<ThresholdDetermination> {
   bool _roundInProgress = true;
   int _stimulationLevel = 0;
   bool _stimLockout = false;
-  Map _stimRatingRound1 = {0: 0, 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0, 10: 0};
-  Map _stimRatingRound2 = {0: 0, 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0, 10: 0};
-  Map _buttonLockouts = {-1: false, 0: false, 1: false, 2: false, 3: false, 4: false, 5: false, 6: false, 7: false, 8: false, 9: false, 10: false};
+  Map<int, int> _stimRatingRound1 = {0: 0, 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0, 10: 0};
+  Map<int, int> _stimRatingRound2 = {0: 0, 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0, 10: 0};
+  Map<int, bool> _buttonLockouts = {
+    -1: false,
+    0: false,
+    1: false,
+    2: false,
+    3: false,
+    4: false,
+    5: false,
+    6: false,
+    7: false,
+    8: false,
+    9: false,
+    10: false
+  };
   bool _generalButtonLockout = true;
 
   void startNextRound() {
@@ -97,6 +111,7 @@ class _ThresholdDeterminationState extends State<ThresholdDetermination> {
           Row(
             children: <Widget>[
               FlatButton(
+                disabledTextColor: Colors.red,
                 onPressed: _generalButtonLockout || _buttonLockouts[-1]
                     ? null
                     : () {
@@ -108,14 +123,17 @@ class _ThresholdDeterminationState extends State<ThresholdDetermination> {
                 child: Text('N/A'),
               ),
               FlatButton(
+                disabledTextColor: Colors.red,
                 onPressed: _generalButtonLockout || _buttonLockouts[0] ? null : () => addStimulationLevel(0),
                 child: Text('0'),
               ),
               FlatButton(
+                disabledTextColor: Colors.red,
                 onPressed: _generalButtonLockout || _buttonLockouts[1] ? null : () => addStimulationLevel(1),
                 child: Text('1'),
               ),
               FlatButton(
+                disabledTextColor: Colors.red,
                 onPressed: _generalButtonLockout || _buttonLockouts[2] ? null : () => addStimulationLevel(2),
                 child: Text('2'),
               ),
@@ -124,18 +142,22 @@ class _ThresholdDeterminationState extends State<ThresholdDetermination> {
           Row(
             children: <Widget>[
               FlatButton(
+                disabledTextColor: Colors.red,
                 onPressed: _generalButtonLockout || _buttonLockouts[3] ? null : () => addStimulationLevel(3),
                 child: Text('3'),
               ),
               FlatButton(
+                disabledTextColor: Colors.red,
                 onPressed: _generalButtonLockout || _buttonLockouts[4] ? null : () => addStimulationLevel(4),
                 child: Text('4'),
               ),
               FlatButton(
+                disabledTextColor: Colors.red,
                 onPressed: _generalButtonLockout || _buttonLockouts[5] ? null : () => addStimulationLevel(5),
                 child: Text('5'),
               ),
               FlatButton(
+                disabledTextColor: Colors.red,
                 onPressed: _generalButtonLockout || _buttonLockouts[6] ? null : () => addStimulationLevel(6),
                 child: Text('6'),
               ),
@@ -144,18 +166,22 @@ class _ThresholdDeterminationState extends State<ThresholdDetermination> {
           Row(
             children: <Widget>[
               FlatButton(
+                disabledTextColor: Colors.red,
                 onPressed: _generalButtonLockout || _buttonLockouts[7] ? null : () => addStimulationLevel(7),
                 child: Text('7'),
               ),
               FlatButton(
+                disabledTextColor: Colors.red,
                 onPressed: _generalButtonLockout || _buttonLockouts[8] ? null : () => addStimulationLevel(8),
                 child: Text('8'),
               ),
               FlatButton(
+                disabledTextColor: Colors.red,
                 onPressed: _generalButtonLockout || _buttonLockouts[9] ? null : () => addStimulationLevel(9),
                 child: Text('9'),
               ),
               FlatButton(
+                disabledTextColor: Colors.red,
                 onPressed: _generalButtonLockout || _buttonLockouts[10] ? null : () => addStimulationLevel(10),
                 child: Text('10'),
               ),
@@ -165,11 +191,11 @@ class _ThresholdDeterminationState extends State<ThresholdDetermination> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               RaisedButton(
-                onPressed: _roundInProgress ? null : widget._onDeterminationEnd(_stimRatingRound1, _stimRatingRound2, _round),
+                onPressed: _roundInProgress ? null : () => widget._onDeterminationEnd(_stimRatingRound1, _stimRatingRound2, _round),
                 child: Text('Start therapy'),
               ),
               RaisedButton(
-                onPressed: _round == 1 && _roundInProgress == false ? startNextRound : null,
+                onPressed: _round == 1 && _roundInProgress == false && widget.isThirdDetermination == false ? startNextRound : null,
                 child: Text('Start second round'),
               ),
             ],

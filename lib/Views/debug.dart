@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:impulsrefactor/Helpers/byte_conversion.dart';
-import 'package:impulsrefactor/Services/bluetooth_handler.dart';
+import 'package:impulsrefactor/Services/bluetooth_service.dart';
 import 'package:impulsrefactor/States/bluetooth_state.dart';
 import 'package:impulsrefactor/States/message_state.dart';
 import 'package:impulsrefactor/Views/Components/ekg_chart_component.dart';

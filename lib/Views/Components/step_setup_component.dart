@@ -2,9 +2,9 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class Setup extends StatefulWidget {
-  final VoidCallback _nextStep;
+  final Function(int) _setupComplete;
 
-  Setup(this._nextStep);
+  Setup(this._setupComplete);
 
   @override
   _SetupState createState() => _SetupState();
@@ -13,6 +13,8 @@ class Setup extends StatefulWidget {
 class _SetupState extends State<Setup> {
   bool _attachElectrodes = false;
   bool _turnedOnMachines = false;
+  List<int> dropdownMenuItemList = List.generate(11, (index) => index);
+  int _prePainRating;
 
   Widget build(BuildContext context) {
     return Column(
@@ -43,8 +45,24 @@ class _SetupState extends State<Setup> {
             Text('Turn on machines'),
           ],
         ),
+        Row(
+          children: [
+            DropdownButton(
+              value: _prePainRating,
+              items: dropdownMenuItemList.map<DropdownMenuItem<int>>((int value) {
+                return DropdownMenuItem<int>(value: value, child: Text(value.toString()));
+              }).toList(),
+              onChanged: (value) {
+                setState(() {
+                  _prePainRating = value;
+                });
+              },
+            ),
+            Text('Enter patient initial pain rating')
+          ],
+        ),
         RaisedButton(
-          onPressed: _attachElectrodes && _turnedOnMachines ? widget._nextStep : null,
+          onPressed: _attachElectrodes && _turnedOnMachines && _prePainRating != null ? () => widget._setupComplete(_prePainRating) : null,
           child: Text('Begin Treatment'),
         ),
       ],

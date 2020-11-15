@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:impulsrefactor/Entities/patient.dart';
-import 'package:impulsrefactor/Services/firebase_handler.dart';
+import 'package:impulsrefactor/Services/firebase_service.dart';
 
 class PatientTile extends StatelessWidget {
 

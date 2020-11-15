@@ -5,19 +5,19 @@ import 'package:impulsrefactor/Views/Components/ekg_chart_component.dart';
 import 'package:percent_indicator/linear_percent_indicator.dart';
 
 class SessionStepper extends StatefulWidget {
-  int _currentStep = 0;
-  RestartableTimer _stimLockout = RestartableTimer(Duration(seconds: 2), () => {});
-  int _painLevel = 200;
-
   @override
   _SessionStepperState createState() => _SessionStepperState();
 }
 
 class _SessionStepperState extends State<SessionStepper> {
+  int _currentStep = 0;
+  RestartableTimer _stimLockout = RestartableTimer(Duration(seconds: 2), () => {});
+  int _painLevel = 200;
+
   @override
   void initState() {
     super.initState();
-    widget._stimLockout = RestartableTimer(Duration(seconds: 2), () => {setState(() {})});
+    _stimLockout = RestartableTimer(Duration(seconds: 2), () => {setState(() {})});
   }
 
   List<Step> getSteps(BuildContext context) {
@@ -77,136 +77,6 @@ class _SessionStepperState extends State<SessionStepper> {
         ),
       ),
       Step(
-        title: Text('Threshold determination'),
-        isActive: false,
-        content: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: <Widget>[
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: <Widget>[
-                Text('Stimulation level'),
-                Text('${widget._painLevel} mA'),
-                RaisedButton(
-                  onPressed: !widget._stimLockout.isActive
-                      ? () {
-                          setState(() {
-                            widget._stimLockout.reset();
-                            widget._painLevel += 200;
-                          });
-                        }
-                      : null,
-                  child: Text('Stimulate'),
-                ),
-                Text('IBI: 825'),
-              ],
-            ),
-            Text('Pain rating'),
-            GridView.count(
-              physics: NeverScrollableScrollPhysics(),
-              childAspectRatio: 1.5,
-              shrinkWrap: true,
-              crossAxisCount: 3,
-              children: <Widget>[
-                Container(),
-                InkWell(
-                  child: Container(
-                      decoration: BoxDecoration(border: Border.all(width: 1, color: Colors.indigo)),
-                      height: 20,
-                      width: 20,
-                      alignment: Alignment.center,
-                      child: Text('N/A')),
-                ),
-                Container(),
-                InkWell(
-                  child: Container(
-                      decoration: BoxDecoration(border: Border.all(width: 1, color: Colors.indigo)),
-                      height: 20,
-                      width: 20,
-                      alignment: Alignment.center,
-                      child: Text('1')),
-                ),
-                InkWell(
-                  child: Container(
-                      decoration: BoxDecoration(border: Border.all(width: 1, color: Colors.indigo)),
-                      height: 20,
-                      width: 20,
-                      alignment: Alignment.center,
-                      child: Text('2')),
-                ),
-                InkWell(
-                  child: Container(
-                      decoration: BoxDecoration(border: Border.all(width: 1, color: Colors.indigo)),
-                      height: 20,
-                      width: 20,
-                      alignment: Alignment.center,
-                      child: Text('3')),
-                ),
-                InkWell(
-                  child: Container(
-                      decoration: BoxDecoration(border: Border.all(width: 1, color: Colors.indigo)),
-                      height: 20,
-                      width: 20,
-                      alignment: Alignment.center,
-                      child: Text('4')),
-                ),
-                InkWell(
-                  child: Container(
-                      decoration: BoxDecoration(border: Border.all(width: 1, color: Colors.indigo)),
-                      height: 20,
-                      width: 20,
-                      alignment: Alignment.center,
-                      child: Text('5')),
-                ),
-                InkWell(
-                  child: Container(
-                      decoration: BoxDecoration(border: Border.all(width: 1, color: Colors.indigo)),
-                      height: 20,
-                      width: 20,
-                      alignment: Alignment.center,
-                      child: Text('6')),
-                ),
-                InkWell(
-                  child: Container(
-                      decoration: BoxDecoration(border: Border.all(width: 1, color: Colors.indigo)),
-                      height: 20,
-                      width: 20,
-                      alignment: Alignment.center,
-                      child: Text('7')),
-                ),
-                InkWell(
-                  child: Container(
-                      decoration: BoxDecoration(border: Border.all(width: 1, color: Colors.indigo)),
-                      height: 20,
-                      width: 20,
-                      alignment: Alignment.center,
-                      child: Text('8')),
-                ),
-                InkWell(
-                  child: Container(
-                      decoration: BoxDecoration(border: Border.all(width: 1, color: Colors.indigo)),
-                      height: 20,
-                      width: 20,
-                      alignment: Alignment.center,
-                      child: Text('9')),
-                ),
-                Container(),
-                InkWell(
-                  child: Container(
-                      decoration: BoxDecoration(border: Border.all(width: 1, color: Colors.indigo)),
-                      height: 20,
-                      width: 20,
-                      alignment: Alignment.center,
-                      child: Text('10')),
-                ),
-                Container(),
-              ],
-            ),
-            RaisedButton(onPressed: nextStep, child: Text('Start stimulation')),
-          ],
-        ),
-      ),
-      Step(
         title: Text('Stimulation'),
         isActive: true,
         content: Column(
@@ -259,144 +129,14 @@ class _SessionStepperState extends State<SessionStepper> {
           ],
         ),
       ),
-      Step(
-        title: Text('Threshold determination'),
-        isActive: false,
-        content: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: <Widget>[
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: <Widget>[
-                Text('Stimulation level'),
-                Text('${widget._painLevel} mA'),
-                RaisedButton(
-                  onPressed: !widget._stimLockout.isActive
-                      ? () {
-                    setState(() {
-                      widget._stimLockout.reset();
-                      widget._painLevel += 200;
-                    });
-                  }
-                      : null,
-                  child: Text('Stimulate'),
-                ),
-                Text('IBI: 825'),
-              ],
-            ),
-            Text('Pain rating'),
-            GridView.count(
-              physics: NeverScrollableScrollPhysics(),
-              childAspectRatio: 1.5,
-              shrinkWrap: true,
-              crossAxisCount: 3,
-              children: <Widget>[
-                Container(),
-                InkWell(
-                  child: Container(
-                      decoration: BoxDecoration(border: Border.all(width: 1, color: Colors.indigo)),
-                      height: 20,
-                      width: 20,
-                      alignment: Alignment.center,
-                      child: Text('N/A')),
-                ),
-                Container(),
-                InkWell(
-                  child: Container(
-                      decoration: BoxDecoration(border: Border.all(width: 1, color: Colors.indigo)),
-                      height: 20,
-                      width: 20,
-                      alignment: Alignment.center,
-                      child: Text('1')),
-                ),
-                InkWell(
-                  child: Container(
-                      decoration: BoxDecoration(border: Border.all(width: 1, color: Colors.indigo)),
-                      height: 20,
-                      width: 20,
-                      alignment: Alignment.center,
-                      child: Text('2')),
-                ),
-                InkWell(
-                  child: Container(
-                      decoration: BoxDecoration(border: Border.all(width: 1, color: Colors.indigo)),
-                      height: 20,
-                      width: 20,
-                      alignment: Alignment.center,
-                      child: Text('3')),
-                ),
-                InkWell(
-                  child: Container(
-                      decoration: BoxDecoration(border: Border.all(width: 1, color: Colors.indigo)),
-                      height: 20,
-                      width: 20,
-                      alignment: Alignment.center,
-                      child: Text('4')),
-                ),
-                InkWell(
-                  child: Container(
-                      decoration: BoxDecoration(border: Border.all(width: 1, color: Colors.indigo)),
-                      height: 20,
-                      width: 20,
-                      alignment: Alignment.center,
-                      child: Text('5')),
-                ),
-                InkWell(
-                  child: Container(
-                      decoration: BoxDecoration(border: Border.all(width: 1, color: Colors.indigo)),
-                      height: 20,
-                      width: 20,
-                      alignment: Alignment.center,
-                      child: Text('6')),
-                ),
-                InkWell(
-                  child: Container(
-                      decoration: BoxDecoration(border: Border.all(width: 1, color: Colors.indigo)),
-                      height: 20,
-                      width: 20,
-                      alignment: Alignment.center,
-                      child: Text('7')),
-                ),
-                InkWell(
-                  child: Container(
-                      decoration: BoxDecoration(border: Border.all(width: 1, color: Colors.indigo)),
-                      height: 20,
-                      width: 20,
-                      alignment: Alignment.center,
-                      child: Text('8')),
-                ),
-                InkWell(
-                  child: Container(
-                      decoration: BoxDecoration(border: Border.all(width: 1, color: Colors.indigo)),
-                      height: 20,
-                      width: 20,
-                      alignment: Alignment.center,
-                      child: Text('9')),
-                ),
-                Container(),
-                InkWell(
-                  child: Container(
-                      decoration: BoxDecoration(border: Border.all(width: 1, color: Colors.indigo)),
-                      height: 20,
-                      width: 20,
-                      alignment: Alignment.center,
-                      child: Text('10')),
-                ),
-                Container(),
-              ],
-            ),
-            RaisedButton(onPressed: nextStep, child: Text('End session')),
-          ],
-        ),
-      ),
     ];
   }
 
   void nextStep() {
-    widget._currentStep + 1 != 6
+    _currentStep + 1 != 6
         ? setState(() {
-            widget._currentStep += 1;
-            widget._painLevel = 200; ///TODO: Debug!
+            _currentStep += 1;
+            _painLevel = 200; ///TODO: Debug!
     })
         : Navigator.of(context).pushNamed('/patient_select'); //TODO: Navigate to session finish
   }
@@ -421,7 +161,7 @@ class _SessionStepperState extends State<SessionStepper> {
             );
           },
           type: StepperType.horizontal,
-          currentStep: widget._currentStep,
+          currentStep: _currentStep,
           steps: getSteps(context),
           /**Step(),/// Setup Instructions
               Step(),/// Threshold

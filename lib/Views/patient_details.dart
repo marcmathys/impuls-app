@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:impulsrefactor/Entities/patient.dart';
 import 'package:impulsrefactor/Entities/session.dart';
-import 'package:impulsrefactor/Services/firebase_handler.dart';
+import 'package:impulsrefactor/Services/firebase_service.dart';
 import 'package:impulsrefactor/Views/Components/components.dart';
 import 'package:impulsrefactor/Views/Components/pain_level_chart_component.dart';
 import 'package:impulsrefactor/Views/Components/threshold_chart.dart';
@@ -24,7 +24,7 @@ class _PatientDetailState extends State<PatientDetail> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    widget._patient = ModalRoute.of(context).settings.arguments;
+    widget._patient = ModalRoute.of(context).settings.arguments; // TODO: This causes the "return" bug!
 
     if (widget._patient.sessions.isNotEmpty) {
       widget._currentSession = widget._patient.sessions.last;
