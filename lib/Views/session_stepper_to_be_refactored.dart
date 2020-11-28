@@ -146,7 +146,7 @@ class _SessionStepperState extends State<SessionStepper> {
     return WillPopScope(
       onWillPop: () async => false,
       child: Scaffold(
-        appBar: Components.appBar('Session'),
+        appBar: Components.appBar(context, 'Session'),
         body: Stepper(
           controlsBuilder: (BuildContext context, {VoidCallback onStepContinue, VoidCallback onStepCancel}) {
             return Row(

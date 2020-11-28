@@ -36,11 +36,9 @@ class _LoginState extends State<Login> {
   }
 
   Widget build(BuildContext context) {
-    _handler.getCurrentUser().whenComplete(() => Navigator.of(context).pushNamed('/patient_select'));
-
     return Scaffold(
       key: _key,
-      appBar: Components.appBar('Impuls'),
+      appBar: Components.appBar(context, 'Impuls'),
       body: Form(
         key: _formKey,
         child: Center(

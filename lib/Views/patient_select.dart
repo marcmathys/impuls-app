@@ -14,7 +14,7 @@ class PatientSelect extends StatefulWidget {
 class _PatientSelectState extends State<PatientSelect> {
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: Components.appBar('Hello, ${Therapist().name}!'),
+      appBar: Components.appBar(context, 'Hello, ${Therapist().name}!'),
       floatingActionButton: FloatingActionButton(onPressed: () => Navigator.of(context).pushNamed('/debug'), child: Text('Debug')),
       body: Builder(builder: (BuildContext context) {
         return Column(

@@ -53,7 +53,7 @@ class _PatientDetailState extends State<PatientDetail> {
 
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: Components.appBar('Sessions of ${widget._patient.moodleID}'),
+      appBar: Components.appBar(context, 'Sessions of ${widget._patient.moodleID}'),
       body: SingleChildScrollView(
         child : Column(
           children: <Widget>[

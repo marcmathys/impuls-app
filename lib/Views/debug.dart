@@ -36,7 +36,7 @@ class _DebugState extends State<Debug> {
 
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: Components.appBar('Debug menu'),
+      appBar: Components.appBar(context, 'Debug menu'),
       body: Builder(builder: (BuildContext context) {
         return ListView(
           children: <Widget>[

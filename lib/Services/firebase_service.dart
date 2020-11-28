@@ -1,4 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:impulsrefactor/Entities/patient.dart';
 import 'package:impulsrefactor/Entities/session.dart';
 import 'package:impulsrefactor/Entities/therapist.dart';
@@ -44,7 +45,7 @@ class FirebaseHandler {
   }
 
   Future signOut() async {
-    _auth.signOut();
+    await _auth.signOut();
     _user = null;
   }
 
