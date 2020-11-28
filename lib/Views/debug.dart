@@ -4,7 +4,7 @@ import 'package:impulsrefactor/Services/bluetooth_service.dart';
 import 'package:impulsrefactor/States/bluetooth_state.dart';
 import 'package:impulsrefactor/States/message_state.dart';
 import 'package:impulsrefactor/Views/Components/ekg_chart_component.dart';
-import 'package:impulsrefactor/Views/Components/components.dart';
+import 'package:impulsrefactor/Views/Components/app_wide_components.dart';
 import 'package:impulsrefactor/app_constants.dart';
 import 'package:provider/provider.dart';
 
@@ -15,7 +15,7 @@ class Debug extends StatefulWidget {
 
 /// Hint! Streams are not closed nor paused in this view! That only happens when the view is disposed!
 class _DebugState extends State<Debug> {
-  BluetoothHandler _handler;
+  BluetoothService _bluetooth;
   BTState _state;
   TextEditingController _textController;
   GlobalKey<EKGChartState> _ekgKey = GlobalKey();
@@ -23,7 +23,7 @@ class _DebugState extends State<Debug> {
   @override
   void initState() {
     super.initState();
-    _handler = BluetoothHandler();
+    _bluetooth = BluetoothService();
     _state = BTState();
     _textController = TextEditingController();
   }
@@ -31,7 +31,7 @@ class _DebugState extends State<Debug> {
   @override
   void dispose() {
     super.dispose();
-    _handler.cancelSubscriptions();
+    _bluetooth.cancelSubscriptions();
   }
 
   Widget build(BuildContext context) {
@@ -51,13 +51,13 @@ class _DebugState extends State<Debug> {
               children: [
                 RaisedButton(
                   onPressed: () {
-                    _handler.scanForDevices(Provider.of<MessageState>(context, listen: false));
+                    _bluetooth.scanForDevices(Provider.of<MessageState>(context, listen: false));
                   },
                   child: Text('Connect device'),
                 ),
                 RaisedButton(
                   onPressed: () {
-                    _handler.disconnectDevice();
+                    _bluetooth.disconnectDevice();
                   },
                   child: Text('Disconnect device'),
                 ),
@@ -90,7 +90,7 @@ class _DebugState extends State<Debug> {
                                   if (hexList.length == 0) {
                                     Scaffold.of(context).showSnackBar(SnackBar(content: Text('The given numbers are in the wrong format! Example format: 111,110,109')));
                                   } else {
-                                    _handler.sendStimulationBytes(hexList);
+                                    _bluetooth.sendStimulationBytes(hexList);
                                   }
                                   Navigator.pop(context);
                                 },
@@ -109,7 +109,7 @@ class _DebugState extends State<Debug> {
                 ),
                 Flexible(
                   child: RaisedButton(
-                    onPressed: () => _handler.sendStimulationBytes([113, 117, 105, 116]), // Stands for quit
+                    onPressed: () => _bluetooth.sendStimulationBytes([113, 117, 105, 116]), // Stands for quit
                     child: Text('Stop therapy (sends quit)'),
                   ),
                 ),
@@ -120,13 +120,13 @@ class _DebugState extends State<Debug> {
               children: [
                 Flexible(
                   child: RaisedButton(
-                    onPressed: () => _handler.getEKGAndBPMData(_ekgKey),
+                    onPressed: () => _bluetooth.getEKGAndBPMData(_ekgKey),
                     child: Text('Get EKG and BPM data'),
                   ),
                 ),
                 Flexible(
                   child: RaisedButton(
-                    onPressed: () => _handler.sendOffSignal(_state.characteristics[AppConstants.EKG_CHARACTERISTIC_UUID]),
+                    onPressed: () => _bluetooth.sendOffSignal(_state.characteristics[AppConstants.EKG_CHARACTERISTIC_UUID]),
                     child: Text('Stop EKG service'),
                   ),
                 ),
@@ -137,7 +137,7 @@ class _DebugState extends State<Debug> {
               children: [
                 Flexible(
                   child: RaisedButton(
-                    onPressed: () => _handler.listenForErrors(),
+                    onPressed: () => _bluetooth.listenForErrors(),
                     child: Text('Listen for errors'),
                   ),
                 ),
@@ -148,13 +148,13 @@ class _DebugState extends State<Debug> {
               children: [
                 Flexible(
                   child: RaisedButton(
-                    onPressed: () => _handler.getBRSData(),
+                    onPressed: () => _bluetooth.getBRSData(),
                     child: Text('Get BRS Data'),
                   ),
                 ),
                 Flexible(
                   child: RaisedButton(
-                    onPressed: () => _handler.sendOffSignal(_state.characteristics[AppConstants.BRS_CHARACTERISTIC_UUID]),
+                    onPressed: () => _bluetooth.sendOffSignal(_state.characteristics[AppConstants.BRS_CHARACTERISTIC_UUID]),
                     child: Text('Stop BRS Data'),
                   ),
                 ),

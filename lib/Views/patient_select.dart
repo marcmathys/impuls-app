@@ -2,7 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:impulsrefactor/Entities/patient_list.dart';
 import 'package:impulsrefactor/Entities/therapist.dart';
-import 'package:impulsrefactor/Views/Components/components.dart';
+import 'package:impulsrefactor/Views/Components/app_wide_components.dart';
 import 'package:impulsrefactor/Entities/patient.dart';
 import 'package:impulsrefactor/Views/Components/patient_tile_component.dart';
 

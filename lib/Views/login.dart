@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:impulsrefactor/Services/firebase_service.dart';
-import 'package:impulsrefactor/Views/Components/components.dart';
+import 'package:impulsrefactor/Views/Components/app_wide_components.dart';
 
 class Login extends StatefulWidget {
   @override
@@ -21,6 +21,11 @@ class _LoginState extends State<Login> {
     _handler = FirebaseHandler();
     _email = TextEditingController();
     _password = TextEditingController();
+    _handler.getCurrentUser().then((autoLogin) {
+      if (autoLogin) {
+        Navigator.of(context).pushNamed('/patient_select');
+      }
+    });
   }
 
   @override
@@ -28,6 +33,26 @@ class _LoginState extends State<Login> {
     super.dispose();
     _email.dispose();
     _password.dispose();
+  }
+
+  void loginUser() async {
+    if (_formKey.currentState.validate()) {
+      if (await _handler.signIn(_email.text, _password.text)) {
+        String statusMessage = await _handler.loadTherapist();
+        if (statusMessage == 'OK') {
+          Navigator.of(context).pushNamed('/patient_select');
+        } else {
+          _key.currentState.showSnackBar(SnackBar(content: Text(statusMessage)));
+        }
+      } else {
+        _key.currentState.showSnackBar(
+          SnackBar(
+            content: Text("User authentication failed."),
+            duration: Duration(seconds: 5),
+          ),
+        );
+      }
+    }
   }
 
   bool validate() {
@@ -82,20 +107,7 @@ class _LoginState extends State<Login> {
                     color: Colors.indigo,
                     child: MaterialButton(
                       onPressed: () async {
-                        if (_formKey.currentState.validate()) {
-                          if (await _handler.signIn(_email.text, _password.text)) {
-                            String statusMessage = await _handler.loadTherapist();
-                            if (statusMessage == 'OK') {
-                              Navigator.of(context).pushNamed('/patient_select');
-                            } else {
-                              _key.currentState.showSnackBar(SnackBar(content: Text(statusMessage)));
-                            }
-                          } else {
-                            _key.currentState.showSnackBar(
-                              SnackBar(content: Text("User authentication failed."), duration: Duration(seconds: 5),),
-                            );
-                          }
-                        }
+                        loginUser();
                       },
                       child: Text(
                         'Sign In',

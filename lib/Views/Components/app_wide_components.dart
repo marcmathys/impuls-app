@@ -3,6 +3,10 @@ import 'package:impulsrefactor/Services/firebase_service.dart';
 import 'package:impulsrefactor/States/message_state.dart';
 
 class Components {
+  static isLoginRoute(BuildContext context) {
+    return ModalRoute.of(context).settings.name == '/login';
+  }
+
   static AppBar appBar(BuildContext context, String title) {
     FirebaseHandler _firebaseHandler = FirebaseHandler();
 
@@ -11,12 +15,15 @@ class Components {
       centerTitle: true,
       title: Text(title),
       actions: [
-        FlatButton(
-          onPressed: () async {
-            await _firebaseHandler.signOut();
-            Navigator.of(context).popUntil(ModalRoute.withName('/login'));
-          },
-          child: Icon(Icons.power_settings_new),
+        Visibility(
+          visible: !isLoginRoute(context),
+          child: FlatButton(
+            onPressed: () async {
+              await _firebaseHandler.signOut();
+              Navigator.of(context).popUntil(ModalRoute.withName('/login'));
+            },
+            child: Icon(Icons.power_settings_new),
+          ),
         ),
       ],
     );

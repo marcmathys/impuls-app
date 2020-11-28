@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:impulsrefactor/Entities/patient.dart';
 import 'package:impulsrefactor/Entities/session.dart';
 import 'package:impulsrefactor/Services/firebase_service.dart';
-import 'package:impulsrefactor/Views/Components/components.dart';
+import 'package:impulsrefactor/Views/Components/app_wide_components.dart';
 import 'package:impulsrefactor/Views/Components/pain_level_chart_component.dart';
 import 'package:impulsrefactor/Views/Components/threshold_chart.dart';
 import 'package:intl/intl.dart';

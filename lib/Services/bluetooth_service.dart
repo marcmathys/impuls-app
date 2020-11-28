@@ -9,12 +9,12 @@ import 'package:impulsrefactor/States/message_state.dart';
 import 'package:impulsrefactor/Views/Components/ekg_chart_component.dart';
 import 'package:impulsrefactor/app_constants.dart';
 
-class BluetoothHandler {
-  static final BluetoothHandler _instance = BluetoothHandler._internal();
+class BluetoothService {
+  static final BluetoothService _instance = BluetoothService._internal();
 
-  factory BluetoothHandler() => _instance;
+  factory BluetoothService() => _instance;
 
-  BluetoothHandler._internal();
+  BluetoothService._internal();
 
   FlutterBlue _flutterBlue = FlutterBlue.instance;
   BTState _state = BTState();

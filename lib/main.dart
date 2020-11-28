@@ -6,7 +6,6 @@ import 'package:impulsrefactor/Views/debug.dart';
 import 'package:impulsrefactor/Views/patient_details.dart';
 import 'package:impulsrefactor/Views/patient_select.dart';
 import 'package:impulsrefactor/Views/session_guide.dart';
-import 'package:impulsrefactor/Views/session_stepper_to_be_refactored.dart';
 import 'package:provider/provider.dart';
 
 import 'Views/login.dart';
