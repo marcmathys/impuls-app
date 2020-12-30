@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:impulsrefactor/Entities/session.dart';
-import 'package:impulsrefactor/Entities/therapist.dart';
 import 'package:impulsrefactor/Views/Components/step_setup_component.dart';
 import 'package:impulsrefactor/Views/Components/step_threshold_determination_component.dart';
 import 'package:impulsrefactor/Views/Components/stimulation_component.dart';

@@ -2,23 +2,22 @@ import 'dart:async';
 import 'dart:typed_data';
 
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_blue/flutter_blue.dart';
 import 'package:impulsrefactor/Helpers/byte_conversion.dart';
 import 'package:impulsrefactor/States/bluetooth_state.dart';
 import 'package:impulsrefactor/States/message_state.dart';
 import 'package:impulsrefactor/Views/Components/ekg_chart_component.dart';
 import 'package:impulsrefactor/app_constants.dart';
+import 'package:provider/provider.dart';
 
-class BluetoothService {
-  static final BluetoothService _instance = BluetoothService._internal();
+class BtService {
+  static final BtService _instance = BtService._internal();
 
-  factory BluetoothService() => _instance;
+  factory BtService() => _instance;
 
-  BluetoothService._internal();
+  BtService._internal();
 
-  FlutterBlue _flutterBlue = FlutterBlue.instance;
-  BTState _state = BTState();
-  BluetoothDevice _device;
   StreamSubscription _stimulation;
   StreamSubscription _ekg;
   StreamSubscription _errors;
@@ -45,99 +44,110 @@ class BluetoothService {
   }
 
   /// Scans the environment for bluetooth devices and connects to the SET-device if found
-  /// Return codes:
-  /// 0 - Okay
-  /// 1 - Bluetooth off
-  /// 2 - Already connected
-  /// 3 - Device not found
-  void scanForDevices(MessageState state) async {
-    if (!await _flutterBlue.isOn) {
-      state.message = ToastMessages.BluetoothOff;
+  void scanForDevices(BuildContext context) async {
+    MessageState messageState = Provider.of<MessageState>(context, listen: false);
+    BTState bluetoothState = Provider.of<BTState>(context, listen: false);
+    FlutterBlue flutterBlue = FlutterBlue.instance;
+
+    if (!await flutterBlue.isOn) {
+      messageState.message = ToastMessages.BluetoothOff;
     }
 
-    if (!(this._device == null)) {
-      state.message = ToastMessages.deviceAlreadyConnected;
+    if (!(bluetoothState.device == null)) {
+      messageState.message = ToastMessages.deviceAlreadyConnected;
     }
 
-    _flutterBlue.startScan(timeout: Duration(seconds: 4)).then((_) {
-      if (_device == null) {
-        state.message = ToastMessages.deviceAlreadyConnected;
-      }
-    });
-    _flutterBlue.scanResults.listen((results) {
-      for (ScanResult result in results) {
-        if (result.device.id == DeviceIdentifier('3C:71:BF:60:2D:CE') ||
-            result.device.id == DeviceIdentifier('3C:71:BF:AA:92:56') ||
-            result.device.id == DeviceIdentifier('24:0A:C4:1D:48:42') ||
-            result.device.id == DeviceIdentifier('3C:71:BF:60:2D:A2')) {
-          // TODO: Hardcoded!
-          result.device.connect().then((value) {
-            _device = result.device;
-            _flutterBlue.stopScan();
-            getCharacteristicReferences();
-            state.message = ToastMessages.deviceSuccessfullyConnected;
-          });
-        }
-      }
+    bluetoothState.resetScannedDevicesList();
+    flutterBlue.startScan();
+    flutterBlue.scanResults.listen((results) {
+      List<BluetoothDevice> devices = [];
+      results.forEach((element) {
+        devices.add(element.device);
+      });
+      bluetoothState.setDeviceList(devices);
     });
   }
 
-  /// Disconnects from the connected bluetooth device
-  void disconnectDevice() {
-    if (_device == null) {
+  Future<bool> connectDevice(BuildContext context, BluetoothDevice device) async {
+    MessageState messageState = Provider.of<MessageState>(context, listen: false);
+    BTState bluetoothState = Provider.of<BTState>(context, listen: false);
+
+    if (bluetoothState.device != null) {
+      await bluetoothState.device.disconnect();
+    }
+
+    await device.connect();
+    bluetoothState.device = device;
+    await getCharacteristicReferences(context);
+    messageState.message = ToastMessages.deviceSuccessfullyConnected;
+
+    if (bluetoothState.device != null) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  /// Disconnects the connected bluetooth device
+  void disconnectDevice(BuildContext context) {
+    BTState bluetoothState = Provider.of<BTState>(context, listen: false);
+
+    if (bluetoothState.device == null) {
       return;
     }
-    _device.disconnect();
-    _device = null;
+    bluetoothState.device.disconnect();
+    bluetoothState.device = null;
   }
 
   /// Discovers all characteristics and tries to get references to all important ones. Saves them in a dictionary in the bluetooth state
-  void getCharacteristicReferences() {
-    if (this._device == null) {
+  Future<void> getCharacteristicReferences(BuildContext context) async {
+    BTState bluetoothState = Provider.of<BTState>(context, listen: false);
+
+    if (bluetoothState.device == null) {
       print('Device is not connected!');
       return;
     }
-    _device.discoverServices().then((services) {
-      services.forEach((service) async {
-        if (service.uuid == AppConstants.STIMULATION_UUID) {
-          var characteristics = service.characteristics;
-          for (BluetoothCharacteristic characteristic in characteristics) {
-            if (characteristic.uuid == AppConstants.STIMULATION_CHARACTERISTIC_UUID) {
-              _state.characteristics[AppConstants.STIMULATION_CHARACTERISTIC_UUID] = characteristic;
-            }
-          }
-        }
 
-        if (service.uuid == AppConstants.EKG_SERVICE_UUID) {
-          var characteristics = service.characteristics;
-          for (BluetoothCharacteristic characteristic in characteristics) {
-            if (characteristic.uuid == AppConstants.EKG_CHARACTERISTIC_UUID) {
-              _state.characteristics[AppConstants.EKG_CHARACTERISTIC_UUID] = characteristic;
-            }
-            if (characteristic.uuid == AppConstants.BPM_CHARACTERISTIC_UUID) {
-              _state.characteristics[AppConstants.BPM_CHARACTERISTIC_UUID] = characteristic;
-            }
+    List<BluetoothService> services = await bluetoothState.device.discoverServices();
+    services.forEach((service) {
+      if (service.uuid == AppConstants.STIMULATION_UUID) {
+        var characteristics = service.characteristics;
+        for (BluetoothCharacteristic characteristic in characteristics) {
+          if (characteristic.uuid == AppConstants.STIMULATION_CHARACTERISTIC_UUID) {
+            bluetoothState.characteristics[AppConstants.STIMULATION_CHARACTERISTIC_UUID] = characteristic;
           }
         }
+      }
 
-        if (service.uuid == AppConstants.ERROR_SERVICE) {
-          var characteristics = service.characteristics;
-          for (BluetoothCharacteristic characteristic in characteristics) {
-            if (characteristic.uuid == AppConstants.ERROR_CHARACTERISTIC_UUID) {
-              _state.characteristics[AppConstants.ERROR_CHARACTERISTIC_UUID] = characteristic;
-            }
+      if (service.uuid == AppConstants.EKG_SERVICE_UUID) {
+        var characteristics = service.characteristics;
+        for (BluetoothCharacteristic characteristic in characteristics) {
+          if (characteristic.uuid == AppConstants.EKG_CHARACTERISTIC_UUID) {
+            bluetoothState.characteristics[AppConstants.EKG_CHARACTERISTIC_UUID] = characteristic;
+          }
+          if (characteristic.uuid == AppConstants.BPM_CHARACTERISTIC_UUID) {
+            bluetoothState.characteristics[AppConstants.BPM_CHARACTERISTIC_UUID] = characteristic;
           }
         }
+      }
 
-        if (service.uuid == AppConstants.BRS_SERVICE) {
-          var characteristics = service.characteristics;
-          for (BluetoothCharacteristic characteristic in characteristics) {
-            if (characteristic.uuid == AppConstants.BRS_CHARACTERISTIC_UUID) {
-              _state.characteristics[AppConstants.BRS_CHARACTERISTIC_UUID] = characteristic;
-            }
+      if (service.uuid == AppConstants.ERROR_SERVICE) {
+        var characteristics = service.characteristics;
+        for (BluetoothCharacteristic characteristic in characteristics) {
+          if (characteristic.uuid == AppConstants.ERROR_CHARACTERISTIC_UUID) {
+            bluetoothState.characteristics[AppConstants.ERROR_CHARACTERISTIC_UUID] = characteristic;
           }
         }
-      });
+      }
+
+      if (service.uuid == AppConstants.BRS_SERVICE) {
+        var characteristics = service.characteristics;
+        for (BluetoothCharacteristic characteristic in characteristics) {
+          if (characteristic.uuid == AppConstants.BRS_CHARACTERISTIC_UUID) {
+            bluetoothState.characteristics[AppConstants.BRS_CHARACTERISTIC_UUID] = characteristic;
+          }
+        }
+      }
     });
   }
 
@@ -160,12 +170,14 @@ class BluetoothService {
   /// Sends the given integers representing bytes to the stimulation characteristic
   /// Note that the stimulation characteristic supports 3 and 7 interger values, and "quit" in integer
   /// Starts listening for values
-  void sendStimulationBytes(List<int> bytes) async {
-    if (!_state.characteristics.containsKey(AppConstants.STIMULATION_CHARACTERISTIC_UUID)) {
+  void sendStimulationBytes(BuildContext context, List<int> bytes) async {
+    BTState state = Provider.of<BTState>(context, listen: false);
+
+    if (!state.characteristics.containsKey(AppConstants.STIMULATION_CHARACTERISTIC_UUID)) {
       print('Characteristic Stimulation not found!');
       return;
     }
-    BluetoothCharacteristic stimulation = _state.characteristics[AppConstants.STIMULATION_CHARACTERISTIC_UUID];
+    BluetoothCharacteristic stimulation = state.characteristics[AppConstants.STIMULATION_CHARACTERISTIC_UUID];
 
     await stimulation.write(bytes);
 
@@ -175,7 +187,7 @@ class BluetoothService {
     }
     if (_stimulation == null) {
       _stimulation = stimulation.value.listen((event) {
-        _state.stimulation = event;
+        state.stimulation = event;
       });
       await stimulation.setNotifyValue(true);
     }
@@ -185,18 +197,20 @@ class BluetoothService {
   }
 
   /// Send "on" to the ekg and bpm characteristic and starts listening for values
-  void getEKGAndBPMData(GlobalKey<EKGChartState> ekgChartKey) async {
-    if (this._device == null) {
+  void getEKGAndBPMData(BuildContext context, GlobalKey<EKGChartState> ekgChartKey) async {
+    BTState bluetoothState = Provider.of<BTState>(context, listen: false);
+
+    if (bluetoothState.device == null) {
       print('Device is not connected!');
       return;
     }
-    if (!_state.characteristics.containsKey(AppConstants.EKG_CHARACTERISTIC_UUID)) {
+    if (!bluetoothState.characteristics.containsKey(AppConstants.EKG_CHARACTERISTIC_UUID)) {
       print('Characteristic EKG not found!');
       return;
     }
 
-    BluetoothCharacteristic ekg = _state.characteristics[AppConstants.EKG_CHARACTERISTIC_UUID];
-    BluetoothCharacteristic bpm = _state.characteristics[AppConstants.BPM_CHARACTERISTIC_UUID];
+    BluetoothCharacteristic ekg = bluetoothState.characteristics[AppConstants.EKG_CHARACTERISTIC_UUID];
+    BluetoothCharacteristic bpm = bluetoothState.characteristics[AppConstants.BPM_CHARACTERISTIC_UUID];
 
     ekgChartKey.currentState.resetEkgPoints();
     await sendOnSignal(ekg);
@@ -211,7 +225,7 @@ class BluetoothService {
     if (_bpm == null) {
       _bpm = bpm.value.listen((event) {
         if (event.length == 4) {
-          _state.bpm = ByteConversion.bpmByteConversion(event);
+          bluetoothState.bpm = ByteConversion.bpmByteConversion(event);
         }
       });
       await bpm.setNotifyValue(true);
@@ -227,23 +241,25 @@ class BluetoothService {
   }
 
   /// Starts listening to the error code characteristic
-  void listenForErrors() async {
-    if (this._device == null) {
+  void listenForErrors(BuildContext context) async {
+    BTState bluetoothState = Provider.of<BTState>(context, listen: false);
+
+    if (bluetoothState.device == null) {
       print('Device is not connected!');
       return;
     }
-    if (!_state.characteristics.containsKey(AppConstants.ERROR_CHARACTERISTIC_UUID)) {
+    if (!bluetoothState.characteristics.containsKey(AppConstants.ERROR_CHARACTERISTIC_UUID)) {
       print('Characteristic Error Code not found!');
       return;
     }
 
-    BluetoothCharacteristic error = _state.characteristics[AppConstants.ERROR_CHARACTERISTIC_UUID];
+    BluetoothCharacteristic error = bluetoothState.characteristics[AppConstants.ERROR_CHARACTERISTIC_UUID];
 
     if (_errors == null) {
       _errors = error.value.listen((event) {
         if (event.length == 1) {
           ByteData errorByteData = ByteData.sublistView(Uint8List.fromList(event.reversed.toList()));
-          _state.addError(errorByteData.getUint8(0));
+          bluetoothState.addError(errorByteData.getUint8(0));
         }
       });
       await error.setNotifyValue(true);
@@ -254,17 +270,19 @@ class BluetoothService {
   }
 
   /// Sends "on" to the brs characteristic and starts listening for values
-  void getBRSData() async {
-    if (this._device == null) {
+  void getBRSData(BuildContext context) async {
+    BTState bluetoothState = Provider.of<BTState>(context, listen: false);
+
+    if (bluetoothState.device == null) {
       print('Device is not connected!');
       return;
     }
-    if (!_state.characteristics.containsKey(AppConstants.BRS_CHARACTERISTIC_UUID)) {
+    if (!bluetoothState.characteristics.containsKey(AppConstants.BRS_CHARACTERISTIC_UUID)) {
       print('Characteristic Error Code not found!');
       return;
     }
 
-    BluetoothCharacteristic brs = _state.characteristics[AppConstants.BRS_CHARACTERISTIC_UUID];
+    BluetoothCharacteristic brs = bluetoothState.characteristics[AppConstants.BRS_CHARACTERISTIC_UUID];
 
     await sendOnSignal(brs);
 
@@ -272,7 +290,7 @@ class BluetoothService {
       _brs = brs.value.listen((event) {
         if (event.length == 4) {
           ByteData brsByteData = ByteData.sublistView(Uint8List.fromList(event.reversed.toList()));
-          _state.brs = brsByteData.getUint32(0);
+          bluetoothState.brs = brsByteData.getUint32(0);
         }
       });
       await brs.setNotifyValue(true);

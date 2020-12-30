@@ -8,11 +8,47 @@ class BTState extends ChangeNotifier {
 
   BTState._internal();
 
+  BluetoothDevice _device;
   Map<Guid, BluetoothCharacteristic> _characteristics = {};
   double _bpm = 0.0;
-  List<int> _error = [];
   int _brs;
-  List<int> _stimulation;
+  List<int> _error = [];
+  List<int> _stimulation = [];
+  List<BluetoothDevice> _scannedDevices = [];
+
+  void resetState() {
+    if (_device != null) {
+      _device.disconnect();
+    }
+    _device = null;
+    _characteristics.clear();
+    _bpm = 0.0;
+    _brs = null;
+    error.clear();
+    _stimulation.clear();
+    _scannedDevices.clear();
+    notifyListeners();
+  }
+
+  List<BluetoothDevice> get scannedDevices => _scannedDevices;
+
+  set device(BluetoothDevice device) {
+    _device = device;
+    notifyListeners();
+  }
+
+  BluetoothDevice get device => _device;
+
+  void setDeviceList(List<BluetoothDevice> devices) {
+    _scannedDevices.clear();
+    _scannedDevices.addAll(devices);
+    notifyListeners();
+  }
+
+  void resetScannedDevicesList() {
+    this._scannedDevices.clear();
+    notifyListeners();
+  }
 
   List<int> get error => _error;
 

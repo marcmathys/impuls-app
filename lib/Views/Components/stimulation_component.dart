@@ -19,6 +19,7 @@ class _StimulationState extends State<Stimulation> {
 
   @override
   void dispose() {
+    super.dispose();
     ///TODO: Trash ESP listeners!
   }
 

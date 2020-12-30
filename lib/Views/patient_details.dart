@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:impulsrefactor/Entities/patient.dart';
 import 'package:impulsrefactor/Entities/session.dart';
-import 'package:impulsrefactor/Services/firebase_service.dart';
 import 'package:impulsrefactor/Views/Components/app_wide_components.dart';
 import 'package:impulsrefactor/Views/Components/pain_level_chart_component.dart';
 import 'package:impulsrefactor/Views/Components/threshold_chart.dart';
@@ -9,13 +8,14 @@ import 'package:intl/intl.dart';
 
 class PatientDetail extends StatefulWidget {
   Patient _patient;
-  Session _currentSession;
 
   @override
   _PatientDetailState createState() => _PatientDetailState();
 }
 
 class _PatientDetailState extends State<PatientDetail> {
+  Session _currentSession;
+
   @override
   void initState() {
     super.initState();
@@ -24,10 +24,11 @@ class _PatientDetailState extends State<PatientDetail> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    widget._patient = ModalRoute.of(context).settings.arguments; // TODO: This causes the "return" bug!
-
+    if(widget._patient == null) { // TODO: Has the if-clause solved this?
+      widget._patient = ModalRoute.of(context).settings.arguments; // TODO: This causes the "return" bug!
+    }
     if (widget._patient.sessions.isNotEmpty) {
-      widget._currentSession = widget._patient.sessions.last;
+      _currentSession = widget._patient.sessions.last;
     }
   }
 
@@ -63,11 +64,11 @@ class _PatientDetailState extends State<PatientDetail> {
                 Flexible(
                     flex: 1,
                     child: DropdownButton(
-                      value: widget._currentSession,
+                      value: _currentSession,
                       items: buildDropdownMenuList(),
                       onChanged: (newValue) {
                         setState(() {
-                          widget._currentSession = newValue;
+                          _currentSession = newValue;
                         });
                       },
                     )),
@@ -82,13 +83,13 @@ class _PatientDetailState extends State<PatientDetail> {
               children: <Widget>[
                 Flexible(
                   child: ThresholdChart(
-                    prepareThresholdData(widget._currentSession.sensoryThreshold),
-                    prepareThresholdData(widget._currentSession.painThreshold),
-                    prepareThresholdData(widget._currentSession.toleranceThreshold),
+                    prepareThresholdData(_currentSession.sensoryThreshold),
+                    prepareThresholdData(_currentSession.painThreshold),
+                    prepareThresholdData(_currentSession.toleranceThreshold),
                   ),
                 ),
                 Flexible(
-                  child: PainLevelChart(widget._currentSession.prePainRating, widget._currentSession.postPainRating),
+                  child: PainLevelChart(_currentSession.prePainRating, _currentSession.postPainRating),
                 ),
               ],
             ),

@@ -2,13 +2,12 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:impulsrefactor/States/bluetooth_state.dart';
 import 'package:impulsrefactor/States/message_state.dart';
-import 'package:impulsrefactor/Views/debug.dart';
+import 'package:impulsrefactor/Views/Debug/debug.dart';
+import 'package:impulsrefactor/Views/login.dart';
 import 'package:impulsrefactor/Views/patient_details.dart';
 import 'package:impulsrefactor/Views/patient_select.dart';
 import 'package:impulsrefactor/Views/session_guide.dart';
 import 'package:provider/provider.dart';
-
-import 'Views/login.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();

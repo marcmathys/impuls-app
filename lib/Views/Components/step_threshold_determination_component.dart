@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 class ThresholdDetermination extends StatefulWidget {
   final Function(Map<int, int>, Map<int, int>, int round) _onDeterminationEnd;
-  bool isThirdDetermination;
+  final bool isThirdDetermination;
 
   ThresholdDetermination(this._onDeterminationEnd, this.isThirdDetermination);
 
