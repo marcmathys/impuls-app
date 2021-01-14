@@ -24,9 +24,9 @@ class _PatientDetailState extends State<PatientDetail> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    if(widget._patient == null) { // TODO: Has the if-clause solved this?
-      widget._patient = ModalRoute.of(context).settings.arguments; // TODO: This causes the "return" bug!
-    }
+
+    widget._patient = ModalRoute.of(context).settings.arguments; // TODO: This causes the "return" bug!
+
     if (widget._patient.sessions.isNotEmpty) {
       _currentSession = widget._patient.sessions.last;
     }
@@ -56,7 +56,7 @@ class _PatientDetailState extends State<PatientDetail> {
     return Scaffold(
       appBar: Components.appBar(context, 'Sessions of ${widget._patient.moodleID}'),
       body: SingleChildScrollView(
-        child : Column(
+        child: Column(
           children: <Widget>[
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -77,7 +77,9 @@ class _PatientDetailState extends State<PatientDetail> {
                     child: RaisedButton(onPressed: () => Navigator.of(context).pushNamed('/session_guide'), child: Text('Start new session'))),
               ],
             ),
-            Divider(thickness: 2,),
+            Divider(
+              thickness: 2,
+            ),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: <Widget>[

@@ -31,7 +31,7 @@ class _PatientSelectState extends State<PatientSelect> {
                     itemCount: snapshot.data.documents.length,
                     itemBuilder: (context, index) {
                       Patient patient = PatientList().addPatientFromSnapshot(snapshot.data.documents[index]);
-                      return PatientTile(patient: patient);
+                      return PatientTile(patient);
                     },
                   );
                 },

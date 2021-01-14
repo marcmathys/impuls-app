@@ -10,7 +10,7 @@ class PatientList {
 
   PatientList._internal();
 
-  List<Patient> patients = List();
+  List<Patient> patients = [];
 
   Patient addPatientFromSnapshot(QueryDocumentSnapshot snapshot) {
     Patient patient = Patient();

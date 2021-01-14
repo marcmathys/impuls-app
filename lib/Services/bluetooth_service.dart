@@ -6,7 +6,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_blue/flutter_blue.dart';
 import 'package:impulsrefactor/Helpers/byte_conversion.dart';
 import 'package:impulsrefactor/States/bluetooth_state.dart';
-import 'package:impulsrefactor/States/message_state.dart';
 import 'package:impulsrefactor/Views/Components/ekg_chart_component.dart';
 import 'package:impulsrefactor/app_constants.dart';
 import 'package:provider/provider.dart';
@@ -45,16 +44,11 @@ class BtService {
 
   /// Scans the environment for bluetooth devices and connects to the SET-device if found
   void scanForDevices(BuildContext context) async {
-    MessageState messageState = Provider.of<MessageState>(context, listen: false);
     BTState bluetoothState = Provider.of<BTState>(context, listen: false);
     FlutterBlue flutterBlue = FlutterBlue.instance;
 
     if (!await flutterBlue.isOn) {
-      messageState.message = ToastMessages.BluetoothOff;
-    }
-
-    if (!(bluetoothState.device == null)) {
-      messageState.message = ToastMessages.deviceAlreadyConnected;
+      Scaffold.of(context).showSnackBar(SnackBar(content: Text('Bluetooth is turned off')));
     }
 
     bluetoothState.resetScannedDevicesList();
@@ -69,7 +63,6 @@ class BtService {
   }
 
   Future<bool> connectDevice(BuildContext context, BluetoothDevice device) async {
-    MessageState messageState = Provider.of<MessageState>(context, listen: false);
     BTState bluetoothState = Provider.of<BTState>(context, listen: false);
 
     if (bluetoothState.device != null) {
@@ -79,7 +72,6 @@ class BtService {
     await device.connect();
     bluetoothState.device = device;
     await getCharacteristicReferences(context);
-    messageState.message = ToastMessages.deviceSuccessfullyConnected;
 
     if (bluetoothState.device != null) {
       return true;
@@ -168,7 +160,7 @@ class BtService {
   }
 
   /// Sends the given integers representing bytes to the stimulation characteristic
-  /// Note that the stimulation characteristic supports 3 and 7 interger values, and "quit" in integer
+  /// Note that the stimulation characteristic supports 3 and 7 integer values, and "quit" in integer
   /// Starts listening for values
   void sendStimulationBytes(BuildContext context, List<int> bytes) async {
     BTState state = Provider.of<BTState>(context, listen: false);
@@ -204,6 +196,7 @@ class BtService {
       print('Device is not connected!');
       return;
     }
+
     if (!bluetoothState.characteristics.containsKey(AppConstants.EKG_CHARACTERISTIC_UUID)) {
       print('Characteristic EKG not found!');
       return;

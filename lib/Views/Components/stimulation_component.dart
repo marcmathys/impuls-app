@@ -12,15 +12,18 @@ class Stimulation extends StatefulWidget {
 }
 
 class _StimulationState extends State<Stimulation> {
-  GlobalKey<ProgressBarState> progressBarKey = GlobalKey();
-  bool _isFinished = true;
+  GlobalKey<ProgressRingState> progressBarKey = GlobalKey();
+  bool _finished = false;
 
-  ///TODO: Set this to false and to true when the stimulation is finished!
+  void stimulationFinished() {
+    setState(() {
+      _finished = true;
+    });
+  }
 
   @override
   void dispose() {
-    super.dispose();
-    ///TODO: Trash ESP listeners!
+    super.dispose(); //TODO: Trash ESP listeners!
   }
 
   Widget build(BuildContext context) {
@@ -37,7 +40,12 @@ class _StimulationState extends State<Stimulation> {
                   children: <Widget>[
                     Text('Treatment progress'),
                     SizedBox(height: 5),
-                    ProgressBar(key: progressBarKey, duration: 80, backgroundColor: Colors.grey, foregroundColor: Colors.red),
+                    ProgressRing(
+                        key: progressBarKey,
+                        duration: 80,
+                        backgroundColor: Colors.grey,
+                        foregroundColor: Colors.red,
+                        onFinished: stimulationFinished),
                   ],
                 ),
               ),
@@ -55,10 +63,11 @@ class _StimulationState extends State<Stimulation> {
                 width: 5,
               ),
               FlatButton(
-                height: double.infinity,
-                  onPressed: () {
-                    _isFinished ? widget._onStimulationEnd() : null;
-                  },
+                  onPressed: _finished
+                      ? () {
+                          widget._onStimulationEnd();
+                        }
+                      : null,
                   color: Colors.blue,
                   child: Text('Advance\nto ${widget._advanceToThresholdNumberText}\nthreshold\ndetermination'))
             ],

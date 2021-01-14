@@ -104,7 +104,31 @@ class _SessionGuideState extends State<SessionGuide> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SafeArea(child: _getCurrentStepWidget()),
+      body: SafeArea(
+        child: WillPopScope(
+          onWillPop: () async {
+            showDialog(
+                context: context,
+                child: AlertDialog(
+                  title: Text('Do you want to return to the patient selection screen?'),
+                  actions: [
+                    FlatButton(
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                        },
+                        child: Text('Abort')),
+                    FlatButton(
+                        onPressed: () {
+                          Navigator.of(context).popUntil(ModalRoute.withName('/patient_select'));
+                        },
+                        child: Text('Confirm')),
+                  ],
+                ));
+            return false;
+          },
+          child: _getCurrentStepWidget(),
+        ),
+      ),
     );
   }
 }

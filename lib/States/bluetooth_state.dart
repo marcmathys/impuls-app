@@ -24,7 +24,7 @@ class BTState extends ChangeNotifier {
     _characteristics.clear();
     _bpm = 0.0;
     _brs = null;
-    error.clear();
+    _error.clear();
     _stimulation.clear();
     _scannedDevices.clear();
     notifyListeners();

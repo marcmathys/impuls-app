@@ -20,6 +20,6 @@ class AppConstants {
   static Guid BRS_SERVICE = Guid('59c22c3c-f0db-11e9-81b4-2a2ae2dbcce4');
   static Guid BRS_CHARACTERISTIC_UUID = Guid('61dc8462-f0db-11e9-81b4-2a2ae2dbcce4');
 
-  static int EKG_LIST_LIMIT = 490;
-  static int EKG_LIST_UPDATE_THRESHOLD = 10;
+  static const int EKG_LIST_LIMIT = 500;
+  static const int EKG_LIST_UPDATE_THRESHOLD = 10;
 }

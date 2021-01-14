@@ -12,7 +12,6 @@ class _LoginState extends State<Login> {
   TextEditingController _email;
   TextEditingController _password;
   final _formKey = GlobalKey<FormState>();
-  final _key = GlobalKey<ScaffoldState>();
   FirebaseHandler _handler;
 
   @override
@@ -21,7 +20,7 @@ class _LoginState extends State<Login> {
     _handler = FirebaseHandler();
     _email = TextEditingController();
     _password = TextEditingController();
-    _handler.getCurrentUser().then((autoLogin) {
+    _handler.checkUserLogin().then((autoLogin) {
       if (autoLogin) {
         Navigator.of(context).pushNamed('/patient_select');
       }
@@ -35,17 +34,17 @@ class _LoginState extends State<Login> {
     _password.dispose();
   }
 
-  void loginUser() async {
+  void loginUser(BuildContext context) async {
     if (_formKey.currentState.validate()) {
       if (await _handler.signIn(_email.text, _password.text)) {
         String statusMessage = await _handler.loadTherapist();
         if (statusMessage == 'OK') {
           Navigator.of(context).pushNamed('/patient_select');
         } else {
-          _key.currentState.showSnackBar(SnackBar(content: Text(statusMessage)));
+          Scaffold.of(context).showSnackBar(SnackBar(content: Text(statusMessage)));
         }
       } else {
-        _key.currentState.showSnackBar(
+        Scaffold.of(context).showSnackBar(
           SnackBar(
             content: Text("User authentication failed."),
             duration: Duration(seconds: 5),
@@ -55,72 +54,68 @@ class _LoginState extends State<Login> {
     }
   }
 
-  bool validate() {
-    //TODO: Implement
-    return true;
-  }
-
   Widget build(BuildContext context) {
     return Scaffold(
-      key: _key,
       appBar: Components.appBar(context, 'Impuls'),
-      body: Form(
-        key: _formKey,
-        child: Center(
-          child: Container(
-            width: MediaQuery.of(context).size.width * 0.8,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: TextFormField(
-                    controller: _email,
-                    validator: (value) => (value.isEmpty) ? "Please enter email" : null,
-                    style: style,
-                    decoration: InputDecoration(
-                      prefixIcon: Icon(Icons.email),
-                      labelText: "Email",
-                      border: OutlineInputBorder(),
-                    ),
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: TextFormField(
-                    controller: _password,
-                    validator: (value) => (value.isEmpty) ? "Please enter password" : null,
-                    style: style,
-                    decoration: InputDecoration(
-                      prefixIcon: Icon(Icons.lock),
-                      labelText: "Password",
-                      border: OutlineInputBorder(),
-                    ),
-                    obscureText: true,
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                  child: Material(
-                    elevation: 5.0,
-                    borderRadius: BorderRadius.circular(30.0),
-                    color: Colors.indigo,
-                    child: MaterialButton(
-                      onPressed: () async {
-                        loginUser();
-                      },
-                      child: Text(
-                        'Sign In',
-                        style: style.copyWith(color: Colors.white, fontWeight: FontWeight.bold),
+      body: Builder(builder: (BuildContext context) {
+        return Form(
+          key: _formKey,
+          child: Center(
+            child: Container(
+              width: MediaQuery.of(context).size.width * 0.8,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: TextFormField(
+                      controller: _email,
+                      validator: (value) => (value.isEmpty) ? "Please enter email" : null,
+                      style: style,
+                      decoration: InputDecoration(
+                        prefixIcon: Icon(Icons.email),
+                        labelText: "Email",
+                        border: OutlineInputBorder(),
                       ),
                     ),
                   ),
-                ),
-              ],
+                  Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: TextFormField(
+                      controller: _password,
+                      validator: (value) => (value.isEmpty) ? "Please enter password" : null,
+                      style: style,
+                      decoration: InputDecoration(
+                        prefixIcon: Icon(Icons.lock),
+                        labelText: "Password",
+                        border: OutlineInputBorder(),
+                      ),
+                      obscureText: true,
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                    child: Material(
+                      elevation: 5.0,
+                      borderRadius: BorderRadius.circular(30.0),
+                      color: Colors.indigo,
+                      child: MaterialButton(
+                        onPressed: () async {
+                          loginUser(context);
+                        },
+                        child: Text(
+                          'Sign In',
+                          style: style.copyWith(color: Colors.white, fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
-        ),
-      ),
+        );
+      }),
     );
   }
 }

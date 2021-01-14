@@ -1,19 +1,22 @@
 import 'package:flutter/material.dart';
 import 'dart:math' as Math;
 
-class ProgressBar extends StatefulWidget {
+import 'package:flutter/scheduler.dart';
+
+class ProgressRing extends StatefulWidget {
   final Key key;
   final int duration;
   final Color backgroundColor;
   final Color foregroundColor;
+  final Function() onFinished;
 
-  const ProgressBar({this.key, this.duration, this.backgroundColor, this.foregroundColor});
+  const ProgressRing({this.key, this.duration, this.backgroundColor, this.foregroundColor, this.onFinished});
 
   @override
-  ProgressBarState createState() => ProgressBarState();
+  ProgressRingState createState() => ProgressRingState();
 }
 
-class ProgressBarState extends State<ProgressBar> with SingleTickerProviderStateMixin {
+class ProgressRingState extends State<ProgressRing> with SingleTickerProviderStateMixin {
   AnimationController _animationController;
   bool _isPaused = false;
 
@@ -58,10 +61,10 @@ class ProgressBarState extends State<ProgressBar> with SingleTickerProviderState
                 return CustomPaint(
                   child: child,
                   foregroundPainter: ProgressBarPainter(
-                    backgroundColor: widget.backgroundColor,
-                    foregroundColor: widget.foregroundColor,
-                    percentage: _animationController.value,
-                  ),
+                      backgroundColor: widget.backgroundColor,
+                      foregroundColor: widget.foregroundColor,
+                      percentage: _animationController.value,
+                      onFinished: widget.onFinished),
                 );
               },
             ),
@@ -87,13 +90,20 @@ class ProgressBarPainter extends CustomPainter {
   final Color backgroundColor;
   final Color foregroundColor;
   double strokeWidth;
+  final Function() onFinished;
 
-  ProgressBarPainter({this.backgroundColor, @required this.foregroundColor, @required this.percentage, double strokeWidth}) {
+  ProgressBarPainter({this.backgroundColor, @required this.foregroundColor, @required this.percentage, this.onFinished, double strokeWidth}) {
     this.strokeWidth = strokeWidth ?? 6;
   }
 
   @override
   void paint(Canvas canvas, Size size) {
+    if (percentage == 1.0) {
+      SchedulerBinding.instance.addPostFrameCallback((timeStamp) {
+        onFinished();
+      });
+    }
+
     final Offset center = size.center(Offset.zero);
     final Size constrainedSize = size - Offset(this.strokeWidth, this.strokeWidth);
     final shortestSide = Math.min(constrainedSize.width, constrainedSize.height);

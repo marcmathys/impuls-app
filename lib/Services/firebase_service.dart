@@ -19,7 +19,7 @@ class FirebaseHandler {
   User get user => _user;
 
   /// A method that searches for an already logged-in user and logs that user in
-  Future<bool> getCurrentUser() async {
+  Future<bool> checkUserLogin() async {
     User user = _auth.currentUser;
     if (user != null) {
       _user = user;

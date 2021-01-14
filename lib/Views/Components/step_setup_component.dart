@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class Setup extends StatefulWidget {
@@ -58,7 +57,7 @@ class _SetupState extends State<Setup> {
                 });
               },
             ),
-            Text('Enter patient initial pain rating')
+            Text('Enter patient initial pain rating'),
           ],
         ),
         RaisedButton(
