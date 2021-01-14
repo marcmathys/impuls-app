@@ -51,7 +51,7 @@ class _BluetoothDevicePickerState extends State<BluetoothDevicePicker> {
                         onTap: () async {
                           bool success = await _bluetoothService.connectDevice(context, _btState.scannedDevices.elementAt(index));
                           if (success) {
-                            //Scaffold.of(context).showSnackBar(SnackBar(content: Text('Device successfully connected')));
+                            Scaffold.of(context).showSnackBar(SnackBar(content: Text('Device successfully connected')));
                             _bluetoothService.listenForErrors(context);
                           }
                         },
@@ -62,7 +62,8 @@ class _BluetoothDevicePickerState extends State<BluetoothDevicePicker> {
         RaisedButton(
           onPressed: () {
             _bluetoothService.disconnectDevice(context);
-            setState(() {});
+            _bluetoothService.cancelSubscriptions();
+            _btState.resetState();
           },
           child: Text('Disconnect device'),
         ),

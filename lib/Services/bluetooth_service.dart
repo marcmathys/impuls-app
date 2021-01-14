@@ -27,18 +27,23 @@ class BtService {
   void cancelSubscriptions() {
     if (_stimulation != null) {
       _stimulation.cancel();
+      _stimulation = null;
     }
     if (_ekg != null) {
       _ekg.cancel();
+      _stimulation = null;
     }
     if (_errors != null) {
       _errors.cancel();
+      _errors = null;
     }
     if (_brs != null) {
       _brs.cancel();
+      _stimulation = null;
     }
     if (_bpm != null) {
       _bpm.cancel();
+      _stimulation = null;
     }
   }
 
@@ -88,7 +93,6 @@ class BtService {
       return;
     }
     bluetoothState.device.disconnect();
-    bluetoothState.device = null;
   }
 
   /// Discovers all characteristics and tries to get references to all important ones. Saves them in a dictionary in the bluetooth state
