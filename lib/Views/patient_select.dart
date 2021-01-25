@@ -28,9 +28,9 @@ class _PatientSelectState extends State<PatientSelect> {
                     return const Text('Loading');
                   }
                   return ListView.builder(
-                    itemCount: snapshot.data.documents.length,
+                    itemCount: snapshot.data.docs.length,
                     itemBuilder: (context, index) {
-                      Patient patient = PatientList().addPatientFromSnapshot(snapshot.data.documents[index]);
+                      Patient patient = PatientList().addPatientFromSnapshot(snapshot.data.docs[index]);
                       return PatientTile(patient);
                     },
                   );
