@@ -29,6 +29,17 @@ class _BluetoothDevicePickerState extends State<BluetoothDevicePicker> {
 
     return Column(
       children: [
+        Visibility(
+          visible: _btState.device != null,
+          child: RaisedButton(
+            onPressed: () {
+              _bluetoothService.disconnectDevice(context);
+              _bluetoothService.cancelSubscriptions();
+              _btState.resetState();
+            },
+            child: Text('Disconnect device'),
+          ),
+        ),
         ExpansionTile(
             title: Text('Expand to search for devices'),
             initiallyExpanded: false,
@@ -59,14 +70,6 @@ class _BluetoothDevicePickerState extends State<BluetoothDevicePicker> {
                     }),
               ),
             ]),
-        RaisedButton(
-          onPressed: () {
-            _bluetoothService.disconnectDevice(context);
-            _bluetoothService.cancelSubscriptions();
-            _btState.resetState();
-          },
-          child: Text('Disconnect device'),
-        ),
       ],
     );
   }

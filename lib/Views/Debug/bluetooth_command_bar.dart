@@ -6,16 +6,16 @@ import 'package:impulsrefactor/Views/Components/ekg_chart_component.dart';
 import 'package:impulsrefactor/app_constants.dart';
 import 'package:provider/provider.dart';
 
-class SwitchBar extends StatefulWidget {
+class BluetoothCommandBar extends StatefulWidget {
   final GlobalKey<EKGChartState> _ekgKey;
 
-  SwitchBar(this._ekgKey);
+  BluetoothCommandBar(this._ekgKey);
 
   @override
-  _SwitchBarState createState() => _SwitchBarState();
+  _BluetoothCommandBarState createState() => _BluetoothCommandBarState();
 }
 
-class _SwitchBarState extends State<SwitchBar> {
+class _BluetoothCommandBarState extends State<BluetoothCommandBar> {
   bool ekgSwitch = false;
   bool brsSwitch = false;
   TextEditingController _textController;
@@ -32,13 +32,11 @@ class _SwitchBarState extends State<SwitchBar> {
   void sendBytesOnPressed() {
     //_bluetoothService.sendStimulationBytes(context, [113, 117, 105, 116]); // Send stop
     try {
-      List<int> hexList = ByteConversion.stringToHex(_textController.value.text);
-      _bluetoothService.sendStimulationBytes(context, hexList);
+      List<int> octList = ByteConversion.stringToOct(_textController.value.text);
+      _bluetoothService.sendStimulationBytes(context, octList);
     } catch (_) {
       Scaffold.of(context).showSnackBar(SnackBar(content: Text('The given numbers are in the wrong format! Example format: 111,110,109')));
     }
-
-    ///TODO: setState assumes communication success!
   }
 
   @override

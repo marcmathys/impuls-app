@@ -6,7 +6,7 @@ import 'package:impulsrefactor/Views/Components/ekg_chart_component.dart';
 import 'package:impulsrefactor/Views/Components/app_wide_components.dart';
 import 'package:impulsrefactor/Views/Debug/bluetooth_device_picker.dart';
 import 'package:impulsrefactor/Views/Debug/ekg_value_text_bar.dart';
-import 'package:impulsrefactor/Views/Debug/switch_bar.dart';
+import 'package:impulsrefactor/Views/Debug/bluetooth_command_bar.dart';
 import 'package:provider/provider.dart';
 
 class Debug extends StatefulWidget {
@@ -56,7 +56,7 @@ class _DebugState extends State<Debug> {
               EKGChart(key: _ekgKey),
               EKGValueTextBar(),
               Divider(thickness: 2),
-              SwitchBar(_ekgKey),
+              BluetoothCommandBar(_ekgKey),
               Divider(thickness: 2),
               Selector<BTState, BluetoothDevice>(
                   selector: (_, state) => state.device,

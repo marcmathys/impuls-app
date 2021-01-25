@@ -11,28 +11,28 @@ class ByteConversion {
   /// - it contains non-digits
   /// - an integer is longer than 3 digits
   /// - an integer is bigger than 255 or smaller than 0
-  static List<int> stringToHex(String hex) {
-    List<int> hexList = List();
-    hex.replaceAll(' ', '');
+  static List<int> stringToOct(String oct) {
+    List<int> octList = [];
+    oct.replaceAll(' ', '');
 
-    if (hex.contains(RegExp('[^0-9,]+'))) {
+    if (oct.contains(RegExp('[^0-9,]+'))) {
       return [];
     }
 
-    List<String> stringList = hex.split(',');
+    List<String> stringList = oct.split(',');
     stringList.forEach((element) {
       if (element.length > 3) {
-        hexList.add(-1);
+        octList.add(-1);
       } else {
-        hexList.add(int.parse(element));
+        octList.add(int.parse(element));
       }
     });
 
-    for (int element in hexList) {
+    for (int element in octList) {
       if (element < 0 || element > 255) {
         return [];
       }
     }
-    return hexList;
+    return octList;
   }
 }
