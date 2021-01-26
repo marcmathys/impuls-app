@@ -14,7 +14,7 @@ class PainLevelChart extends StatefulWidget {
 class _PainLevelChartState extends State<PainLevelChart> {
   Widget build(BuildContext context) {
     return SfCartesianChart(
-      title: ChartTitle(text: 'Thresholds', textStyle: TextStyle(fontWeight: FontWeight.bold)),
+      title: ChartTitle(text: 'Pain Levels', textStyle: TextStyle(fontWeight: FontWeight.bold)),
       primaryXAxis: CategoryAxis(),
       series: <ColumnSeries>[
         ColumnSeries<num, String>(

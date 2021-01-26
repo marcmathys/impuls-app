@@ -2,6 +2,8 @@ import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:impulsrefactor/Entities/medical_data.dart';
+import 'package:impulsrefactor/Services/bluetooth_service.dart';
+import 'package:impulsrefactor/States/bluetooth_state.dart';
 import 'package:impulsrefactor/app_constants.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 
@@ -19,6 +21,15 @@ class EKGChartState extends State<EKGChart> {
   @override
   void initState() {
     super.initState();
+    BtService().getEKGAndBPMData(context, widget.key);
+  }
+
+
+  @override
+  void dispose() {
+    BtService().sendOffSignal(BtState().characteristics[AppConstants.EKG_CHARACTERISTIC_UUID]
+    );
+
   }
 
   void updateList(List<int> bluetoothData) {
@@ -33,21 +44,21 @@ class EKGChartState extends State<EKGChart> {
 
     setState(() {});
 
-   /** if (updateCounter >= AppConstants.EKG_LIST_UPDATE_THRESHOLD) {
-      if (_ekgPoints.length >= AppConstants.EKG_LIST_LIMIT + AppConstants.EKG_LIST_UPDATE_THRESHOLD) {
+    /** if (updateCounter >= AppConstants.EKG_LIST_UPDATE_THRESHOLD) {
+        if (_ekgPoints.length >= AppConstants.EKG_LIST_LIMIT + AppConstants.EKG_LIST_UPDATE_THRESHOLD) {
         _ekgPoints.removeRange(0, 10);
         _controller.updateDataSource(
-          addedDataIndexes: List<int>.generate(AppConstants.EKG_LIST_UPDATE_THRESHOLD, (index) => AppConstants.EKG_LIST_LIMIT + index + 1),
-          removedDataIndexes: List<int>.generate(AppConstants.EKG_LIST_UPDATE_THRESHOLD, (index) => index),
+        addedDataIndexes: List<int>.generate(AppConstants.EKG_LIST_UPDATE_THRESHOLD, (index) => AppConstants.EKG_LIST_LIMIT + index + 1),
+        removedDataIndexes: List<int>.generate(AppConstants.EKG_LIST_UPDATE_THRESHOLD, (index) => index),
         );
-      } else {
+        } else {
         _controller.updateDataSource(
-          addedDataIndexes: List<int>.generate(AppConstants.EKG_LIST_UPDATE_THRESHOLD, (index) => _ekgPoints.length - index),
+        addedDataIndexes: List<int>.generate(AppConstants.EKG_LIST_UPDATE_THRESHOLD, (index) => _ekgPoints.length - index),
         );
-      }
-      updateCounter = 0;
-      setState(() {});
-    } **/
+        }
+        updateCounter = 0;
+        setState(() {});
+        } **/
   }
 
   void resetEkgPoints() {

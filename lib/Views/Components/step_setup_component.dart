@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:impulsrefactor/States/session_state.dart';
+import 'package:impulsrefactor/Views/Debug/bluetooth_device_picker.dart';
+import 'package:provider/provider.dart';
 
 class Setup extends StatefulWidget {
-  final Function(int) _setupComplete;
-
-  Setup(this._setupComplete);
-
   @override
   _SetupState createState() => _SetupState();
 }
@@ -15,22 +14,14 @@ class _SetupState extends State<Setup> {
   List<int> dropdownMenuItemList = List.generate(11, (index) => index);
   int _prePainRating;
 
+  void setupComplete() {
+    Provider.of<SessionState>(context, listen: false).currentSession.prePainRating = _prePainRating;
+    Provider.of<SessionState>(context, listen: false).incrementStep();
+  }
+
   Widget build(BuildContext context) {
     return Column(
       children: <Widget>[
-        Row(
-          children: <Widget>[
-            Checkbox(
-              value: _attachElectrodes,
-              onChanged: (value) {
-                setState(() {
-                  _attachElectrodes = value;
-                });
-              },
-            ),
-            Text('Attach Electrodes'),
-          ],
-        ),
         Row(
           children: <Widget>[
             Checkbox(
@@ -42,6 +33,19 @@ class _SetupState extends State<Setup> {
               },
             ),
             Text('Turn on machines'),
+          ],
+        ),
+        Row(
+          children: <Widget>[
+            Checkbox(
+              value: _attachElectrodes,
+              onChanged: (value) {
+                setState(() {
+                  _attachElectrodes = value;
+                });
+              },
+            ),
+            Text('Attach Electrodes'),
           ],
         ),
         Row(
@@ -61,9 +65,10 @@ class _SetupState extends State<Setup> {
           ],
         ),
         RaisedButton(
-          onPressed: _attachElectrodes && _turnedOnMachines && _prePainRating != null ? () => widget._setupComplete(_prePainRating) : null,
-          child: Text('Begin Treatment'),
+          onPressed: _attachElectrodes && _turnedOnMachines && _prePainRating != null ? () => setupComplete() : null,
+          child: Text('Begin Session'),
         ),
+        BluetoothDevicePicker(),
       ],
     );
   }

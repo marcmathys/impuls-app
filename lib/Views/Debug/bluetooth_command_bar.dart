@@ -20,7 +20,7 @@ class _BluetoothCommandBarState extends State<BluetoothCommandBar> {
   bool brsSwitch = false;
   TextEditingController _textController;
   BtService _bluetoothService;
-  BTState _btState;
+  BtState _btState;
 
   @override
   void initState() {
@@ -42,7 +42,7 @@ class _BluetoothCommandBarState extends State<BluetoothCommandBar> {
   @override
   Widget build(BuildContext context) {
     if (_btState == null) {
-      _btState = Provider.of<BTState>(context);
+      _btState = Provider.of<BtState>(context);
     }
 
     return Column(

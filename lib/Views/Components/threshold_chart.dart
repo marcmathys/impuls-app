@@ -15,7 +15,7 @@ class ThresholdChart extends StatefulWidget {
 class _ThresholdChartState extends State<ThresholdChart> {
   Widget build(BuildContext context) {
     return SfCartesianChart(
-      title: ChartTitle(text: 'Pain Levels', textStyle: TextStyle(fontWeight: FontWeight.bold)),
+      title: ChartTitle(text: 'Thresholds', textStyle: TextStyle(fontWeight: FontWeight.bold)),
       series: <ChartSeries>[
         StackedLineSeries<int, int>(
             dataSource: widget.sensoryThresholds,

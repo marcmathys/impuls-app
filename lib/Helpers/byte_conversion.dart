@@ -6,6 +6,12 @@ class ByteConversion {
     return bpmByteData.getFloat32(0, Endian.big);
   }
 
+  static List<int> convertFloatToByteList(double value) {
+    ByteData data = ByteData(4);
+    data.setFloat32(0, value);
+    return data.buffer.asUint8List().toList();
+  }
+
   /// This method converts a string to an array of integers.
   /// The string is stripped from all spaces, and rejected if...
   /// - it contains non-digits

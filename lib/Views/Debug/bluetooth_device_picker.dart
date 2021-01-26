@@ -11,7 +11,7 @@ class BluetoothDevicePicker extends StatefulWidget {
 
 class _BluetoothDevicePickerState extends State<BluetoothDevicePicker> {
   BtService _bluetoothService;
-  BTState _btState;
+  BtState _btState;
   FlutterBlue _flutterBlue;
 
   @override
@@ -24,7 +24,7 @@ class _BluetoothDevicePickerState extends State<BluetoothDevicePicker> {
   @override
   Widget build(BuildContext context) {
     if (_btState == null) {
-      _btState = Provider.of<BTState>(context);
+      _btState = Provider.of<BtState>(context);
     }
 
     return Column(

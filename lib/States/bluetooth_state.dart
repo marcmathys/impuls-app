@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_blue/flutter_blue.dart';
 
-class BTState extends ChangeNotifier {
-  static final BTState _instance = BTState._internal();
+class BtState extends ChangeNotifier {
+  static final BtState _instance = BtState._internal();
 
-  factory BTState() => _instance;
+  factory BtState() => _instance;
 
-  BTState._internal();
+  BtState._internal();
 
   BluetoothDevice _device;
   Map<Guid, BluetoothCharacteristic> _characteristics = {};

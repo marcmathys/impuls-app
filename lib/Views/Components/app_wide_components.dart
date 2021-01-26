@@ -6,6 +6,10 @@ class Components {
     return ModalRoute.of(context).settings.name == '/login';
   }
 
+  static isSessionRoute(BuildContext context) {
+    return ModalRoute.of(context).settings.name == '/session_guide';
+  }
+
   static AppBar appBar(BuildContext context, String title) {
     FirebaseHandler _firebaseHandler = FirebaseHandler();
 
@@ -15,7 +19,7 @@ class Components {
       title: Text(title),
       actions: [
         Visibility(
-          visible: !isLoginRoute(context),
+          visible: !isLoginRoute(context) || !isSessionRoute(context),
           child: FlatButton(
             onPressed: () async {
               await _firebaseHandler.signOut();

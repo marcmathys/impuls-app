@@ -33,7 +33,7 @@ class _DebugState extends State<Debug> {
   }
 
   void backButtonPressed() {
-    BTState().resetState();
+    BtState().resetState();
     _bluetoothService.cancelSubscriptions();
     _flutterBlue.isScanning.first.then((value) {
       if (value) {
@@ -58,7 +58,7 @@ class _DebugState extends State<Debug> {
               Divider(thickness: 2),
               BluetoothCommandBar(_ekgKey),
               Divider(thickness: 2),
-              Selector<BTState, BluetoothDevice>(
+              Selector<BtState, BluetoothDevice>(
                   selector: (_, state) => state.device,
                   builder: (_, device, __) {
                     return Text('Currently connected to: ${device?.id ?? 'none'} ${device?.name ?? ''}');

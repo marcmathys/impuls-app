@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:impulsrefactor/Entities/patient.dart';
 import 'package:impulsrefactor/Services/firebase_service.dart';
+import 'package:impulsrefactor/States/session_state.dart';
+import 'package:provider/provider.dart';
 
 class PatientTile extends StatelessWidget {
   PatientTile(this.patient);
@@ -13,7 +15,8 @@ class PatientTile extends StatelessWidget {
     return GestureDetector(
       onTap: () async {
         await _handler.addSessionsToPatient(patient);
-        Navigator.of(context).pushNamed('/patient_details', arguments: patient);
+        Provider.of<SessionState>(context, listen: false).currentPatient = patient;
+        Navigator.of(context).pushNamed('/patient_details');
       },
       child: Container(
         margin: EdgeInsets.fromLTRB(10, 5, 10, 5),

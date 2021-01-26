@@ -1,6 +1,7 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:impulsrefactor/Adminpanel/admin_screen.dart';
+import 'package:impulsrefactor/States/session_state.dart';
 import 'package:impulsrefactor/States/bluetooth_state.dart';
 import 'package:impulsrefactor/Views/Debug/debug.dart';
 import 'package:impulsrefactor/Views/login.dart';
@@ -14,7 +15,8 @@ void main() async {
   await Firebase.initializeApp();
   runApp(MultiProvider(
     providers: [
-      ChangeNotifierProvider(create: (_) => BTState()),
+      ChangeNotifierProvider(create: (_) => BtState()),
+      ChangeNotifierProvider(create: (_) => SessionState()),
     ],
     child: ImpulsMain(),
   ));

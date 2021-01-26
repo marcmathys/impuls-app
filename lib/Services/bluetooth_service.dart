@@ -49,7 +49,7 @@ class BtService {
 
   /// Scans the environment for bluetooth devices and connects to the SET-device if found
   void scanForDevices(BuildContext context) async {
-    BTState bluetoothState = Provider.of<BTState>(context, listen: false);
+    BtState bluetoothState = Provider.of<BtState>(context, listen: false);
     FlutterBlue flutterBlue = FlutterBlue.instance;
 
     if (!await flutterBlue.isOn) {
@@ -68,7 +68,7 @@ class BtService {
   }
 
   Future<bool> connectDevice(BuildContext context, BluetoothDevice device) async {
-    BTState bluetoothState = Provider.of<BTState>(context, listen: false);
+    BtState bluetoothState = Provider.of<BtState>(context, listen: false);
 
     if (bluetoothState.device != null) {
       await bluetoothState.device.disconnect();
@@ -87,7 +87,7 @@ class BtService {
 
   /// Disconnects the connected bluetooth device
   void disconnectDevice(BuildContext context) {
-    BTState bluetoothState = Provider.of<BTState>(context, listen: false);
+    BtState bluetoothState = Provider.of<BtState>(context, listen: false);
 
     if (bluetoothState.device == null) {
       return;
@@ -97,7 +97,7 @@ class BtService {
 
   /// Discovers all characteristics and tries to get references to all important ones. Saves them in a dictionary in the bluetooth state
   Future<void> getCharacteristicReferences(BuildContext context) async {
-    BTState bluetoothState = Provider.of<BTState>(context, listen: false);
+    BtState bluetoothState = Provider.of<BtState>(context, listen: false);
 
     if (bluetoothState.device == null) {
       print('Device is not connected!');
@@ -167,7 +167,7 @@ class BtService {
   /// Note that the stimulation characteristic supports 3 and 7 integer values, and "quit" in integer
   /// Starts listening for values
   void sendStimulationBytes(BuildContext context, List<int> bytes) async {
-    BTState state = Provider.of<BTState>(context, listen: false);
+    BtState state = Provider.of<BtState>(context, listen: false);
 
     if (!state.characteristics.containsKey(AppConstants.STIMULATION_CHARACTERISTIC_UUID)) {
       print('Characteristic Stimulation not found!');
@@ -194,7 +194,7 @@ class BtService {
 
   /// Send "on" to the ekg and bpm characteristic and starts listening for values
   void getEKGAndBPMData(BuildContext context, GlobalKey<EKGChartState> ekgChartKey) async {
-    BTState bluetoothState = Provider.of<BTState>(context, listen: false);
+    BtState bluetoothState = Provider.of<BtState>(context, listen: false);
 
     if (bluetoothState.device == null) {
       print('Device is not connected!');
@@ -239,7 +239,7 @@ class BtService {
 
   /// Starts listening to the error code characteristic
   void listenForErrors(BuildContext context) async {
-    BTState bluetoothState = Provider.of<BTState>(context, listen: false);
+    BtState bluetoothState = Provider.of<BtState>(context, listen: false);
 
     if (bluetoothState.device == null) {
       print('Device is not connected!');
@@ -268,7 +268,7 @@ class BtService {
 
   /// Sends "on" to the brs characteristic and starts listening for values
   void getBRSData(BuildContext context) async {
-    BTState bluetoothState = Provider.of<BTState>(context, listen: false);
+    BtState bluetoothState = Provider.of<BtState>(context, listen: false);
 
     if (bluetoothState.device == null) {
       print('Device is not connected!');

@@ -88,7 +88,7 @@ class _AdminScreenState extends State<AdminScreen> {
       if (value > 1023 || value < 0) {
         throw FormatException();
       }
-      if (Provider.of<BTState>(context, listen: false).device == null) {
+      if (Provider.of<BtState>(context, listen: false).device == null) {
         throw Exception('No device connected.');
       }
 
@@ -214,7 +214,7 @@ class _AdminScreenState extends State<AdminScreen> {
                 ),
               ),
               Divider(thickness: 2),
-              Selector<BTState, BluetoothDevice>(
+              Selector<BtState, BluetoothDevice>(
                   selector: (_, state) => state.device,
                   builder: (_, device, __) {
                     return Text('Currently connected to: ${device?.id ?? 'none'} ${device?.name ?? ''}');
