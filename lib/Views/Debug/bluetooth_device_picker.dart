@@ -34,7 +34,6 @@ class _BluetoothDevicePickerState extends State<BluetoothDevicePicker> {
           child: RaisedButton(
             onPressed: () {
               _bluetoothService.disconnectDevice(context);
-              _bluetoothService.cancelSubscriptions();
               _btState.resetState();
             },
             child: Text('Disconnect device'),

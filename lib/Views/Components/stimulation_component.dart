@@ -11,7 +11,6 @@ class Stimulation extends StatefulWidget {
 
 class _StimulationState extends State<Stimulation> {
   GlobalKey<ProgressRingState> _progressBarKey = GlobalKey();
-  GlobalKey<EKGChartState> _ekgKey = GlobalKey();
   BtService _bluetoothService;
   bool _finished = false;
   bool ekgStarted = false;
@@ -76,7 +75,7 @@ class _StimulationState extends State<Stimulation> {
             ],
           ),
         ),
-        EKGChart(key: _ekgKey),
+        EKGChart(),
       ],
     );
   }

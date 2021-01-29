@@ -6,13 +6,18 @@ class ByteConversion {
     return bpmByteData.getFloat32(0, Endian.big);
   }
 
-  static List<int> convertFloatToByteList(double value) {
-    ByteData data = ByteData(4);
-    data.setFloat32(0, value);
+  /// Integer value needs to be between 0 and 1023
+  static List<int> convertIntToByteList(int value) {
+    if(value < 0 || value > 1023) {
+      throw FormatException('Value must be between 0 and 1023');
+    }
+
+    ByteData data = ByteData(3);
+    data.setInt16(0, value, Endian.big);
     return data.buffer.asUint8List().toList();
   }
 
-  /// This method converts a string to an array of integers.
+  /// Ths method converts a string to an array of integers.
   /// The string is stripped from all spaces, and rejected if...
   /// - it contains non-digits
   /// - an integer is longer than 3 digits

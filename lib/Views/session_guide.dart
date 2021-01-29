@@ -94,7 +94,7 @@ class _SessionGuideState extends State<SessionGuide> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: Components.appBar(context, title),
+      appBar: Components().appBar(context, title),
       body: SafeArea(
         child: WillPopScope(
           onWillPop: () async {

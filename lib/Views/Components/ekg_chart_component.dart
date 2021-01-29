@@ -4,18 +4,17 @@ import 'package:flutter/material.dart';
 import 'package:impulsrefactor/Entities/medical_data.dart';
 import 'package:impulsrefactor/Services/bluetooth_service.dart';
 import 'package:impulsrefactor/States/bluetooth_state.dart';
+import 'package:impulsrefactor/States/ekg_state.dart';
 import 'package:impulsrefactor/app_constants.dart';
+import 'package:provider/provider.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 
 class EKGChart extends StatefulWidget {
-  const EKGChart({Key key}) : super(key: key);
-
   EKGChartState createState() => EKGChartState();
 }
 
 class EKGChartState extends State<EKGChart> {
   ChartSeriesController _controller;
-  List<MedicalData> _ekgPoints = [];
   num currentIndex = 0;
 
   @override
@@ -24,45 +23,11 @@ class EKGChartState extends State<EKGChart> {
     BtService().getEKGAndBPMData(context, widget.key);
   }
 
-
   @override
   void dispose() {
-    BtService().sendOffSignal(BtState().characteristics[AppConstants.EKG_CHARACTERISTIC_UUID]
-    );
-
-  }
-
-  void updateList(List<int> bluetoothData) {
-    ByteData ekgByteData = ByteData.sublistView(Uint8List.fromList(bluetoothData.reversed.toList()));
-    int ekgPoint = ekgByteData.getInt16(0, Endian.big);
-    _ekgPoints.add(MedicalData(ekgPoint, currentIndex));
-    currentIndex++;
-
-    if (_ekgPoints.length > AppConstants.EKG_LIST_LIMIT) {
-      _ekgPoints.removeAt(0);
-    }
-
-    setState(() {});
-
-    /** if (updateCounter >= AppConstants.EKG_LIST_UPDATE_THRESHOLD) {
-        if (_ekgPoints.length >= AppConstants.EKG_LIST_LIMIT + AppConstants.EKG_LIST_UPDATE_THRESHOLD) {
-        _ekgPoints.removeRange(0, 10);
-        _controller.updateDataSource(
-        addedDataIndexes: List<int>.generate(AppConstants.EKG_LIST_UPDATE_THRESHOLD, (index) => AppConstants.EKG_LIST_LIMIT + index + 1),
-        removedDataIndexes: List<int>.generate(AppConstants.EKG_LIST_UPDATE_THRESHOLD, (index) => index),
-        );
-        } else {
-        _controller.updateDataSource(
-        addedDataIndexes: List<int>.generate(AppConstants.EKG_LIST_UPDATE_THRESHOLD, (index) => _ekgPoints.length - index),
-        );
-        }
-        updateCounter = 0;
-        setState(() {});
-        } **/
-  }
-
-  void resetEkgPoints() {
-    _ekgPoints.clear();
+    BtService().sendOffSignal(BtState().characteristics[AppConstants.EKG_CHARACTERISTIC_UUID]);
+    print('ekgChart disposed!');
+    super.dispose();
   }
 
   Widget build(BuildContext context) {
@@ -72,7 +37,7 @@ class EKGChartState extends State<EKGChart> {
       primaryYAxis: NumericAxis(),
       series: <ChartSeries<MedicalData, num>>[
         LineSeries<MedicalData, num>(
-          dataSource: _ekgPoints,
+          dataSource: Provider.of<EkgState>(context).ekgPoints,
           onRendererCreated: (ChartSeriesController controller) => _controller = controller,
           name: 'EKG',
           xValueMapper: (MedicalData medicalData, _) => medicalData.xAxis,

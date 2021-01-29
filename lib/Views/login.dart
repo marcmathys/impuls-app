@@ -56,7 +56,7 @@ class _LoginState extends State<Login> {
 
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: Components.appBar(context, 'Impuls'),
+      appBar: Components().appBar(context, 'Impuls'),
       body: Builder(builder: (BuildContext context) {
         return Form(
           key: _formKey,

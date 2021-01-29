@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:impulsrefactor/Helpers/byte_conversion.dart';
 import 'package:impulsrefactor/Helpers/fitting_curve_calculator.dart';
 import 'package:impulsrefactor/Services/bluetooth_service.dart';
+import 'package:impulsrefactor/States/bluetooth_state.dart';
+import 'package:provider/provider.dart';
 
 class ThresholdDetermination extends StatefulWidget {
   final Function(Map<int, int>, Map<int, int>, int round) _onDeterminationEnd;
@@ -96,8 +98,8 @@ class _ThresholdDeterminationState extends State<ThresholdDetermination> {
                 RaisedButton(
                   onPressed: _roundInProgress && !_stimLockout
                       ? () async {
-                          double fittedValue = await FittingCurveCalculator.fitToCurve(_stimulationLevel + 200);
-                          List<int> byteList = ByteConversion.convertFloatToByteList(fittedValue);
+                          int fittedValue = await FittingCurveCalculator.fitToCurve(_stimulationLevel + 200);
+                          List<int> byteList = ByteConversion.convertIntToByteList(fittedValue);
                           BtService().sendStimulationBytes(context, byteList);
 
                           setState(() {
@@ -108,7 +110,7 @@ class _ThresholdDeterminationState extends State<ThresholdDetermination> {
                           });
                         }
                       : null,
-                  child: Text('Stimulate with ${_stimulationLevel + 200} mA'),
+                  child: Text('Stimulate with ${_stimulationLevel + 200} µA'),
                 ),
                 Text('IBI: 825'), //TODO: Connect to ESP
               ],

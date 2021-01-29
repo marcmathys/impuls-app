@@ -49,11 +49,11 @@ class _DebugState extends State<Debug> {
         return true;
       },
       child: Scaffold(
-        appBar: Components.appBar(context, 'Debug menu'),
+        appBar: Components().appBar(context, 'Debug menu'),
         body: Builder(builder: (BuildContext context) {
           return ListView(
             children: <Widget>[
-              EKGChart(key: _ekgKey),
+              EKGChart(),
               EKGValueTextBar(),
               Divider(thickness: 2),
               BluetoothCommandBar(_ekgKey),

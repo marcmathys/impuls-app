@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_blue/flutter_blue.dart';
 import 'package:impulsrefactor/Helpers/byte_conversion.dart';
 import 'package:impulsrefactor/States/bluetooth_state.dart';
+import 'package:impulsrefactor/States/ekg_state.dart';
 import 'package:impulsrefactor/Views/Components/ekg_chart_component.dart';
 import 'package:impulsrefactor/app_constants.dart';
 import 'package:provider/provider.dart';
@@ -22,6 +23,7 @@ class BtService {
   StreamSubscription _errors;
   StreamSubscription _brs;
   StreamSubscription _bpm;
+  StreamSubscription _stateListener;
 
   /// Cancels all subscriptions and resets their variables.
   void cancelSubscriptions() {
@@ -31,7 +33,7 @@ class BtService {
     }
     if (_ekg != null) {
       _ekg.cancel();
-      _stimulation = null;
+      _ekg = null;
     }
     if (_errors != null) {
       _errors.cancel();
@@ -39,11 +41,15 @@ class BtService {
     }
     if (_brs != null) {
       _brs.cancel();
-      _stimulation = null;
+      _brs = null;
     }
     if (_bpm != null) {
       _bpm.cancel();
-      _stimulation = null;
+      _brs = null;
+    }
+    if (_stateListener != null) {
+      _stateListener.cancel();
+      _stateListener = null;
     }
   }
 
@@ -57,7 +63,7 @@ class BtService {
     }
 
     bluetoothState.resetScannedDevicesList();
-    flutterBlue.startScan();
+    flutterBlue.startScan(timeout: Duration(seconds: 10));
     flutterBlue.scanResults.listen((results) {
       List<BluetoothDevice> devices = [];
       results.forEach((element) {
@@ -75,6 +81,16 @@ class BtService {
     }
 
     await device.connect();
+
+    _stateListener = device.state.listen((event) {
+      if (event == BluetoothDeviceState.disconnected) {
+        print('State event: $event');
+        bluetoothState.device = null;
+        cancelSubscriptions();
+        Scaffold.of(context).showSnackBar(SnackBar(content: Text('Device got disconnected')));
+      }
+    });
+
     bluetoothState.device = device;
     await getCharacteristicReferences(context);
 
@@ -192,6 +208,20 @@ class BtService {
     }
   }
 
+  void startTherapy(BuildContext context) {
+    BtState bluetoothState = Provider.of<BtState>(context, listen: false);
+
+    if (bluetoothState.device == null) {
+      print('Device is not connected!');
+      return;
+    }
+
+    if (!bluetoothState.characteristics.containsKey(AppConstants.EKG_CHARACTERISTIC_UUID)) {
+      print('Characteristic EKG not found!');
+      return;
+    }
+  }
+
   /// Send "on" to the ekg and bpm characteristic and starts listening for values
   void getEKGAndBPMData(BuildContext context, GlobalKey<EKGChartState> ekgChartKey) async {
     BtState bluetoothState = Provider.of<BtState>(context, listen: false);
@@ -206,26 +236,26 @@ class BtService {
       return;
     }
 
-    BluetoothCharacteristic ekg = bluetoothState.characteristics[AppConstants.EKG_CHARACTERISTIC_UUID];
-    BluetoothCharacteristic bpm = bluetoothState.characteristics[AppConstants.BPM_CHARACTERISTIC_UUID];
+    BluetoothCharacteristic ekgCharacteristic = bluetoothState.characteristics[AppConstants.EKG_CHARACTERISTIC_UUID];
+    BluetoothCharacteristic bpmCharacteristic = bluetoothState.characteristics[AppConstants.BPM_CHARACTERISTIC_UUID];
 
-    ekgChartKey.currentState.resetEkgPoints();
-    await sendOnSignal(ekg);
+    Provider.of<EkgState>(context, listen: false).resetEkgPoints();
+    await sendOnSignal(ekgCharacteristic);
 
     if (_ekg == null) {
-      _ekg = ekg.value.listen((event) {
-        ekgChartKey.currentState.updateList(event);
+      _ekg = ekgCharacteristic.value.listen((event) {
+        Provider.of<EkgState>(context, listen: false).addEkgPoint(event);
       });
-      await ekg.setNotifyValue(true);
+      await ekgCharacteristic.setNotifyValue(true);
     }
 
     if (_bpm == null) {
-      _bpm = bpm.value.listen((event) {
+      _bpm = bpmCharacteristic.value.listen((event) {
         if (event.length == 4) {
           bluetoothState.bpm = ByteConversion.bpmByteConversion(event);
         }
       });
-      await bpm.setNotifyValue(true);
+      await bpmCharacteristic.setNotifyValue(true);
     }
 
     if (_ekg.isPaused) {

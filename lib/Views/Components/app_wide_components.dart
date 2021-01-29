@@ -2,15 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:impulsrefactor/Services/firebase_service.dart';
 
 class Components {
-  static isLoginRoute(BuildContext context) {
+  bool isLoginRoute(BuildContext context) {
     return ModalRoute.of(context).settings.name == '/login';
   }
 
-  static isSessionRoute(BuildContext context) {
+  bool isSessionRoute(BuildContext context) {
     return ModalRoute.of(context).settings.name == '/session_guide';
   }
 
-  static AppBar appBar(BuildContext context, String title) {
+  AppBar appBar(BuildContext context, String title) {
     FirebaseHandler _firebaseHandler = FirebaseHandler();
 
     return AppBar(
