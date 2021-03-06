@@ -1,5 +1,3 @@
-import 'dart:typed_data';
-
 import 'package:flutter/material.dart';
 import 'package:impulsrefactor/Entities/medical_data.dart';
 import 'package:impulsrefactor/Services/bluetooth_service.dart';
@@ -14,6 +12,7 @@ class EKGChart extends StatefulWidget {
 }
 
 class EKGChartState extends State<EKGChart> {
+  // ignore: unused_field
   ChartSeriesController _controller;
   num currentIndex = 0;
 

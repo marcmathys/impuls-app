@@ -35,7 +35,7 @@ class _BluetoothCommandBarState extends State<BluetoothCommandBar> {
       List<int> octList = ByteConversion.stringToOct(_textController.value.text);
       _bluetoothService.sendStimulationBytes(context, octList);
     } catch (_) {
-      Scaffold.of(context).showSnackBar(SnackBar(content: Text('The given numbers are in the wrong format! Example format: 111,110,109')));
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('The given numbers are in the wrong format! Example format: 111,110,109')));
     }
   }
 
@@ -55,7 +55,7 @@ class _BluetoothCommandBarState extends State<BluetoothCommandBar> {
               controller: _textController,
               decoration: InputDecoration(hintText: 'Enter Bytes (example: 110,110,109)'),
             )),
-            RaisedButton(
+            ElevatedButton(
               onPressed: () {
                 sendBytesOnPressed();
               },

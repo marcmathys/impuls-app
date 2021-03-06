@@ -100,15 +100,15 @@ class _SessionGuideState extends State<SessionGuide> {
           onWillPop: () async {
             showDialog(
                 context: context,
-                child: AlertDialog(
+                builder: (context) => AlertDialog(
                   title: Text('Do you want to return to the patient selection screen?'),
                   actions: [
-                    FlatButton(
+                    TextButton(
                         onPressed: () {
                           Navigator.of(context).pop();
                         },
                         child: Text('Abort')),
-                    FlatButton(
+                    TextButton(
                         onPressed: () {
                           sessionState.resetState();
                           Navigator.of(context).popUntil(ModalRoute.withName('/patient_select'));

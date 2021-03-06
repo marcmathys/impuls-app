@@ -69,9 +69,18 @@ class ProgressRingState extends State<ProgressRing> with SingleTickerProviderSta
               },
             ),
           ),
-          FlatButton(
-              splashColor: Colors.transparent,
-              highlightColor: Colors.transparent,
+          TextButton(
+              style: ButtonStyle(
+                foregroundColor: MaterialStateProperty.resolveWith<Color>((Set<MaterialState> states) {
+                  return Colors.black;
+                }),
+                overlayColor: MaterialStateProperty.resolveWith<Color>((Set<MaterialState> states) {
+                  return Colors.transparent;
+                }),
+              ),
+
+              //splashColor: Colors.transparent,
+              //highlightColor: Colors.transparent,
               onPressed: () {
                 _isPaused ? resumeAnimation() : pauseAnimation();
                 setState(() {

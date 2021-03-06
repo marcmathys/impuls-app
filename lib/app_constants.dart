@@ -1,5 +1,6 @@
 import 'package:flutter_blue/flutter_blue.dart';
 
+// ignore_for_file: non_constant_identifier_names
 class AppConstants {
   static final AppConstants _instance = AppConstants._internal();
 

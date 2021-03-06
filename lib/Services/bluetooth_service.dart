@@ -59,7 +59,7 @@ class BtService {
     FlutterBlue flutterBlue = FlutterBlue.instance;
 
     if (!await flutterBlue.isOn) {
-      Scaffold.of(context).showSnackBar(SnackBar(content: Text('Bluetooth is turned off')));
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Bluetooth is turned off')));
     }
 
     bluetoothState.resetScannedDevicesList();
@@ -87,7 +87,7 @@ class BtService {
         print('State event: $event');
         bluetoothState.device = null;
         cancelSubscriptions();
-        Scaffold.of(context).showSnackBar(SnackBar(content: Text('Device got disconnected')));
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Device got disconnected')));
       }
     });
 

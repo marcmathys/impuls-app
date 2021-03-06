@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:impulsrefactor/Helpers/byte_conversion.dart';
 import 'package:impulsrefactor/Helpers/fitting_curve_calculator.dart';
 import 'package:impulsrefactor/Services/bluetooth_service.dart';
-import 'package:impulsrefactor/States/bluetooth_state.dart';
-import 'package:provider/provider.dart';
 
 class ThresholdDetermination extends StatefulWidget {
   final Function(Map<int, int>, Map<int, int>, int round) _onDeterminationEnd;
@@ -95,7 +93,7 @@ class _ThresholdDeterminationState extends State<ThresholdDetermination> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: <Widget>[
-                RaisedButton(
+                ElevatedButton(
                   onPressed: _roundInProgress && !_stimLockout
                       ? () async {
                           int fittedValue = await FittingCurveCalculator.fitToCurve(_stimulationLevel + 200);
@@ -119,7 +117,7 @@ class _ThresholdDeterminationState extends State<ThresholdDetermination> {
           Text('Pain rating'),
           Row(
             children: <Widget>[
-              FlatButton(
+              TextButton(
                 onPressed: _generalButtonLockout || _buttonLockouts[-1]
                     ? null
                     : () {
@@ -130,15 +128,15 @@ class _ThresholdDeterminationState extends State<ThresholdDetermination> {
                       },
                 child: Text('N/A'),
               ),
-              FlatButton(
+              TextButton(
                 onPressed: _generalButtonLockout || _buttonLockouts[0] ? null : () => addStimulationLevel(0),
                 child: Text('0'),
               ),
-              FlatButton(
+              TextButton(
                 onPressed: _generalButtonLockout || _buttonLockouts[1] ? null : () => addStimulationLevel(1),
                 child: Text('1'),
               ),
-              FlatButton(
+              TextButton(
                 onPressed: _generalButtonLockout || _buttonLockouts[2] ? null : () => addStimulationLevel(2),
                 child: Text('2'),
               ),
@@ -146,19 +144,19 @@ class _ThresholdDeterminationState extends State<ThresholdDetermination> {
           ),
           Row(
             children: <Widget>[
-              FlatButton(
+              TextButton(
                 onPressed: _generalButtonLockout || _buttonLockouts[3] ? null : () => addStimulationLevel(3),
                 child: Text('3'),
               ),
-              FlatButton(
+              TextButton(
                 onPressed: _generalButtonLockout || _buttonLockouts[4] ? null : () => addStimulationLevel(4),
                 child: Text('4'),
               ),
-              FlatButton(
+              TextButton(
                 onPressed: _generalButtonLockout || _buttonLockouts[5] ? null : () => addStimulationLevel(5),
                 child: Text('5'),
               ),
-              FlatButton(
+              TextButton(
                 onPressed: _generalButtonLockout || _buttonLockouts[6] ? null : () => addStimulationLevel(6),
                 child: Text('6'),
               ),
@@ -166,19 +164,19 @@ class _ThresholdDeterminationState extends State<ThresholdDetermination> {
           ),
           Row(
             children: <Widget>[
-              FlatButton(
+              TextButton(
                 onPressed: _generalButtonLockout || _buttonLockouts[7] ? null : () => addStimulationLevel(7),
                 child: Text('7'),
               ),
-              FlatButton(
+              TextButton(
                 onPressed: _generalButtonLockout || _buttonLockouts[8] ? null : () => addStimulationLevel(8),
                 child: Text('8'),
               ),
-              FlatButton(
+              TextButton(
                 onPressed: _generalButtonLockout || _buttonLockouts[9] ? null : () => addStimulationLevel(9),
                 child: Text('9'),
               ),
-              FlatButton(
+              TextButton(
                 onPressed: _generalButtonLockout || _buttonLockouts[10] ? null : () => addStimulationLevel(10),
                 child: Text('10'),
               ),
@@ -187,11 +185,11 @@ class _ThresholdDeterminationState extends State<ThresholdDetermination> {
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              RaisedButton(
+              ElevatedButton(
                 onPressed: _roundInProgress ? null : () => widget._onDeterminationEnd(_stimRatingRound1, _stimRatingRound2, _round),
                 child: Text('Start therapy'),
               ),
-              RaisedButton(
+              ElevatedButton(
                 onPressed: _round == 1 && _roundInProgress == false && widget.isThirdDetermination == false ? startNextRound : null,
                 child: Text('Start second round'),
               ),

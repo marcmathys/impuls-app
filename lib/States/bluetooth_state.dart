@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_blue/flutter_blue.dart';
 
+// ignore_for_file: unnecessary_getters_setters
 class BtState extends ChangeNotifier {
   static final BtState _instance = BtState._internal();
 

@@ -11,7 +11,6 @@ import 'package:impulsrefactor/States/bluetooth_state.dart';
 import 'package:impulsrefactor/Views/Components/app_wide_components.dart';
 import 'package:impulsrefactor/Views/Debug/bluetooth_device_picker.dart';
 import 'package:provider/provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class AdminScreen extends StatefulWidget {
   AdminScreen({Key key}) : super(key: key);
@@ -101,9 +100,9 @@ class _AdminScreenState extends State<AdminScreen> {
       enterVoltageFocusNode.requestFocus();
       setState(() {});
     } on FormatException {
-      Scaffold.of(context).showSnackBar(SnackBar(content: Text('Wrong number format')));
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Wrong number format')));
     } catch (exception) {
-      Scaffold.of(context).showSnackBar(SnackBar(content: Text('$exception')));
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('$exception')));
     }
   }
 
@@ -119,9 +118,9 @@ class _AdminScreenState extends State<AdminScreen> {
         enterStimulationValue.requestFocus();
         setState(() {});
       } on FormatException {
-        Scaffold.of(context).showSnackBar(SnackBar(content: Text('Wrong number format of resistance or voltage')));
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Wrong number format of resistance or voltage')));
       } on IntegerDivisionByZeroException {
-        Scaffold.of(context).showSnackBar(SnackBar(content: Text('Resistance must not be zero')));
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Resistance must not be zero')));
       }
         catch (_) {}
   }
@@ -138,7 +137,7 @@ class _AdminScreenState extends State<AdminScreen> {
   void startFitting(BuildContext context) async {
     PolynomialFit result = await FittingCurveCalculator.calculate(_fittingPoints);
     if (result != null) {
-      Scaffold.of(context).showSnackBar(
+      ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: EasyRichText(
             'Coefficients: a = ${result.coefficients.first.toStringAsFixed(3)}, b = ${result.coefficients.elementAt(1).toStringAsFixed(3)}',
@@ -153,7 +152,8 @@ class _AdminScreenState extends State<AdminScreen> {
         ),
       );
     } else
-      Scaffold.of(context).showSnackBar(SnackBar(
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        duration: Duration(seconds: 5),
         content: Text('Error occurred while trying to fit the curve!'),
       ));
   }
@@ -184,7 +184,7 @@ class _AdminScreenState extends State<AdminScreen> {
                   )),
                   Container(
                     width: MediaQuery.of(context).size.width / 4,
-                    child: RaisedButton(
+                    child: ElevatedButton(
                       onPressed: _currentPoint?.x == null ? () => sendBytesOnPressed(context) : null,
                       child: Text('Send'),
                     ),
@@ -203,7 +203,7 @@ class _AdminScreenState extends State<AdminScreen> {
                   ),
                   Container(
                     width: MediaQuery.of(context).size.width / 4,
-                    child: RaisedButton(
+                    child: ElevatedButton(
                       onPressed: _currentPoint?.x != null
                           ? () => saveAmpsOnPressed(context)
                           : null,
@@ -215,7 +215,7 @@ class _AdminScreenState extends State<AdminScreen> {
               SizedBox(height: 8),
               Text(fittingPointsToString(), textAlign: TextAlign.start),
               Center(
-                child: RaisedButton(
+                child: ElevatedButton(
                   onPressed: () => setState(() {
                     _fittingPoints = _testingPoints;
                   }),
@@ -223,7 +223,7 @@ class _AdminScreenState extends State<AdminScreen> {
                 ),
               ),
               Center(
-                child: RaisedButton(
+                child: ElevatedButton(
                   onPressed: _fittingPoints.isNotEmpty ? () => startFitting(context) : null,
                   child: Text('Start fitting with given points'),
                 ),

@@ -41,10 +41,10 @@ class _LoginState extends State<Login> {
         if (statusMessage == 'OK') {
           Navigator.of(context).pushNamed('/patient_select');
         } else {
-          Scaffold.of(context).showSnackBar(SnackBar(content: Text(statusMessage)));
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(statusMessage)));
         }
       } else {
-        Scaffold.of(context).showSnackBar(
+        ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text("User authentication failed."),
             duration: Duration(seconds: 5),

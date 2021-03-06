@@ -64,7 +64,7 @@ class _SetupState extends State<Setup> {
             Text('Enter patient initial pain rating'),
           ],
         ),
-        RaisedButton(
+        ElevatedButton(
           onPressed: _attachElectrodes && _turnedOnMachines && _prePainRating != null ? () => setupComplete() : null,
           child: Text('Begin Session'),
         ),

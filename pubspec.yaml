@@ -23,14 +23,14 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  provider: ^4.3.3
+  provider: ^5.0.0
   flutter_blue: ^0.7.3
-  syncfusion_flutter_charts: ^18.4.35
-  percent_indicator: ^2.1.9
+  syncfusion_flutter_charts: ^18.4.46
+  percent_indicator: ^2.1.9+1
   firebase_core: ^0.7.0
   cloud_firestore: ^0.16.0
   firebase_auth: ^0.20.0+1
-  shared_preferences: ^0.5.12+4
+  shared_preferences: ^2.0.3
   easy_rich_text: ^0.5.3
 
 
