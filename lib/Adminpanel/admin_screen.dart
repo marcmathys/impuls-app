@@ -1,6 +1,5 @@
 import 'dart:math';
 
-import 'package:easy_rich_text/easy_rich_text.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_blue/flutter_blue.dart';
@@ -11,6 +10,7 @@ import 'package:impulsrefactor/States/bluetooth_state.dart';
 import 'package:impulsrefactor/Views/Components/app_wide_components.dart';
 import 'package:impulsrefactor/Views/Debug/bluetooth_device_picker.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class AdminScreen extends StatefulWidget {
   AdminScreen({Key key}) : super(key: key);
@@ -24,51 +24,58 @@ class _AdminScreenState extends State<AdminScreen> {
   TextEditingController _byteSendTextController;
   TextEditingController _measuredVoltageTextController;
   TextEditingController _resistance;
+  TextEditingController _editXValueController;
+  TextEditingController _editYValueController;
   List<FittingPoint> _fittingPoints = [];
   FittingPoint _currentPoint;
   FocusNode enterStimulationValue;
   FocusNode enterVoltageFocusNode;
+  String oldDataPoints = 'None';
+  String oldCoefficients = 'None';
+  String oldResistance = 'None';
+  bool confirmButtonLockout = true;
+  SharedPreferences prefs;
 
   //TODO: Remove debug lists!
   List<FittingPoint> _testingPoints = [
-    FittingPoint(32, 9.8959592861),
-    FittingPoint(64, 9.6933836147),
-    FittingPoint(96, 9.4977724132),
-    FittingPoint(128, 9.29743507881),
-    FittingPoint(160, 9.1138294716),
-    FittingPoint(192, 8.9385316487),
-    FittingPoint(224, 8.7624895474),
-    FittingPoint(255, 8.5978510944),
-    FittingPoint(256, 8.5923006639),
-    FittingPoint(287, 8.4294542771),
-    FittingPoint(288, 8.4118326758),
-    FittingPoint(319, 8.2506200822),
-    FittingPoint(320, 8.2348302804),
-    FittingPoint(351, 8.0709060888),
-    FittingPoint(352, 8.0614868669),
-    FittingPoint(383, 7.882314919),
-    FittingPoint(384, 7.8709295968),
-    FittingPoint(415, 7.6870801558),
-    FittingPoint(416, 7.6732231211),
-    FittingPoint(447, 7.4955419439),
-    FittingPoint(479, 7.2930176798),
-    FittingPoint(511, 7.0817085861),
-    FittingPoint(543, 6.8772960715),
-    FittingPoint(575, 6.6720329455),
-    FittingPoint(607, 6.4614681764),
-    FittingPoint(639, 6.2538288116),
-    FittingPoint(671, 6.0402547113),
-    FittingPoint(703, 5.8289456176),
-    FittingPoint(735, 5.6347896032),
-    FittingPoint(767, 5.4380793089),
-    FittingPoint(799, 5.2470240722),
-    FittingPoint(831, 5.0751738152),
-    FittingPoint(863, 4.8675344505),
-    FittingPoint(895, 4.7004803658),
-    FittingPoint(927, 4.605170186),
-    FittingPoint(959, 4.3820266347),
-    FittingPoint(991, 4.3820266347),
-    FittingPoint(1023, 4.248495242),
+    FittingPoint(32, 198.5),
+    FittingPoint(64, 162.1),
+    FittingPoint(96, 133.3),
+    FittingPoint(128, 109.1),
+    FittingPoint(160, 90.8),
+    FittingPoint(192, 76.2),
+    FittingPoint(224, 63.9),
+    FittingPoint(255, 54.2),
+    FittingPoint(256, 53.9),
+    FittingPoint(287, 45.8),
+    FittingPoint(288, 45.0),
+    FittingPoint(319, 38.3),
+    FittingPoint(320, 37.7),
+    FittingPoint(351, 32.0),
+    FittingPoint(352, 31.7),
+    FittingPoint(383, 26.5),
+    FittingPoint(384, 26.2),
+    FittingPoint(415, 21.8),
+    FittingPoint(416, 21.5),
+    FittingPoint(447, 18.0),
+    FittingPoint(479, 14.7),
+    FittingPoint(511, 11.9),
+    FittingPoint(543, 9.7),
+    FittingPoint(575, 7.9),
+    FittingPoint(607, 6.4),
+    FittingPoint(639, 5.2),
+    FittingPoint(671, 4.2),
+    FittingPoint(703, 3.4),
+    FittingPoint(735, 2.8),
+    FittingPoint(767, 2.3),
+    FittingPoint(799, 1.9),
+    FittingPoint(831, 1.6),
+    FittingPoint(863, 1.3),
+    FittingPoint(895, 1.1),
+    FittingPoint(927, 1.0),
+    FittingPoint(959, 0.8),
+    FittingPoint(991, 0.8),
+    FittingPoint(1023, 0.7),
   ];
 
   @override
@@ -76,14 +83,130 @@ class _AdminScreenState extends State<AdminScreen> {
     super.initState();
     _bluetoothService = BtService();
     _byteSendTextController = TextEditingController();
+    _editXValueController = TextEditingController();
+    _editYValueController = TextEditingController();
     _measuredVoltageTextController = TextEditingController();
-    _resistance = TextEditingController(text: '1');
+    _resistance = TextEditingController(text: '10000');
     _currentPoint = FittingPoint(null, null);
     enterStimulationValue = FocusNode();
     enterVoltageFocusNode = FocusNode();
+    SharedPreferences.getInstance().then((preferences) {
+      this.prefs = preferences;
+      if (prefs.containsKey('fittingPointList')) {
+        oldDataPoints = prefs.getString('fittingPointList');
+      }
+      if (prefs.containsKey('fittingCurveFirstCoefficient') && prefs.containsKey('fittingCurveSecondCoefficient')) {
+        oldCoefficients =
+            'a = ${prefs.getDouble('fittingCurveFirstCoefficient').toStringAsFixed(3)}, b = ${prefs.getDouble('fittingCurveSecondCoefficient').toStringAsFixed(3)}';
+      }
+      if (prefs.containsKey('resistance')) {
+        oldResistance = prefs.getString('resistance');
+      }
+      setState(() {});
+    });
   }
 
-  void sendBytesOnPressed(BuildContext context) {
+  StatefulBuilder showFittingPointListDialog() {
+    List<FittingPoint> fittingPointsUpdate = performDeepCopy(_fittingPoints);
+
+    return StatefulBuilder(
+      builder: (context, setState) => AlertDialog(
+        actions: [
+          TextButton(
+              onPressed: () {
+                fittingPointsUpdate.clear();
+                setState(() {});
+              },
+              child: Icon(Icons.delete)),
+          TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Icon(Icons.cancel)),
+          TextButton(
+              onPressed: () {
+                _fittingPoints.clear();
+                _fittingPoints.addAll(performDeepCopy(fittingPointsUpdate));
+                Navigator.of(context).pop();
+              },
+              child: Icon(Icons.check)),
+        ],
+        content: SizedBox(
+          height: MediaQuery.of(context).size.height - 20,
+          width: MediaQuery.of(context).size.width,
+          child: ListView.builder(
+            shrinkWrap: true,
+            itemCount: fittingPointsUpdate.length,
+            itemBuilder: (BuildContext context, int index) {
+              return Column(
+                children: [
+                  GestureDetector(
+                    onTap: () async {
+                      await showDialog(context: context, builder: (context) => showFittingPointEditDialog(fittingPointsUpdate, index));
+                      setState(() {});
+                    },
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: [
+                        Text(fittingPointsUpdate.elementAt(index).x.toString()),
+                        Text(fittingPointsUpdate.elementAt(index).y.toString()),
+                      ],
+                    ),
+                  ),
+                  Divider(thickness: 2),
+                  SizedBox(height: 10)
+                ],
+              );
+            },
+          ),
+        ),
+      ),
+    );
+  }
+
+  AlertDialog showFittingPointEditDialog(List<FittingPoint> points, int index) {
+    _editXValueController.text = points.elementAt(index).x.toString();
+    _editYValueController.text = points.elementAt(index).y.toString();
+
+    return AlertDialog(
+      actions: [
+        TextButton(
+            onPressed: () {
+              points.removeAt(index);
+              Navigator.pop(context);
+              setState(() {});
+            },
+            child: Icon(Icons.delete)),
+        TextButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+            child: Icon(Icons.cancel)),
+        TextButton(
+            onPressed: () {
+              points.elementAt(index).x = int.parse(_editXValueController.text);
+              points.elementAt(index).y = double.parse(_editYValueController.text);
+              Navigator.of(context).pop();
+            },
+            child: Icon(Icons.check)),
+      ],
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          TextField(
+            controller: _editXValueController,
+            decoration: InputDecoration(labelText: 'Stimulation'),
+          ),
+          TextField(
+            controller: _editYValueController,
+            decoration: InputDecoration(labelText: 'Voltage'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void sendBytesToESP(BuildContext context) {
     try {
       int value = int.parse(_byteSendTextController.value.text);
       if (value > 1023 || value < 0) {
@@ -94,10 +217,15 @@ class _AdminScreenState extends State<AdminScreen> {
       }
 
       String radixString = value.toRadixString(8).padLeft(9, '0');
-      List<int> octList = [int.parse(radixString.substring(0, 3)), int.parse(radixString.substring(3, 6)), int.parse(radixString.substring(6, 9))];
+      List<int> octList = [
+        int.parse(radixString.substring(0, 3)),
+        int.parse(radixString.substring(3, 6)),
+        int.parse(radixString.substring(6, 9)),
+      ];
       _bluetoothService.sendStimulationBytes(context, octList);
       _currentPoint.x = value;
       enterVoltageFocusNode.requestFocus();
+      confirmButtonLockout = false;
       setState(() {});
     } on FormatException {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Wrong number format')));
@@ -107,55 +235,65 @@ class _AdminScreenState extends State<AdminScreen> {
   }
 
   void saveAmpsOnPressed(BuildContext context) {
-      try {
-        int resistance = int.parse(_resistance.value.text);
-
-        _currentPoint.y = log((double.parse(_measuredVoltageTextController.text)/resistance) * 1000000);
-        _fittingPoints.add(_currentPoint);
-        _byteSendTextController.clear();
-        _measuredVoltageTextController.clear();
-        _currentPoint = FittingPoint(null, null);
-        enterStimulationValue.requestFocus();
-        setState(() {});
-      } on FormatException {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Wrong number format of resistance or voltage')));
-      } on IntegerDivisionByZeroException {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Resistance must not be zero')));
-      }
-        catch (_) {}
+    try {
+      _currentPoint.y = double.parse(_measuredVoltageTextController.text);
+      _fittingPoints.add(_currentPoint);
+      _byteSendTextController.clear();
+      _measuredVoltageTextController.clear();
+      _currentPoint = FittingPoint(null, null);
+      enterStimulationValue.requestFocus();
+      confirmButtonLockout = true;
+      setState(() {});
+    } on FormatException {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Wrong number format of resistance or voltage')));
+    } on IntegerDivisionByZeroException {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Resistance must not be zero')));
+    } catch (_) {}
   }
 
   String fittingPointsToString() {
     String points = '';
     _fittingPoints.forEach((point) {
-      points = points + '(${point.x.toString()}, ${point.y.toString()}) ';
+      points = points + '(${point.x.toString()}, ${point.y.toStringAsFixed(2)}) ';
     });
 
     return points;
   }
 
   void startFitting(BuildContext context) async {
-    PolynomialFit result = await FittingCurveCalculator.calculate(_fittingPoints);
+    List<FittingPoint> tmp = performDeepCopy(_fittingPoints);
+    int resistance = int.parse(_resistance.value.text);
+
+    tmp.forEach((point) {
+      point.y = log((point.y / resistance) * 1000000);
+    });
+    PolynomialFit result = await FittingCurveCalculator.calculate(tmp);
+
     if (result != null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: EasyRichText(
-            'Coefficients: a = ${result.coefficients.first.toStringAsFixed(3)}, b = ${result.coefficients.elementAt(1).toStringAsFixed(3)}',
-            patternList: [
-              EasyRichTextPattern(
-                  targetString: result.coefficients.elementAt(1).toStringAsFixed(3),
-                  superScript: true,
-                  stringBeforeTarget: 'e',
-                  matchWordBoundaries: false),
-            ],
-          ),
-        ),
-      );
+      setState(() {
+        oldCoefficients = 'a = ${result.coefficients.first.toStringAsFixed(3)}, b = ${result.coefficients.elementAt(1).toStringAsFixed(3)}';
+        oldDataPoints = fittingPointsToString();
+        oldResistance = _resistance.text;
+      });
+      await prefs.setDouble('fittingCurveFirstCoefficient', result.coefficients.first);
+      await prefs.setDouble('fittingCurveSecondCoefficient', result.coefficients.elementAt(1));
+      await prefs.setString('fittingPointList', oldDataPoints);
+      await prefs.setString('resistance', oldResistance);
     } else
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        duration: Duration(seconds: 5),
-        content: Text('Error occurred while trying to fit the curve!'),
+        duration: Duration(seconds: 10),
+        content: Text('An error occurred while trying to fit the curve!'),
       ));
+  }
+
+  List<FittingPoint> performDeepCopy(List<FittingPoint> listToCopy) {
+    List<FittingPoint> copy = [];
+
+    listToCopy.forEach((fittingPoint) {
+      copy.add(FittingPoint(fittingPoint.x, fittingPoint.y));
+    });
+
+    return copy;
   }
 
   @override
@@ -171,21 +309,21 @@ class _AdminScreenState extends State<AdminScreen> {
               TextField(
                 style: _currentPoint?.x != null ? TextStyle(color: Colors.grey) : TextStyle(),
                 controller: _resistance,
-                decoration: InputDecoration(hintText: 'Enter resistance'),
+                decoration: InputDecoration(labelText: 'Enter resistance'),
               ),
               Row(
                 children: [
                   Expanded(
-                      child: TextField(
-                    style: _currentPoint?.x != null ? TextStyle(color: Colors.grey) : TextStyle(),
-                    readOnly: _currentPoint?.x != null,
-                    controller: _byteSendTextController,
-                    decoration: InputDecoration(hintText: 'Enter stimulation as decimal (0-1023)'),
-                  )),
+                    child: TextField(
+                      controller: _byteSendTextController,
+                      onChanged: (newValue) => setState(() => confirmButtonLockout = true),
+                      decoration: InputDecoration(labelText: 'Enter stimulation as decimal (0-1023)'),
+                    ),
+                  ),
                   Container(
                     width: MediaQuery.of(context).size.width / 4,
                     child: ElevatedButton(
-                      onPressed: _currentPoint?.x == null ? () => sendBytesOnPressed(context) : null,
+                      onPressed: () => sendBytesToESP(context),
                       child: Text('Send'),
                     ),
                   ),
@@ -196,28 +334,32 @@ class _AdminScreenState extends State<AdminScreen> {
                   Expanded(
                     child: TextField(
                       focusNode: enterVoltageFocusNode,
-                      readOnly: _currentPoint?.x == null,
+                      readOnly: confirmButtonLockout,
                       controller: _measuredVoltageTextController,
-                      decoration: InputDecoration(hintText: 'Enter measured voltage as floating point'),
+                      decoration: InputDecoration(labelText: 'Enter measured voltage as floating point'),
                     ),
                   ),
                   Container(
                     width: MediaQuery.of(context).size.width / 4,
                     child: ElevatedButton(
-                      onPressed: _currentPoint?.x != null
-                          ? () => saveAmpsOnPressed(context)
-                          : null,
+                      onPressed: confirmButtonLockout ? null : () => saveAmpsOnPressed(context),
                       child: Text('Confirm'),
                     ),
                   ),
                 ],
               ),
               SizedBox(height: 8),
-              Text(fittingPointsToString(), textAlign: TextAlign.start),
+              GestureDetector(
+                  onTap: () async {
+                    await showDialog(context: context, builder: (context) => showFittingPointListDialog());
+                    setState(() {});
+                  },
+                  child: Text(fittingPointsToString(), textAlign: TextAlign.start)),
               Center(
                 child: ElevatedButton(
                   onPressed: () => setState(() {
-                    _fittingPoints = _testingPoints;
+                    _fittingPoints.clear();
+                    _fittingPoints.addAll(performDeepCopy(_testingPoints));
                   }),
                   child: Text('Load test data set'),
                 ),
@@ -228,6 +370,8 @@ class _AdminScreenState extends State<AdminScreen> {
                   child: Text('Start fitting with given points'),
                 ),
               ),
+              Text('Current coefficients: $oldCoefficients'),
+              Text('Used data points (Resistance $oldResistance Ohm):\n$oldDataPoints'),
               Divider(thickness: 2),
               Selector<BtState, BluetoothDevice>(
                   selector: (_, state) => state.device,

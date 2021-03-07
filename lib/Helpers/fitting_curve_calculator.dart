@@ -8,13 +8,9 @@ class FittingCurveCalculator {
   static Future<PolynomialFit> calculate(List<FittingPoint> points) async {
     List<double> xValues = points.map((point) => point.x.toDouble()).toList();
     List<double> yValues = points.map((point) => point.y).toList();
-    SharedPreferences prefs = await SharedPreferences.getInstance();
 
     LeastSquaresSolver leastSquaresSolver = LeastSquaresSolver(xValues, yValues, List.generate(xValues.length, (index) => 1));
     PolynomialFit solve = leastSquaresSolver.solve(1);
-
-    prefs.setDouble('fittingCurveFirstCoefficient', solve.coefficients.first);
-    prefs.setDouble('fittingCurveSecondCoefficient', solve.coefficients.elementAt(1));
 
     return solve;
   }
