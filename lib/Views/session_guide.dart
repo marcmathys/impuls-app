@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:impulsrefactor/Entities/session.dart';
 import 'package:impulsrefactor/Entities/therapist.dart';
+import 'package:impulsrefactor/Services/bluetooth_service.dart';
+import 'package:impulsrefactor/States/bluetooth_state.dart';
 import 'package:impulsrefactor/States/session_state.dart';
 import 'package:impulsrefactor/Views/Components/app_wide_components.dart';
 import 'package:impulsrefactor/Views/Components/step_setup_component.dart';
@@ -111,6 +113,7 @@ class _SessionGuideState extends State<SessionGuide> {
                     TextButton(
                         onPressed: () {
                           sessionState.resetState();
+                          BtService().cancelSubscriptions();
                           Navigator.of(context).popUntil(ModalRoute.withName('/patient_select'));
                         },
                         child: Text('Confirm')),

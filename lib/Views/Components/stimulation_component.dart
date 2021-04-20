@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:impulsrefactor/Services/bluetooth_service.dart';
 import 'package:impulsrefactor/States/session_state.dart';
 import 'package:impulsrefactor/Views/Components/ekg_chart_component.dart';
 import 'package:impulsrefactor/Views/Components/progress_bar_component.dart';
@@ -64,6 +65,7 @@ class _StimulationState extends State<Stimulation> {
                     onPressed: _finished
                         ? () {
                             Provider.of<SessionState>(context, listen: false).incrementStep();
+                            BtService().cancelSubscriptions();
                           }
                         : null,
                     child: Text('Next threshold\ndetermination')),

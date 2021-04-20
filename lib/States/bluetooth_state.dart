@@ -28,7 +28,6 @@ class BtState extends ChangeNotifier {
     _error.clear();
     _stimulation.clear();
     _scannedDevices.clear();
-    notifyListeners();
   }
 
   List<BluetoothDevice> get scannedDevices => _scannedDevices;

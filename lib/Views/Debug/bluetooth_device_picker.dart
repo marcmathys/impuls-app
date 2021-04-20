@@ -35,6 +35,7 @@ class _BluetoothDevicePickerState extends State<BluetoothDevicePicker> {
             onPressed: () {
               _bluetoothService.disconnectDevice(context);
               _btState.resetState();
+              setState(() {});
             },
             child: Text('Disconnect device'),
           ),
@@ -55,14 +56,14 @@ class _BluetoothDevicePickerState extends State<BluetoothDevicePicker> {
                 child: ListView.builder(
                     shrinkWrap: true,
                     itemCount: _btState.scannedDevices.length,
-                    itemBuilder: (context, index) {
+                    itemBuilder: (builderContext, index) {
                       return ListTile(
                         title: Text('ID: ${_btState.scannedDevices.elementAt(index).id} ${_btState.scannedDevices.elementAt(index).name}'),
                         onTap: () async {
                           bool success = await _bluetoothService.connectDevice(context, _btState.scannedDevices.elementAt(index));
                           if (success) {
-                            ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Device successfully connected')));
                             _bluetoothService.listenForErrors(context);
+                            ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Device successfully connected')));
                           }
                         },
                       );

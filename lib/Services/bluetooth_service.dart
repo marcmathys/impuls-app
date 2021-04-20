@@ -87,7 +87,8 @@ class BtService {
         print('State event: $event');
         bluetoothState.device = null;
         cancelSubscriptions();
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Device got disconnected')));
+        //TODO: Set a Variable in a state that, at another point in the code, triggers the message! (Via Consumer!) (Do the same for all instances of ScaffoldMessenger!)
+        //ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Device got disconnected')));
       }
     });
 
@@ -200,6 +201,7 @@ class BtService {
     if (_stimulation == null) {
       _stimulation = stimulation.value.listen((event) {
         state.stimulation = event;
+        print(event);
       });
       await stimulation.setNotifyValue(true);
     }
@@ -208,6 +210,7 @@ class BtService {
     }
   }
 
+  //TODO: Implement
   void startTherapy(BuildContext context) {
     BtState bluetoothState = Provider.of<BtState>(context, listen: false);
 

@@ -3,7 +3,7 @@ import 'dart:typed_data';
 class ByteConversion {
   static double bpmByteConversion(List<int> bluetoothData) {
     ByteData bpmByteData = ByteData.sublistView(Uint8List.fromList(bluetoothData.reversed.toList()));
-    return bpmByteData.getFloat32(0, Endian.big);
+    return bpmByteData.getFloat32(0, Endian.little);
   }
 
   /// Integer value needs to be between 0 and 1023
@@ -13,7 +13,7 @@ class ByteConversion {
     }
 
     ByteData data = ByteData(3);
-    data.setInt16(0, value, Endian.big);
+    data.setInt16(0, value, Endian.little);
     return data.buffer.asUint8List().toList();
   }
 
