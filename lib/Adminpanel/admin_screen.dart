@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_blue/flutter_blue.dart';
+import 'package:impulsrefactor/Adminpanel/fitting_curve_info_window.dart';
 import 'package:impulsrefactor/Entities/fitting_point.dart';
 import 'package:impulsrefactor/Helpers/fitting_curve_calculator.dart';
 import 'package:impulsrefactor/Services/bluetooth_service.dart';
@@ -30,9 +31,10 @@ class _AdminScreenState extends State<AdminScreen> {
   FittingPoint _currentPoint;
   FocusNode enterStimulationValue;
   FocusNode enterVoltageFocusNode;
-  String oldDataPoints = 'None';
-  String oldCoefficients = 'None';
-  String oldResistance = 'None';
+  String oldDataPoints;
+  String oldFirstCoefficient;
+  String oldSecondCoefficient;
+  String oldResistance;
   bool confirmButtonLockout = true;
   SharedPreferences prefs;
 
@@ -96,8 +98,8 @@ class _AdminScreenState extends State<AdminScreen> {
         oldDataPoints = prefs.getString('fittingPointList');
       }
       if (prefs.containsKey('fittingCurveFirstCoefficient') && prefs.containsKey('fittingCurveSecondCoefficient')) {
-        oldCoefficients =
-            'a = ${prefs.getDouble('fittingCurveFirstCoefficient').toStringAsFixed(3)}, b = ${prefs.getDouble('fittingCurveSecondCoefficient').toStringAsFixed(3)}';
+        oldFirstCoefficient = prefs.getDouble('fittingCurveFirstCoefficient').toStringAsFixed(3);
+        oldSecondCoefficient = prefs.getDouble('fittingCurveSecondCoefficient').toStringAsFixed(3);
       }
       if (prefs.containsKey('resistance')) {
         oldResistance = prefs.getString('resistance');
@@ -271,7 +273,8 @@ class _AdminScreenState extends State<AdminScreen> {
 
     if (result != null) {
       setState(() {
-        oldCoefficients = 'a = ${result.coefficients.first.toStringAsFixed(3)}, b = ${result.coefficients.elementAt(1).toStringAsFixed(3)}';
+        oldFirstCoefficient = prefs.getDouble('fittingCurveFirstCoefficient').toStringAsFixed(3);
+        oldSecondCoefficient = prefs.getDouble('fittingCurveSecondCoefficient').toStringAsFixed(3);
         oldDataPoints = fittingPointsToString();
         oldResistance = _resistance.text;
       });
@@ -370,8 +373,7 @@ class _AdminScreenState extends State<AdminScreen> {
                   child: Text('Start fitting with given points'),
                 ),
               ),
-              Text('Current coefficients: $oldCoefficients'),
-              Text('Used data points (Resistance $oldResistance Ohm):\n$oldDataPoints'),
+              FittingCurveInfoWindow(oldFirstCoefficient, oldSecondCoefficient, oldResistance, oldDataPoints),
               Divider(thickness: 2),
               Selector<BtState, BluetoothDevice>(
                   selector: (_, state) => state.device,

@@ -53,7 +53,7 @@ class _BluetoothCommandBarState extends State<BluetoothCommandBar> {
             Expanded(
                 child: TextField(
               controller: _textController,
-              decoration: InputDecoration(hintText: 'Enter Bytes (example: 110,110,109)'),
+              decoration: InputDecoration(labelText: 'Enter Bytes (example: 110,110,109)', border: InputBorder.none),
             )),
             ElevatedButton(
               onPressed: () {

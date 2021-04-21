@@ -201,7 +201,6 @@ class BtService {
     if (_stimulation == null) {
       _stimulation = stimulation.value.listen((event) {
         state.stimulation = event;
-        print(event);
       });
       await stimulation.setNotifyValue(true);
     }
