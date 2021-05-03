@@ -184,14 +184,19 @@ class BtService {
   /// Note that the stimulation characteristic supports 3 and 7 integer values, and "quit" in integer
   /// Starts listening for values
   void sendStimulationBytes(BuildContext context, List<int> bytes) async {
-    BtState state = Provider.of<BtState>(context, listen: false);
+    BtState bluetoothState = Provider.of<BtState>(context, listen: false);
 
-    if (!state.characteristics.containsKey(AppConstants.STIMULATION_CHARACTERISTIC_UUID)) {
+    if (bluetoothState.device == null) {
+      print('Device is not connected!');
+      return;
+    }
+
+    if (!bluetoothState.characteristics.containsKey(AppConstants.STIMULATION_CHARACTERISTIC_UUID)) {
       print('Characteristic Stimulation not found!');
       return;
     }
-    BluetoothCharacteristic stimulation = state.characteristics[AppConstants.STIMULATION_CHARACTERISTIC_UUID];
 
+    BluetoothCharacteristic stimulation = bluetoothState.characteristics[AppConstants.STIMULATION_CHARACTERISTIC_UUID];
     await stimulation.write(bytes);
 
     if (bytes == [113, 117, 105, 116]) {
@@ -200,7 +205,7 @@ class BtService {
     }
     if (_stimulation == null) {
       _stimulation = stimulation.value.listen((event) {
-        state.stimulation = event;
+        bluetoothState.stimulation = event;
       });
       await stimulation.setNotifyValue(true);
     }
@@ -209,23 +214,8 @@ class BtService {
     }
   }
 
-  //TODO: Implement
-  void startTherapy(BuildContext context) {
-    BtState bluetoothState = Provider.of<BtState>(context, listen: false);
-
-    if (bluetoothState.device == null) {
-      print('Device is not connected!');
-      return;
-    }
-
-    if (!bluetoothState.characteristics.containsKey(AppConstants.EKG_CHARACTERISTIC_UUID)) {
-      print('Characteristic EKG not found!');
-      return;
-    }
-  }
-
   /// Send "on" to the ekg and bpm characteristic and starts listening for values
-  void getEKGAndBPMData(BuildContext context, GlobalKey<EKGChartState> ekgChartKey) async {
+  void getEKGAndBPMData(BuildContext context) async {
     BtState bluetoothState = Provider.of<BtState>(context, listen: false);
 
     if (bluetoothState.device == null) {

@@ -4,6 +4,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_blue/flutter_blue.dart';
 import 'package:impulsrefactor/Adminpanel/fitting_curve_info_window.dart';
+import 'package:impulsrefactor/Adminpanel/test_byte_array_bar.dart';
 import 'package:impulsrefactor/Entities/fitting_point.dart';
 import 'package:impulsrefactor/Helpers/fitting_curve_calculator.dart';
 import 'package:impulsrefactor/Services/bluetooth_service.dart';
@@ -211,7 +212,7 @@ class _AdminScreenState extends State<AdminScreen> {
   void sendBytesToESP(BuildContext context) {
     try {
       int value = int.parse(_byteSendTextController.value.text);
-      if (value > 1023 || value < 0) {
+      if (value < 0 || value > 1023) {
         throw FormatException();
       }
       if (Provider.of<BtState>(context, listen: false).device == null) {
@@ -273,8 +274,8 @@ class _AdminScreenState extends State<AdminScreen> {
 
     if (result != null) {
       setState(() {
-        oldFirstCoefficient = prefs.getDouble('fittingCurveFirstCoefficient').toStringAsFixed(3);
-        oldSecondCoefficient = prefs.getDouble('fittingCurveSecondCoefficient').toStringAsFixed(3);
+        oldFirstCoefficient = result.coefficients.first.toStringAsFixed(3);
+        oldSecondCoefficient = result.coefficients.elementAt(1).toStringAsFixed(3);
         oldDataPoints = fittingPointsToString();
         oldResistance = _resistance.text;
       });
@@ -373,6 +374,7 @@ class _AdminScreenState extends State<AdminScreen> {
                   child: Text('Start fitting with given points'),
                 ),
               ),
+              ByteArrayTestBar(),
               FittingCurveInfoWindow(oldFirstCoefficient, oldSecondCoefficient, oldResistance, oldDataPoints),
               Divider(thickness: 2),
               Selector<BtState, BluetoothDevice>(

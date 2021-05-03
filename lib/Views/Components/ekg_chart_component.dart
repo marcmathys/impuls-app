@@ -19,13 +19,12 @@ class EKGChartState extends State<EKGChart> {
   @override
   void initState() {
     super.initState();
-    BtService().getEKGAndBPMData(context, widget.key);
+    BtService().getEKGAndBPMData(context);
   }
 
   @override
   void dispose() {
     BtService().sendOffSignal(BtState().characteristics[AppConstants.EKG_CHARACTERISTIC_UUID]);
-    print('ekgChart disposed!');
     super.dispose();
   }
 

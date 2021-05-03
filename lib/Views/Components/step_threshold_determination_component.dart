@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:impulsrefactor/Helpers/byte_conversion.dart';
+import 'package:impulsrefactor/Helpers/calculator.dart';
 import 'package:impulsrefactor/Helpers/fitting_curve_calculator.dart';
 import 'package:impulsrefactor/Services/bluetooth_service.dart';
+import 'package:impulsrefactor/States/bluetooth_state.dart';
+import 'package:impulsrefactor/app_constants.dart';
+import 'package:provider/provider.dart';
 
 class ThresholdDetermination extends StatefulWidget {
   final Function(Map<int, int>, Map<int, int>, int round) _onDeterminationEnd;
@@ -14,10 +18,12 @@ class ThresholdDetermination extends StatefulWidget {
 }
 
 class _ThresholdDeterminationState extends State<ThresholdDetermination> {
-  int _round = 1;
-  bool _roundInProgress = true;
-  int _stimulationLevel = 0;
-  bool _stimLockout = false;
+  int _round;
+  bool _roundInProgress;
+  int _stimulationLevel;
+  bool _stimLockout;
+  BtState _btState;
+  BtService _btService;
   Map<int, int> _stimRatingRound1 = {0: 0, 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0, 10: 0};
   Map<int, int> _stimRatingRound2 = {0: 0, 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0, 10: 0};
   Map<int, bool> _buttonLockouts = {
@@ -35,6 +41,24 @@ class _ThresholdDeterminationState extends State<ThresholdDetermination> {
     10: false
   };
   bool _generalButtonLockout = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _round = 1;
+    _roundInProgress = true;
+    _stimulationLevel = 0;
+    _stimLockout = false;
+    _btState = BtState();
+    _btService = BtService();
+    _btService.getEKGAndBPMData(context);
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    _btService.sendOffSignal(_btState.characteristics[AppConstants.EKG_CHARACTERISTIC_UUID]);
+  }
 
   void startNextRound() {
     setState(() {
@@ -91,7 +115,7 @@ class _ThresholdDeterminationState extends State<ThresholdDetermination> {
           Container(
             decoration: BoxDecoration(border: Border(top: BorderSide(), bottom: BorderSide())),
             child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: <Widget>[
                 ElevatedButton(
                   onPressed: _roundInProgress && !_stimLockout
@@ -110,7 +134,7 @@ class _ThresholdDeterminationState extends State<ThresholdDetermination> {
                       : null,
                   child: Text('Stimulate with ${_stimulationLevel + 200} µA'),
                 ),
-                Text('IBI: 825'), //TODO: Connect to ESP
+                //Text('IBI: ${Calculator.calculateIBI(Provider.of<BtState>(context).bpm)} ms'), //TODO: Wrap with Listener-Widget
               ],
             ),
           ),

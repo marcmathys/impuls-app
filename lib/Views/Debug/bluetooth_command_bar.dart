@@ -71,7 +71,7 @@ class _BluetoothCommandBarState extends State<BluetoothCommandBar> {
                 value: ekgSwitch,
                 onChanged: (value) {
                   if (value) {
-                    _bluetoothService.getEKGAndBPMData(context, widget._ekgKey);
+                    _bluetoothService.getEKGAndBPMData(context);
 
                     ///TODO: setState assumes communication success!
                     setState(() {

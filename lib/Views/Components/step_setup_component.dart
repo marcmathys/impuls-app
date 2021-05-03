@@ -82,7 +82,9 @@ class _SetupState extends State<Setup> {
           ],
         ),
         ElevatedButton(
-          onPressed: _attachElectrodes && _turnedOnMachines && _prePainRating != null && _showFittingCurveErrorMessage == true ? () => setupComplete() : null,
+          onPressed: _attachElectrodes && _turnedOnMachines && _prePainRating != null && _showFittingCurveErrorMessage == false
+              ? () => setupComplete()
+              : null,
           child: Text('Begin Session'),
         ),
         Visibility(

@@ -1,9 +1,11 @@
 import 'dart:typed_data';
 
+import 'package:impulsrefactor/Helpers/calculator.dart';
+
 class ByteConversion {
   static double bpmByteConversion(List<int> bluetoothData) {
     ByteData bpmByteData = ByteData.sublistView(Uint8List.fromList(bluetoothData.reversed.toList()));
-    return bpmByteData.getFloat32(0, Endian.little);
+    return bpmByteData.getFloat32(0, Endian.big);
   }
 
   /// Integer value needs to be between 0 and 1023
@@ -13,7 +15,19 @@ class ByteConversion {
     }
 
     ByteData data = ByteData(3);
-    data.setInt16(0, value, Endian.little);
+    data.setInt16(1, value, Endian.big);
+    return data.buffer.asUint8List().toList();
+  }
+
+  static List<int> convertThresholdsToByteList(List<int> sensoryThreshold, List<int> painThreshold, List<int> toleranceThreshold) {
+    int dt = Calculator.calculateMeanOfList(sensoryThreshold).toInt();
+    int htt = Calculator.calculateMeanOfList(painThreshold).toInt();
+    int tt = Calculator.calculateMeanOfList(toleranceThreshold).toInt();
+
+    ByteData data = ByteData(7);
+    data.setInt16(1, dt, Endian.big);
+    data.setInt16(3, htt, Endian.big);
+    data.setInt16(5, tt, Endian.big);
     return data.buffer.asUint8List().toList();
   }
 

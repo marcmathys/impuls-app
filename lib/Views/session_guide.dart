@@ -31,6 +31,7 @@ class _SessionGuideState extends State<SessionGuide> {
     sessionState.currentSession.therapistUIDs.add(Therapist().uid);
   }
 
+  ///TODO: Why are the Thresholds List<int>?
   void thresholdDeterminationComplete(Map<int, int> stimRatingRound1, Map<int, int> stimRatingRound2, int rounds) {
     if (rounds == 2) {
       stimRatingRound1.forEach((key, value) {

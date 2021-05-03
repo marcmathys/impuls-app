@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:impulsrefactor/Helpers/byte_conversion.dart';
+import 'package:impulsrefactor/Helpers/calculator.dart';
 import 'package:impulsrefactor/Services/bluetooth_service.dart';
+import 'package:impulsrefactor/States/bluetooth_state.dart';
 import 'package:impulsrefactor/States/session_state.dart';
 import 'package:impulsrefactor/Views/Components/ekg_chart_component.dart';
 import 'package:impulsrefactor/Views/Components/progress_bar_component.dart';
+import 'package:impulsrefactor/app_constants.dart';
 import 'package:provider/provider.dart';
 
 class Stimulation extends StatefulWidget {
@@ -11,15 +15,35 @@ class Stimulation extends StatefulWidget {
 
 class _StimulationState extends State<Stimulation> {
   GlobalKey<ProgressRingState> _progressBarKey = GlobalKey();
-  bool _finished = false;
-  bool ekgStarted = false;
+  bool _finished;
+  bool _started = false;
+  BtState _btState;
+  BtService _btService;
+  SessionState _sessionState;
+
+  @override
+  void initState() {
+    super.initState();
+    _finished = false;
+    _btService = BtService();
+    _btService.getEKGAndBPMData(context);
+  }
 
   @override
   void dispose() {
-    super.dispose(); //TODO: Stop listening to values!
+    super.dispose();
+    _btService.sendOffSignal(_btState.characteristics[AppConstants.EKG_CHARACTERISTIC_UUID]);
   }
 
   Widget build(BuildContext context) {
+    if(!_started) {
+      _btState = Provider.of<BtState>(context);
+      _sessionState = Provider.of<SessionState>(context);
+      List<int> bytes = ByteConversion.convertThresholdsToByteList(_sessionState.currentSession.sensoryThreshold, _sessionState.currentSession.painThreshold, _sessionState.currentSession.toleranceThreshold);
+      _btService.sendStimulationBytes(context, bytes);
+      _started = true;
+    }
+
     return Column(
       children: <Widget>[
         SizedBox(
@@ -50,7 +74,7 @@ class _StimulationState extends State<Stimulation> {
                 child: Column(
                   children: <Widget>[
                     Text('Stimulation level: --'),
-                    Text('IBI: 801'),
+                    Text('IBI: ${Calculator.calculateIBI(Provider.of<BtState>(context).bpm)} ms'), //TODO: Wrap with Listener-Widget
                   ],
                 ),
               ),
