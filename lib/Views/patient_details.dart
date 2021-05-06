@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:impulsrefactor/Entities/patient.dart';
 import 'package:impulsrefactor/Entities/session.dart';
-import 'package:impulsrefactor/States/session_state.dart';
+import 'package:impulsrefactor/States/Refactored/current_patient.dart';
 import 'package:impulsrefactor/Views/Components/app_wide_components.dart';
 import 'package:impulsrefactor/Views/Components/pain_level_chart_component.dart';
 import 'package:impulsrefactor/Views/Components/threshold_chart.dart';
 import 'package:intl/intl.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class PatientDetail extends StatefulWidget {
   @override
@@ -20,13 +20,13 @@ class _PatientDetailState extends State<PatientDetail> {
   @override
   void initState() {
     super.initState();
-    _patient = Provider.of<SessionState>(context, listen: false).currentPatient;
+    _patient = context.read(currentPatientProvider);
   }
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    _patient = Provider.of<SessionState>(context, listen: false).currentPatient;
+    _patient = context.read(currentPatientProvider);
     if (_patient.sessions.isNotEmpty) {
       _currentSession = _patient.sessions.last;
     }

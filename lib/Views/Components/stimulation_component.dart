@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:impulsrefactor/Helpers/byte_conversion.dart';
 import 'package:impulsrefactor/Helpers/calculator.dart';
-import 'package:impulsrefactor/Services/bluetooth_service.dart';
-import 'package:impulsrefactor/States/bluetooth_state.dart';
-import 'package:impulsrefactor/States/session_state.dart';
+import 'package:impulsrefactor/States/Refactored/bpm_service.dart';
+import 'package:impulsrefactor/States/Refactored/ekg_service.dart';
+import 'package:impulsrefactor/States/Refactored/session_step.dart';
+import 'package:impulsrefactor/States/Refactored/session_state.dart';
+import 'package:impulsrefactor/States/Refactored/stimulation_service.dart';
 import 'package:impulsrefactor/Views/Components/ekg_chart_component.dart';
 import 'package:impulsrefactor/Views/Components/progress_bar_component.dart';
-import 'package:impulsrefactor/app_constants.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class Stimulation extends StatefulWidget {
   _StimulationState createState() => _StimulationState();
@@ -16,34 +17,24 @@ class Stimulation extends StatefulWidget {
 class _StimulationState extends State<Stimulation> {
   GlobalKey<ProgressRingState> _progressBarKey = GlobalKey();
   bool _finished;
-  bool _started = false;
-  BtState _btState;
-  BtService _btService;
-  SessionState _sessionState;
 
   @override
   void initState() {
     super.initState();
     _finished = false;
-    _btService = BtService();
-    _btService.getEKGAndBPMData(context);
+    context.read(ekgServiceProvider.notifier).startDataStreams();
+    List<int> bytes = ByteConversion.convertThresholdsToByteList(
+        context.read(sessionProvider).sensoryThreshold, context.read(sessionProvider).painThreshold, context.read(sessionProvider).toleranceThreshold);
+    context.read(stimulationServiceProvider.notifier).sendStimulationBytes(bytes);
   }
 
   @override
   void dispose() {
     super.dispose();
-    _btService.sendOffSignal(_btState.characteristics[AppConstants.EKG_CHARACTERISTIC_UUID]);
+    context.read(ekgServiceProvider.notifier).sendOffSignal();
   }
 
   Widget build(BuildContext context) {
-    if(!_started) {
-      _btState = Provider.of<BtState>(context);
-      _sessionState = Provider.of<SessionState>(context);
-      List<int> bytes = ByteConversion.convertThresholdsToByteList(_sessionState.currentSession.sensoryThreshold, _sessionState.currentSession.painThreshold, _sessionState.currentSession.toleranceThreshold);
-      _btService.sendStimulationBytes(context, bytes);
-      _started = true;
-    }
-
     return Column(
       children: <Widget>[
         SizedBox(
@@ -74,7 +65,11 @@ class _StimulationState extends State<Stimulation> {
                 child: Column(
                   children: <Widget>[
                     Text('Stimulation level: --'),
-                    Text('IBI: ${Calculator.calculateIBI(Provider.of<BtState>(context).bpm)} ms'), //TODO: Wrap with Listener-Widget
+                    Consumer(
+                      builder: (context, watch, child) {
+                        return Text('IBI: ${Calculator.calculateIBI(watch(bpmServiceProvider))} ms');
+                      },
+                    ),
                   ],
                 ),
               ),
@@ -88,8 +83,8 @@ class _StimulationState extends State<Stimulation> {
                     ),
                     onPressed: _finished
                         ? () {
-                            Provider.of<SessionState>(context, listen: false).incrementStep();
-                            BtService().cancelSubscriptions();
+                            context.read(sessionStepProvider.notifier).increment();
+                            //TODO: BtService().cancelSubscriptions();
                           }
                         : null,
                     child: Text('Next threshold\ndetermination')),

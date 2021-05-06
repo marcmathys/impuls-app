@@ -2,17 +2,16 @@ import 'dart:math';
 
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_blue/flutter_blue.dart';
 import 'package:impulsrefactor/Adminpanel/fitting_curve_info_window.dart';
 import 'package:impulsrefactor/Adminpanel/test_byte_array_bar.dart';
 import 'package:impulsrefactor/Entities/fitting_point.dart';
 import 'package:impulsrefactor/Helpers/fitting_curve_calculator.dart';
-import 'package:impulsrefactor/Services/bluetooth_service.dart';
-import 'package:impulsrefactor/States/bluetooth_state.dart';
+import 'package:impulsrefactor/States/Refactored/connected_device.dart';
+import 'package:impulsrefactor/States/Refactored/stimulation_service.dart';
 import 'package:impulsrefactor/Views/Components/app_wide_components.dart';
 import 'package:impulsrefactor/Views/Debug/bluetooth_device_picker.dart';
-import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class AdminScreen extends StatefulWidget {
   AdminScreen({Key key}) : super(key: key);
@@ -22,7 +21,6 @@ class AdminScreen extends StatefulWidget {
 }
 
 class _AdminScreenState extends State<AdminScreen> {
-  BtService _bluetoothService;
   TextEditingController _byteSendTextController;
   TextEditingController _measuredVoltageTextController;
   TextEditingController _resistance;
@@ -84,7 +82,6 @@ class _AdminScreenState extends State<AdminScreen> {
   @override
   void initState() {
     super.initState();
-    _bluetoothService = BtService();
     _byteSendTextController = TextEditingController();
     _editXValueController = TextEditingController();
     _editYValueController = TextEditingController();
@@ -215,7 +212,7 @@ class _AdminScreenState extends State<AdminScreen> {
       if (value < 0 || value > 1023) {
         throw FormatException();
       }
-      if (Provider.of<BtState>(context, listen: false).device == null) {
+      if (context.read(connectedDeviceProvider) == null) {
         throw Exception('No device connected.');
       }
 
@@ -225,7 +222,7 @@ class _AdminScreenState extends State<AdminScreen> {
         int.parse(radixString.substring(3, 6)),
         int.parse(radixString.substring(6, 9)),
       ];
-      _bluetoothService.sendStimulationBytes(context, octList);
+      context.read(stimulationServiceProvider.notifier).sendStimulationBytes(octList);
       _currentPoint.x = value;
       enterVoltageFocusNode.requestFocus();
       confirmButtonLockout = false;
@@ -377,11 +374,6 @@ class _AdminScreenState extends State<AdminScreen> {
               ByteArrayTestBar(),
               FittingCurveInfoWindow(oldFirstCoefficient, oldSecondCoefficient, oldResistance, oldDataPoints),
               Divider(thickness: 2),
-              Selector<BtState, BluetoothDevice>(
-                  selector: (_, state) => state.device,
-                  builder: (_, device, __) {
-                    return Text('Currently connected to: ${device?.id ?? 'none'} ${device?.name ?? ''}');
-                  }),
               BluetoothDevicePicker(),
             ],
           ),

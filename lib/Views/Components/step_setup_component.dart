@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:impulsrefactor/States/session_state.dart';
+import 'package:impulsrefactor/States/Refactored/session_step.dart';
+import 'package:impulsrefactor/States/Refactored/session_state.dart';
 import 'package:impulsrefactor/Views/Debug/bluetooth_device_picker.dart';
-import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class Setup extends StatefulWidget {
   @override
@@ -17,8 +18,8 @@ class _SetupState extends State<Setup> {
   bool _showFittingCurveErrorMessage;
 
   void setupComplete() {
-    Provider.of<SessionState>(context, listen: false).currentSession.prePainRating = _prePainRating;
-    Provider.of<SessionState>(context, listen: false).incrementStep();
+    context.read(sessionProvider).prePainRating = _prePainRating;
+    context.read(sessionStepProvider.notifier).increment();
   }
 
   checkFittingCurveCoefficients() {

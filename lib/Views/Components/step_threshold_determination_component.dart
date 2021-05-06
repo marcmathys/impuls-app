@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:impulsrefactor/Helpers/byte_conversion.dart';
 import 'package:impulsrefactor/Helpers/calculator.dart';
 import 'package:impulsrefactor/Helpers/fitting_curve_calculator.dart';
-import 'package:impulsrefactor/Services/bluetooth_service.dart';
-import 'package:impulsrefactor/States/bluetooth_state.dart';
-import 'package:impulsrefactor/app_constants.dart';
-import 'package:provider/provider.dart';
+import 'package:impulsrefactor/States/Refactored/bpm_service.dart';
+import 'package:impulsrefactor/States/Refactored/ekg_service.dart';
+import 'package:impulsrefactor/States/Refactored/stimulation_service.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class ThresholdDetermination extends StatefulWidget {
   final Function(Map<int, int>, Map<int, int>, int round) _onDeterminationEnd;
@@ -22,24 +22,9 @@ class _ThresholdDeterminationState extends State<ThresholdDetermination> {
   bool _roundInProgress;
   int _stimulationLevel;
   bool _stimLockout;
-  BtState _btState;
-  BtService _btService;
   Map<int, int> _stimRatingRound1 = {0: 0, 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0, 10: 0};
   Map<int, int> _stimRatingRound2 = {0: 0, 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0, 10: 0};
-  Map<int, bool> _buttonLockouts = {
-    -1: false,
-    0: false,
-    1: false,
-    2: false,
-    3: false,
-    4: false,
-    5: false,
-    6: false,
-    7: false,
-    8: false,
-    9: false,
-    10: false
-  };
+  Map<int, bool> _buttonLockouts = {-1: false, 0: false, 1: false, 2: false, 3: false, 4: false, 5: false, 6: false, 7: false, 8: false, 9: false, 10: false};
   bool _generalButtonLockout = true;
 
   @override
@@ -49,15 +34,13 @@ class _ThresholdDeterminationState extends State<ThresholdDetermination> {
     _roundInProgress = true;
     _stimulationLevel = 0;
     _stimLockout = false;
-    _btState = BtState();
-    _btService = BtService();
-    _btService.getEKGAndBPMData(context);
+    context.read(ekgServiceProvider.notifier).startDataStreams();
   }
 
   @override
   void dispose() {
     super.dispose();
-    _btService.sendOffSignal(_btState.characteristics[AppConstants.EKG_CHARACTERISTIC_UUID]);
+    context.read(ekgServiceProvider.notifier).sendOffSignal();
   }
 
   void startNextRound() {
@@ -122,7 +105,7 @@ class _ThresholdDeterminationState extends State<ThresholdDetermination> {
                       ? () async {
                           int fittedValue = await FittingCurveCalculator.fitToCurve(_stimulationLevel + 200);
                           List<int> byteList = ByteConversion.convertIntToByteList(fittedValue);
-                          BtService().sendStimulationBytes(context, byteList);
+                          context.read(stimulationServiceProvider.notifier).sendStimulationBytes(byteList);
 
                           setState(() {
                             _generalButtonLockout = false;
@@ -134,7 +117,11 @@ class _ThresholdDeterminationState extends State<ThresholdDetermination> {
                       : null,
                   child: Text('Stimulate with ${_stimulationLevel + 200} µA'),
                 ),
-                //Text('IBI: ${Calculator.calculateIBI(Provider.of<BtState>(context).bpm)} ms'), //TODO: Wrap with Listener-Widget
+                Consumer(
+                  builder: (context, watch, child) {
+                    return Text('IBI: ${Calculator.calculateIBI(watch(bpmServiceProvider))} ms');
+                  },
+                ),
               ],
             ),
           ),

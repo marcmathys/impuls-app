@@ -2,7 +2,8 @@ import 'dart:async';
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
-import 'package:impulsrefactor/Services/bluetooth_service.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:impulsrefactor/States/Refactored/stimulation_service.dart';
 
 class ByteArrayTestBar extends StatefulWidget {
   @override
@@ -22,14 +23,14 @@ class _ByteArrayTestBarState extends State<ByteArrayTestBar> {
 
   String currentSentValue = '';
 
-  void testFittingCurveZeroLowHigh(BuildContext context) {
+  void testFittingCurveZeroLowHigh() {
     int currentValue = 0;
 
     zeroLowHighTimer = Timer.periodic(Duration(seconds: 1), (timer) async {
       ByteData data = ByteData(3);
       data.setInt16(1, currentValue, Endian.little);
 
-      BtService().sendStimulationBytes(context, data.buffer.asUint8List().toList());
+      context.read(stimulationServiceProvider.notifier).sendStimulationBytes(data.buffer.asUint8List().toList());
       setState(() {
         currentSentValue = 'Value sent: $currentValue - array: ${data.buffer.asUint8List().toList()} (0|L|H)';
       });
@@ -41,14 +42,15 @@ class _ByteArrayTestBarState extends State<ByteArrayTestBar> {
     });
   }
 
-  void testFittingCurveZeroHighLow(BuildContext context) {
+  /// The correct one!
+  void testFittingCurveZeroHighLow() {
     int currentValue = 0;
 
     zeroHighLowTimer = Timer.periodic(Duration(seconds: 1), (timer) async {
       ByteData data = ByteData(3);
       data.setInt16(1, currentValue, Endian.big);
 
-      BtService().sendStimulationBytes(context, data.buffer.asUint8List().toList());
+      context.read(stimulationServiceProvider.notifier).sendStimulationBytes(data.buffer.asUint8List().toList());
       setState(() {
         currentSentValue = 'Value sent: $currentValue - array: ${data.buffer.asUint8List().toList()} (0|H|L)';
       });
@@ -60,14 +62,14 @@ class _ByteArrayTestBarState extends State<ByteArrayTestBar> {
     });
   }
 
-  void testFittingCurveLowHighZero(BuildContext context) {
+  void testFittingCurveLowHighZero() {
     int currentValue = 0;
 
     lowHighZeroTimer = Timer.periodic(Duration(seconds: 1), (timer) async {
       ByteData data = ByteData(3);
       data.setInt16(0, currentValue, Endian.little);
 
-      BtService().sendStimulationBytes(context, data.buffer.asUint8List().toList());
+      context.read(stimulationServiceProvider.notifier).sendStimulationBytes(data.buffer.asUint8List().toList());
       setState(() {
         currentSentValue = 'Value sent: $currentValue - array: ${data.buffer.asUint8List().toList()} (L|H|0)';
       });
@@ -79,14 +81,14 @@ class _ByteArrayTestBarState extends State<ByteArrayTestBar> {
     });
   }
 
-  void testFittingCurveHighLowZero(BuildContext context) {
+  void testFittingCurveHighLowZero() {
     int currentValue = 0;
 
     highLowZeroTimer = Timer.periodic(Duration(seconds: 1), (timer) async {
       ByteData data = ByteData(3);
       data.setInt16(0, currentValue, Endian.big);
 
-      BtService().sendStimulationBytes(context, data.buffer.asUint8List().toList());
+      context.read(stimulationServiceProvider.notifier).sendStimulationBytes(data.buffer.asUint8List().toList());
       setState(() {
         currentSentValue = 'Value sent: $currentValue - array: ${data.buffer.asUint8List().toList()} (H|L|0)';
       });
@@ -109,7 +111,7 @@ class _ByteArrayTestBarState extends State<ByteArrayTestBar> {
                 value: zeroLowHigh,
                 onChanged: (value) {
                   if (value) {
-                    testFittingCurveZeroLowHigh(context);
+                    testFittingCurveZeroLowHigh();
 
                     setState(() {
                       zeroLowHigh = !zeroLowHigh;
@@ -132,7 +134,7 @@ class _ByteArrayTestBarState extends State<ByteArrayTestBar> {
                 value: zeroHighLow,
                 onChanged: (value) {
                   if (value) {
-                    testFittingCurveZeroHighLow(context);
+                    testFittingCurveZeroHighLow();
 
                     setState(() {
                       zeroHighLow = !zeroHighLow;
@@ -155,7 +157,7 @@ class _ByteArrayTestBarState extends State<ByteArrayTestBar> {
                 value: lowHighZero,
                 onChanged: (value) {
                   if (value) {
-                    testFittingCurveLowHighZero(context);
+                    testFittingCurveLowHighZero();
 
                     setState(() {
                       lowHighZero = !lowHighZero;
@@ -178,7 +180,7 @@ class _ByteArrayTestBarState extends State<ByteArrayTestBar> {
                 value: highLowZero,
                 onChanged: (value) {
                   if (value) {
-                    testFittingCurveHighLowZero(context);
+                    testFittingCurveHighLowZero();
 
                     setState(() {
                       highLowZero = !highLowZero;

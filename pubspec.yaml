@@ -23,7 +23,7 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  provider: ^5.0.0
+  flutter_riverpod: ^0.14.0+3
   flutter_blue: ^0.7.3
   syncfusion_flutter_charts: ^18.4.46
   percent_indicator: ^2.1.9+1

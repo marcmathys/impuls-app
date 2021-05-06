@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:impulsrefactor/States/bluetooth_state.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:impulsrefactor/States/Refactored/bpm_service.dart';
+import 'package:impulsrefactor/States/Refactored/brs_service.dart';
+import 'package:impulsrefactor/States/Refactored/error_service.dart';
+import 'package:impulsrefactor/States/Refactored/stimulation_service.dart';
 
 class EKGValueTextBar extends StatelessWidget {
   @override
@@ -9,26 +12,22 @@ class EKGValueTextBar extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Selector<BtState, String>(
-              selector: (_, state) => state.stimulation.toString(),
-              builder: (_, stimulation, __) {
-                return Text('Stimulation characteristic answer: $stimulation');
-              }),
-          Selector<BtState, String>(
-              selector: (_, state) => state.bpm.toStringAsFixed(2),
-              builder: (_, bpm, __) {
-                return Text('Beats per minute: $bpm');
-              }),
-          Selector<BtState, String>(
-              selector: (_, state) => state.error.toString(),
-              builder: (_, error, __) {
-                return Text('Error code: $error');
-              }),
-          Selector<BtState, String>(
-              selector: (_, state) => state.brs.toString(),
-              builder: (_, brs, __) {
-                return Text('Baur Reflex Sensitivity: $brs');
-              }),
+          Consumer(builder: (context, watch, child) {
+            String stimulationValue = watch(stimulationServiceProvider).toString();
+            return Text('Stimulation characteristic answer: $stimulationValue');
+          }),
+          Consumer(builder: (context, watch, child) {
+            String bpmValue = watch(bpmServiceProvider).toStringAsFixed(2);
+            return Text('Beats per minute: $bpmValue');
+          }),
+          Consumer(builder: (context, watch, child) {
+            String errorString = watch(errorServiceProvider).toString();
+            return Text('Error code: $errorString');
+          }),
+          Consumer(builder: (context, watch, child) {
+            String brsValue = watch(brsServiceProvider).toString();
+            return Text('Baur Reflex Sensitivity: $brsValue');
+          }),
         ],
       ),
     );

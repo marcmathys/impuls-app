@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:impulsrefactor/Helpers/byte_conversion.dart';
-import 'package:impulsrefactor/Services/bluetooth_service.dart';
-import 'package:impulsrefactor/States/bluetooth_state.dart';
+import 'package:impulsrefactor/States/Refactored/bpm_service.dart';
+import 'package:impulsrefactor/States/Refactored/brs_service.dart';
+import 'package:impulsrefactor/States/Refactored/ekg_service.dart';
+import 'package:impulsrefactor/States/Refactored/stimulation_service.dart';
 import 'package:impulsrefactor/Views/Components/ekg_chart_component.dart';
-import 'package:impulsrefactor/app_constants.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class BluetoothCommandBar extends StatefulWidget {
   final GlobalKey<EKGChartState> _ekgKey;
@@ -19,21 +20,18 @@ class _BluetoothCommandBarState extends State<BluetoothCommandBar> {
   bool ekgSwitch = false;
   bool brsSwitch = false;
   TextEditingController _textController;
-  BtService _bluetoothService;
-  BtState _btState;
 
   @override
   void initState() {
     super.initState();
     _textController = TextEditingController();
-    _bluetoothService = BtService();
   }
 
   void sendBytesOnPressed() {
     //_bluetoothService.sendStimulationBytes(context, [113, 117, 105, 116]); // Send stop
     try {
       List<int> octList = ByteConversion.stringToOct(_textController.value.text);
-      _bluetoothService.sendStimulationBytes(context, octList);
+      context.read(stimulationServiceProvider.notifier).sendStimulationBytes(octList);
     } catch (_) {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('The given numbers are in the wrong format! Example format: 111,110,109')));
     }
@@ -41,10 +39,6 @@ class _BluetoothCommandBarState extends State<BluetoothCommandBar> {
 
   @override
   Widget build(BuildContext context) {
-    if (_btState == null) {
-      _btState = Provider.of<BtState>(context);
-    }
-
     return Column(
       children: [
         Row(
@@ -71,14 +65,16 @@ class _BluetoothCommandBarState extends State<BluetoothCommandBar> {
                 value: ekgSwitch,
                 onChanged: (value) {
                   if (value) {
-                    _bluetoothService.getEKGAndBPMData(context);
+                    context.read(ekgServiceProvider.notifier).startDataStreams();
+                    context.read(bpmServiceProvider.notifier).resumeListenToBpm();
 
                     ///TODO: setState assumes communication success!
                     setState(() {
                       ekgSwitch = !ekgSwitch;
                     });
                   } else {
-                    _bluetoothService.sendOffSignal(_btState.characteristics[AppConstants.EKG_CHARACTERISTIC_UUID]);
+                    context.read(ekgServiceProvider.notifier).pauseListenToEkg();
+                    context.read(bpmServiceProvider.notifier).pauseListenToBpm();
 
                     ///TODO: setState assumes communication success!
                     setState(() {
@@ -96,14 +92,14 @@ class _BluetoothCommandBarState extends State<BluetoothCommandBar> {
               value: brsSwitch,
               onChanged: (value) {
                 if (value) {
-                  _bluetoothService.getBRSData(context);
+                  context.read(brsServiceProvider.notifier).getBRSData();
 
                   ///TODO: setState assumes communication success!
                   setState(() {
                     brsSwitch = !brsSwitch;
                   });
                 } else {
-                  _bluetoothService.sendOffSignal(_btState.characteristics[AppConstants.BRS_CHARACTERISTIC_UUID]);
+                  context.read(brsServiceProvider.notifier).sendOffSignal();
 
                   ///TODO: setState assumes communication success!
                   setState(() {

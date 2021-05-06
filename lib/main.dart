@@ -1,27 +1,17 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:impulsrefactor/Adminpanel/admin_screen.dart';
-import 'package:impulsrefactor/States/ekg_state.dart';
-import 'package:impulsrefactor/States/session_state.dart';
-import 'package:impulsrefactor/States/bluetooth_state.dart';
 import 'package:impulsrefactor/Views/Debug/debug.dart';
 import 'package:impulsrefactor/Views/login.dart';
 import 'package:impulsrefactor/Views/patient_details.dart';
 import 'package:impulsrefactor/Views/patient_select.dart';
 import 'package:impulsrefactor/Views/session_guide.dart';
-import 'package:provider/provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
-  runApp(MultiProvider(
-    providers: [
-      ChangeNotifierProvider(create: (_) => BtState()),
-      ChangeNotifierProvider(create: (_) => SessionState()),
-      ChangeNotifierProvider(create: (_) => EkgState()),
-    ],
-    child: ImpulsMain(),
-  ));
+  runApp(ProviderScope(child: ImpulsMain()));
 }
 
 class ImpulsMain extends StatelessWidget {

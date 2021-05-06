@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:impulsrefactor/Entities/session.dart';
 import 'package:impulsrefactor/Entities/therapist.dart';
-import 'package:impulsrefactor/Services/bluetooth_service.dart';
-import 'package:impulsrefactor/States/bluetooth_state.dart';
-import 'package:impulsrefactor/States/session_state.dart';
+import 'package:impulsrefactor/States/Refactored/current_patient.dart';
+import 'package:impulsrefactor/States/Refactored/session_step.dart';
+import 'package:impulsrefactor/States/Refactored/session_state.dart';
 import 'package:impulsrefactor/Views/Components/app_wide_components.dart';
 import 'package:impulsrefactor/Views/Components/step_setup_component.dart';
 import 'package:impulsrefactor/Views/Components/step_threshold_determination_component.dart';
 import 'package:impulsrefactor/Views/Components/stimulation_component.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class SessionGuide extends StatefulWidget {
   @override
@@ -17,18 +17,16 @@ class SessionGuide extends StatefulWidget {
 
 class _SessionGuideState extends State<SessionGuide> {
   String title = 'Session';
-  SessionState sessionState;
 
   @override
   void initState() {
     super.initState();
-    sessionState = Provider.of<SessionState>(context, listen: false);
-
-    sessionState.currentSession = Session();
-    sessionState.currentSession.confirmed = false;
-    sessionState.currentSession.date = DateTime.now();
-    sessionState.currentSession.patientUID = sessionState.currentPatient.uid;
-    sessionState.currentSession.therapistUIDs.add(Therapist().uid);
+    Session session = Session();
+    session.confirmed = false;
+    session.date = DateTime.now();
+    session.patientUID = context.read(currentPatientProvider).uid;
+    session.therapistUIDs.add(Therapist().uid);
+    context.read(sessionProvider.notifier).setSession(session);
   }
 
   ///TODO: Why are the Thresholds List<int>?
@@ -36,38 +34,38 @@ class _SessionGuideState extends State<SessionGuide> {
     if (rounds == 2) {
       stimRatingRound1.forEach((key, value) {
         int average = (value + stimRatingRound2[key]) ~/ 2;
-        if (sessionState.currentSession.stimRating1.isEmpty) {
-          sessionState.currentSession.stimRating1.add(average);
-        } else if (sessionState.currentSession.stimRating2.isEmpty) {
-          sessionState.currentSession.stimRating2.add(average);
-        } else if (sessionState.currentSession.stimRating3.isEmpty) {
-          sessionState.currentSession.stimRating3.add(average);
+        if (context.read(sessionProvider).stimRating1.isEmpty) {
+          context.read(sessionProvider).stimRating1.add(average);
+        } else if (context.read(sessionProvider).stimRating2.isEmpty) {
+          context.read(sessionProvider).stimRating2.add(average);
+        } else if (context.read(sessionProvider).stimRating3.isEmpty) {
+          context.read(sessionProvider).stimRating3.add(average);
         }
 
-        sessionState.currentSession.sensoryThreshold.addAll({stimRatingRound1[0], stimRatingRound2[0]});
-        sessionState.currentSession.painThreshold.addAll({stimRatingRound1[1], stimRatingRound2[1]});
-        sessionState.currentSession.toleranceThreshold.addAll({stimRatingRound1[10], stimRatingRound2[10]});
+        context.read(sessionProvider).sensoryThreshold.addAll({stimRatingRound1[0], stimRatingRound2[0]});
+        context.read(sessionProvider).painThreshold.addAll({stimRatingRound1[1], stimRatingRound2[1]});
+        context.read(sessionProvider).toleranceThreshold.addAll({stimRatingRound1[10], stimRatingRound2[10]});
       });
     } else {
       stimRatingRound1.forEach((key, value) {
-        if (sessionState.currentSession.stimRating1.isEmpty) {
-          sessionState.currentSession.stimRating1.add(value);
-        } else if (sessionState.currentSession.stimRating2.isEmpty) {
-          sessionState.currentSession.stimRating2.add(value);
-        } else if (sessionState.currentSession.stimRating3.isEmpty) {
-          sessionState.currentSession.stimRating3.add(value);
+        if (context.read(sessionProvider).stimRating1.isEmpty) {
+          context.read(sessionProvider).stimRating1.add(value);
+        } else if (context.read(sessionProvider).stimRating2.isEmpty) {
+          context.read(sessionProvider).stimRating2.add(value);
+        } else if (context.read(sessionProvider).stimRating3.isEmpty) {
+          context.read(sessionProvider).stimRating3.add(value);
         }
 
-        sessionState.currentSession.sensoryThreshold.addAll({stimRatingRound1[0], stimRatingRound1[0]});
-        sessionState.currentSession.painThreshold.addAll({stimRatingRound1[1], stimRatingRound1[1]});
-        sessionState.currentSession.toleranceThreshold.addAll({stimRatingRound1[10], stimRatingRound1[10]});
+        context.read(sessionProvider).sensoryThreshold.addAll({stimRatingRound1[0], stimRatingRound1[0]});
+        context.read(sessionProvider).painThreshold.addAll({stimRatingRound1[1], stimRatingRound1[1]});
+        context.read(sessionProvider).toleranceThreshold.addAll({stimRatingRound1[10], stimRatingRound1[10]});
       });
     }
-    sessionState.incrementStep();
+    context.read(sessionStepProvider.notifier).increment();
   }
 
-  Widget _getCurrentStepWidget(BuildContext context) {
-    switch (Provider.of<SessionState>(context).currentStep) {
+  Widget _getCurrentStepWidget(int currentStep) {
+    switch (currentStep) {
       case 0:
         return Setup();
         break;
@@ -104,27 +102,33 @@ class _SessionGuideState extends State<SessionGuide> {
             showDialog(
                 context: context,
                 builder: (context) => AlertDialog(
-                  title: Text('Do you want to return to the patient selection screen?'),
-                  actions: [
-                    TextButton(
-                        onPressed: () {
-                          Navigator.of(context).pop();
-                        },
-                        child: Text('Abort')),
-                    TextButton(
-                        onPressed: () {
-                          sessionState.resetState();
-                          BtService().cancelSubscriptions();
-                          Navigator.of(context).popUntil(ModalRoute.withName('/patient_select'));
-                        },
-                        child: Text('Confirm')),
-                  ],
-                ));
+                      title: Text('Do you want to return to the patient selection screen?'),
+                      actions: [
+                        TextButton(
+                            onPressed: () {
+                              Navigator.of(context).pop();
+                            },
+                            child: Text('Abort')),
+                        TextButton(
+                            onPressed: () {
+                              // TODO: context.read(sessionProvider).resetState();
+                              // TODO: BtService().cancelSubscriptions();
+                              Navigator.of(context).popUntil(ModalRoute.withName('/patient_select'));
+                            },
+                            child: Text('Confirm')),
+                      ],
+                    ));
             return false;
           },
-          child: Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: _getCurrentStepWidget(context),
+          child: Consumer(
+            builder: ( context, watch, child) {
+              int currentStep = watch(sessionStepProvider);
+
+              return Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: _getCurrentStepWidget(currentStep),
+              );
+            },
           ),
         ),
       ),
