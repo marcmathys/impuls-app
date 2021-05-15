@@ -3,7 +3,7 @@ import 'dart:typed_data';
 
 import 'package:flutter_blue/flutter_blue.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:impulsrefactor/States/Refactored/connected_device.dart';
+import 'package:impulsrefactor/States/connected_device.dart';
 import 'package:impulsrefactor/app_constants.dart';
 
 final errorServiceProvider = StateNotifierProvider<ErrorServiceState, List<int>>((ref) => ErrorServiceState([], ref.read));

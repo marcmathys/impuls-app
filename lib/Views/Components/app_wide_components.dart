@@ -12,7 +12,7 @@ class Components {
     return AppBar(
       leading: Container(),
       centerTitle: true,
-      title: Text(title),
+      title: Text(title, style: Theme.of(context).textTheme.bodyText1),
       actions: [
         Visibility(
           visible: showLogoutButton(context),

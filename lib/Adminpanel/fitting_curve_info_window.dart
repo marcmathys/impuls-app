@@ -13,14 +13,13 @@ class FittingCurveInfoWindow extends StatelessWidget {
     return oldFirstCoefficient != null && oldSecondCoefficient != null && oldResistance != null && oldDataPoints != null
         ? Column(
             children: [
-              Text('Current formula: (log(x) - $oldFirstCoefficient) / $oldSecondCoefficient'),
+              Text('Current formula: (log(x) - $oldFirstCoefficient) / $oldSecondCoefficient', style: Theme.of(context).textTheme.bodyText1),
               SizedBox(height: 10),
-              Text('Used data points (Resistance $oldResistance Ohm):\n$oldDataPoints'),
+              Text('Used data points (Resistance $oldResistance Ohm):\n$oldDataPoints', style: Theme.of(context).textTheme.bodyText1),
             ],
           )
         : Text(
-            'No previous fitting curve data found!',
-            style: TextStyle(color: Colors.red),
+            'No previous fitting curve data found!', style: Theme.of(context).textTheme.bodyText2
           );
   }
 }

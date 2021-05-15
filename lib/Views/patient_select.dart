@@ -15,17 +15,17 @@ class _PatientSelectState extends State<PatientSelect> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: Components().appBar(context, 'Hello, ${Therapist().name}!'),
-      floatingActionButton: FloatingActionButton(onPressed: () => Navigator.of(context).pushNamed('/debug'), child: Text('Debug')),
+      floatingActionButton: FloatingActionButton(onPressed: () => Navigator.of(context).pushNamed('/debug'), child: Text('Debug', style: Theme.of(context).textTheme.bodyText1)),
       body: Builder(builder: (BuildContext context) {
         return Column(
           children: <Widget>[
-            Text('Please select a patient from the list'),
+            Text('Please select a patient from the list', style: Theme.of(context).textTheme.bodyText1),
             Flexible(
               child: StreamBuilder(
                 stream: FirebaseFirestore.instance.collection('patients').where('therapistUIDs', arrayContains: Therapist().uid).snapshots(),
                 builder: (context, snapshot) {
                   if (!snapshot.hasData) {
-                    return const Text('Loading');
+                    return Text('Loading', style: Theme.of(context).textTheme.bodyText1);
                   }
                   return ListView.builder(
                     itemCount: snapshot.data.docs.length,

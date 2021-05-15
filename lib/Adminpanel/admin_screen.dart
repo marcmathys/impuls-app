@@ -6,8 +6,8 @@ import 'package:impulsrefactor/Adminpanel/fitting_curve_info_window.dart';
 import 'package:impulsrefactor/Adminpanel/test_byte_array_bar.dart';
 import 'package:impulsrefactor/Entities/fitting_point.dart';
 import 'package:impulsrefactor/Helpers/fitting_curve_calculator.dart';
-import 'package:impulsrefactor/States/Refactored/connected_device.dart';
-import 'package:impulsrefactor/States/Refactored/stimulation_service.dart';
+import 'package:impulsrefactor/States/connected_device.dart';
+import 'package:impulsrefactor/States/stimulation_service.dart';
 import 'package:impulsrefactor/Views/Components/app_wide_components.dart';
 import 'package:impulsrefactor/Views/Debug/bluetooth_device_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -148,8 +148,8 @@ class _AdminScreenState extends State<AdminScreen> {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceAround,
                       children: [
-                        Text(fittingPointsUpdate.elementAt(index).x.toString()),
-                        Text(fittingPointsUpdate.elementAt(index).y.toString()),
+                        Text(fittingPointsUpdate.elementAt(index).x.toString(), style: Theme.of(context).textTheme.bodyText1),
+                        Text(fittingPointsUpdate.elementAt(index).y.toString(), style: Theme.of(context).textTheme.bodyText1),
                       ],
                     ),
                   ),
@@ -216,7 +216,7 @@ class _AdminScreenState extends State<AdminScreen> {
         throw Exception('No device connected.');
       }
 
-      String radixString = value.toRadixString(8).padLeft(9, '0');
+      String radixString = value.toString().padLeft(9, '0');
       List<int> octList = [
         int.parse(radixString.substring(0, 3)),
         int.parse(radixString.substring(3, 6)),
@@ -228,9 +228,9 @@ class _AdminScreenState extends State<AdminScreen> {
       confirmButtonLockout = false;
       setState(() {});
     } on FormatException {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Wrong number format')));
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Wrong number format', style: Theme.of(context).textTheme.bodyText2)));
     } catch (exception) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('$exception')));
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('$exception', style: Theme.of(context).textTheme.bodyText2)));
     }
   }
 
@@ -245,9 +245,9 @@ class _AdminScreenState extends State<AdminScreen> {
       confirmButtonLockout = true;
       setState(() {});
     } on FormatException {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Wrong number format of resistance or voltage')));
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Wrong number format of resistance or voltage', style: Theme.of(context).textTheme.bodyText2)));
     } on IntegerDivisionByZeroException {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Resistance must not be zero')));
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Resistance must not be zero', style: Theme.of(context).textTheme.bodyText2)));
     } catch (_) {}
   }
 
@@ -283,7 +283,7 @@ class _AdminScreenState extends State<AdminScreen> {
     } else
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
         duration: Duration(seconds: 10),
-        content: Text('An error occurred while trying to fit the curve!'),
+        content: Text('An error occurred while trying to fit the curve!', style: Theme.of(context).textTheme.bodyText2),
       ));
   }
 
@@ -306,7 +306,7 @@ class _AdminScreenState extends State<AdminScreen> {
           padding: const EdgeInsets.all(8.0),
           child: ListView(
             children: [
-              Text('Send Bytes to ESP for the voltage fitting process.'),
+              Text('Send Bytes to ESP for the voltage fitting process.', style: Theme.of(context).textTheme.bodyText1),
               TextField(
                 style: _currentPoint?.x != null ? TextStyle(color: Colors.grey) : TextStyle(),
                 controller: _resistance,
@@ -325,7 +325,7 @@ class _AdminScreenState extends State<AdminScreen> {
                     width: MediaQuery.of(context).size.width / 4,
                     child: ElevatedButton(
                       onPressed: () => sendBytesToESP(context),
-                      child: Text('Send'),
+                      child: Text('Send', style: Theme.of(context).textTheme.bodyText1),
                     ),
                   ),
                 ],
@@ -344,7 +344,7 @@ class _AdminScreenState extends State<AdminScreen> {
                     width: MediaQuery.of(context).size.width / 4,
                     child: ElevatedButton(
                       onPressed: confirmButtonLockout ? null : () => saveAmpsOnPressed(context),
-                      child: Text('Confirm'),
+                      child: Text('Confirm', style: Theme.of(context).textTheme.bodyText1),
                     ),
                   ),
                 ],
@@ -355,20 +355,20 @@ class _AdminScreenState extends State<AdminScreen> {
                     await showDialog(context: context, builder: (context) => showFittingPointListDialog());
                     setState(() {});
                   },
-                  child: Text(fittingPointsToString(), textAlign: TextAlign.start)),
+                  child: Text(fittingPointsToString(), textAlign: TextAlign.start, style: Theme.of(context).textTheme.bodyText1)),
               Center(
                 child: ElevatedButton(
                   onPressed: () => setState(() {
                     _fittingPoints.clear();
                     _fittingPoints.addAll(performDeepCopy(_testingPoints));
                   }),
-                  child: Text('Load test data set'),
+                  child: Text('Load test data set', style: Theme.of(context).textTheme.bodyText1),
                 ),
               ),
               Center(
                 child: ElevatedButton(
                   onPressed: _fittingPoints.isNotEmpty ? () => startFitting(context) : null,
-                  child: Text('Start fitting with given points'),
+                  child: Text('Start fitting with given points', style: Theme.of(context).textTheme.bodyText1),
                 ),
               ),
               ByteArrayTestBar(),

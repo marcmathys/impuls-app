@@ -3,8 +3,8 @@ import 'dart:typed_data';
 
 import 'package:flutter_blue/flutter_blue.dart';
 import 'package:impulsrefactor/Entities/medical_data.dart';
-import 'package:impulsrefactor/States/Refactored/bpm_service.dart';
-import 'package:impulsrefactor/States/Refactored/connected_device.dart';
+import 'package:impulsrefactor/States/bpm_service.dart';
+import 'package:impulsrefactor/States/connected_device.dart';
 import 'package:impulsrefactor/app_constants.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 

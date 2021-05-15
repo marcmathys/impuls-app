@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:impulsrefactor/Entities/medical_data.dart';
-import 'package:impulsrefactor/States/Refactored/ekg_service.dart';
+import 'package:impulsrefactor/States/ekg_service.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 

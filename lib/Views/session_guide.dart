@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:impulsrefactor/Entities/session.dart';
 import 'package:impulsrefactor/Entities/therapist.dart';
-import 'package:impulsrefactor/States/Refactored/current_patient.dart';
-import 'package:impulsrefactor/States/Refactored/session_step.dart';
-import 'package:impulsrefactor/States/Refactored/session_state.dart';
+import 'package:impulsrefactor/States/current_patient.dart';
+import 'package:impulsrefactor/States/session_step.dart';
+import 'package:impulsrefactor/States/session_state.dart';
 import 'package:impulsrefactor/Views/Components/app_wide_components.dart';
 import 'package:impulsrefactor/Views/Components/step_setup_component.dart';
 import 'package:impulsrefactor/Views/Components/step_threshold_determination_component.dart';
@@ -85,7 +85,7 @@ class _SessionGuideState extends State<SessionGuide> {
         return ThresholdDetermination(thresholdDeterminationComplete, true);
         break;
       case 6:
-        return Container(child: Center(child: Text('Done! (Temp screen)')));
+        return Container(child: Center(child: Text('Done! (Temp screen)', style: Theme.of(context).textTheme.bodyText1)));
         break;
       default:
         return null;
@@ -102,20 +102,20 @@ class _SessionGuideState extends State<SessionGuide> {
             showDialog(
                 context: context,
                 builder: (context) => AlertDialog(
-                      title: Text('Do you want to return to the patient selection screen?'),
+                      title: Text('Do you want to return to the patient selection screen?', style: Theme.of(context).textTheme.bodyText1),
                       actions: [
                         TextButton(
                             onPressed: () {
                               Navigator.of(context).pop();
                             },
-                            child: Text('Abort')),
+                            child: Text('Abort', style: Theme.of(context).textTheme.bodyText1)),
                         TextButton(
                             onPressed: () {
                               // TODO: context.read(sessionProvider).resetState();
                               // TODO: BtService().cancelSubscriptions();
                               Navigator.of(context).popUntil(ModalRoute.withName('/patient_select'));
                             },
-                            child: Text('Confirm')),
+                            child: Text('Confirm', style: Theme.of(context).textTheme.bodyText1)),
                       ],
                     ));
             return false;

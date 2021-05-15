@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:impulsrefactor/Entities/patient.dart';
 import 'package:impulsrefactor/Entities/session.dart';
-import 'package:impulsrefactor/States/Refactored/current_patient.dart';
+import 'package:impulsrefactor/States/current_patient.dart';
 import 'package:impulsrefactor/Views/Components/app_wide_components.dart';
 import 'package:impulsrefactor/Views/Components/pain_level_chart_component.dart';
 import 'package:impulsrefactor/Views/Components/threshold_chart.dart';
@@ -34,10 +34,10 @@ class _PatientDetailState extends State<PatientDetail> {
 
   List<DropdownMenuItem<Session>> buildDropdownMenuList() {
     if (_patient.sessions.isEmpty) {
-      return [DropdownMenuItem(value: null, child: Text('No sessions'))];
+      return [DropdownMenuItem(value: null, child: Text('No sessions', style: Theme.of(context).textTheme.bodyText1))];
     } else {
       return _patient.sessions.map((Session session) {
-        return DropdownMenuItem(value: session, child: Text(DateFormat.yMMMd().format(session.date)));
+        return DropdownMenuItem(value: session, child: Text(DateFormat.yMMMd().format(session.date), style: Theme.of(context).textTheme.bodyText1));
       }).toList();
     }
   }
@@ -74,7 +74,7 @@ class _PatientDetailState extends State<PatientDetail> {
                     )),
                 Flexible(
                     flex: 1,
-                    child: ElevatedButton(onPressed: () => Navigator.of(context).pushNamed('/session_guide'), child: Text('Start new session'))),
+                    child: ElevatedButton(onPressed: () => Navigator.of(context).pushNamed('/session_guide'), child: Text('Start new session', style: Theme.of(context).textTheme.bodyText1))),
               ],
             ),
             Divider(

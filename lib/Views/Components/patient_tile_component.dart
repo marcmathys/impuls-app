@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:impulsrefactor/Entities/patient.dart';
 import 'package:impulsrefactor/Services/firebase_service.dart';
-import 'package:impulsrefactor/States/Refactored/current_patient.dart';
+import 'package:impulsrefactor/States/current_patient.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class PatientTile extends StatelessWidget {
@@ -26,7 +26,7 @@ class PatientTile extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: <Widget>[
             Flexible(flex: 1, child: Icon(patient.icon)),
-            Flexible(flex: 2, child: Text(patient.moodleID)),
+            Flexible(flex: 2, child: Text(patient.moodleID, style: Theme.of(context).textTheme.bodyText1)),
             Flexible(flex: 1, child: Icon(Icons.keyboard_arrow_right)),
           ],
         ),

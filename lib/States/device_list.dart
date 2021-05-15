@@ -26,7 +26,7 @@ class DeviceList extends StateNotifier<List<BluetoothDevice>> {
 
     /**TODO: Messenger?
      * if (!await flutterBlue.isOn) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Bluetooth is turned off')));
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Bluetooth is turned off', style: Theme.of(context).textTheme.bodyText2)));
         }**/
 
     flutterBlue.startScan(timeout: Duration(seconds: 10));

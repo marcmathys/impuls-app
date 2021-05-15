@@ -32,7 +32,7 @@ class ConnectedDevice extends StateNotifier<BluetoothDevice> {
         state = null;
         _connectionStateListener.cancel();
         //TODO: Set a Variable in a state that, at another point in the code, triggers the message! (Via Consumer!) (Do the same for all instances of ScaffoldMessenger!)
-        //ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Device got disconnected')));
+        //ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Device got disconnected', style: Theme.of(context).textTheme.bodyText1)));
       }
     });
 

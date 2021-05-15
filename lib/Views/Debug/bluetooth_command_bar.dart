@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:impulsrefactor/Helpers/byte_conversion.dart';
-import 'package:impulsrefactor/States/Refactored/bpm_service.dart';
-import 'package:impulsrefactor/States/Refactored/brs_service.dart';
-import 'package:impulsrefactor/States/Refactored/ekg_service.dart';
-import 'package:impulsrefactor/States/Refactored/stimulation_service.dart';
+import 'package:impulsrefactor/States/bpm_service.dart';
+import 'package:impulsrefactor/States/brs_service.dart';
+import 'package:impulsrefactor/States/ekg_service.dart';
+import 'package:impulsrefactor/States/stimulation_service.dart';
 import 'package:impulsrefactor/Views/Components/ekg_chart_component.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -33,7 +33,7 @@ class _BluetoothCommandBarState extends State<BluetoothCommandBar> {
       List<int> octList = ByteConversion.stringToOct(_textController.value.text);
       context.read(stimulationServiceProvider.notifier).sendStimulationBytes(octList);
     } catch (_) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('The given numbers are in the wrong format! Example format: 111,110,109')));
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('The given numbers are in the wrong format! Example format: 111,110,109', style: Theme.of(context).textTheme.bodyText1)));
     }
   }
 
@@ -53,14 +53,14 @@ class _BluetoothCommandBarState extends State<BluetoothCommandBar> {
               onPressed: () {
                 sendBytesOnPressed();
               },
-              child: Text('Send Bytes'),
+              child: Text('Send Bytes', style: Theme.of(context).textTheme.bodyText1),
             ),
           ],
         ),
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text('Start EKG and BPM data stream'),
+            Text('Start EKG and BPM data stream', style: Theme.of(context).textTheme.bodyText1),
             Switch(
                 value: ekgSwitch,
                 onChanged: (value) {
@@ -87,7 +87,7 @@ class _BluetoothCommandBarState extends State<BluetoothCommandBar> {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text('Get BRS data'),
+            Text('Get BRS data', style: Theme.of(context).textTheme.bodyText1),
             Switch(
               value: brsSwitch,
               onChanged: (value) {

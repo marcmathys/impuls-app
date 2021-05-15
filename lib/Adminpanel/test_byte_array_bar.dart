@@ -3,7 +3,7 @@ import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:impulsrefactor/States/Refactored/stimulation_service.dart';
+import 'package:impulsrefactor/States/stimulation_service.dart';
 
 class ByteArrayTestBar extends StatefulWidget {
   @override
@@ -103,10 +103,10 @@ class _ByteArrayTestBarState extends State<ByteArrayTestBar> {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        Text(currentSentValue),
+        Text(currentSentValue, style: Theme.of(context).textTheme.bodyText1),
         Row(
           children: [
-            Text('Send byte values 0 - 1023 to EKG. Format: 0|Low|High'),
+            Text('Send byte values 0 - 1023 to EKG. Format: 0|Low|High', style: Theme.of(context).textTheme.bodyText1),
             Switch(
                 value: zeroLowHigh,
                 onChanged: (value) {
@@ -129,7 +129,7 @@ class _ByteArrayTestBarState extends State<ByteArrayTestBar> {
         ),
         Row(
           children: [
-            Text('Send byte values 0 - 1023 to EKG. Format: 0|High|Low'),
+            Text('Send byte values 0 - 1023 to EKG. Format: 0|High|Low', style: Theme.of(context).textTheme.bodyText1),
             Switch(
                 value: zeroHighLow,
                 onChanged: (value) {
@@ -152,7 +152,7 @@ class _ByteArrayTestBarState extends State<ByteArrayTestBar> {
         ),
         Row(
           children: [
-            Text('Send byte values 0 - 1023 to EKG. Format: Low|High|0'),
+            Text('Send byte values 0 - 1023 to EKG. Format: Low|High|0', style: Theme.of(context).textTheme.bodyText1),
             Switch(
                 value: lowHighZero,
                 onChanged: (value) {
@@ -175,7 +175,7 @@ class _ByteArrayTestBarState extends State<ByteArrayTestBar> {
         ),
         Row(
           children: [
-            Text('Send byte values 0 - 1023 to EKG. Format: High|Low|0'),
+            Text('Send byte values 0 - 1023 to EKG. Format: High|Low|0', style: Theme.of(context).textTheme.bodyText1),
             Switch(
                 value: highLowZero,
                 onChanged: (value) {

@@ -21,6 +21,11 @@ class ImpulsMain extends StatelessWidget {
       theme: ThemeData(
         primaryColor: Colors.indigo,
         buttonColor: Colors.blue,
+        fontFamily: 'Montserrat',
+        textTheme: TextTheme(
+          bodyText1: TextStyle(fontSize: 20), // Standard Text
+          bodyText2: TextStyle(fontSize: 30, color: Colors.red, fontWeight: FontWeight.bold) // Error messages
+        ),
       ),
       title: 'Impuls',
       debugShowCheckedModeBanner: false,

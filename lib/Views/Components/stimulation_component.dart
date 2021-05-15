@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:impulsrefactor/Helpers/byte_conversion.dart';
 import 'package:impulsrefactor/Helpers/calculator.dart';
-import 'package:impulsrefactor/States/Refactored/bpm_service.dart';
-import 'package:impulsrefactor/States/Refactored/ekg_service.dart';
-import 'package:impulsrefactor/States/Refactored/session_step.dart';
-import 'package:impulsrefactor/States/Refactored/session_state.dart';
-import 'package:impulsrefactor/States/Refactored/stimulation_service.dart';
+import 'package:impulsrefactor/States/bpm_service.dart';
+import 'package:impulsrefactor/States/ekg_service.dart';
+import 'package:impulsrefactor/States/session_step.dart';
+import 'package:impulsrefactor/States/session_state.dart';
+import 'package:impulsrefactor/States/stimulation_service.dart';
 import 'package:impulsrefactor/Views/Components/ekg_chart_component.dart';
 import 'package:impulsrefactor/Views/Components/progress_bar_component.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -46,7 +46,7 @@ class _StimulationState extends State<Stimulation> {
                 decoration: BoxDecoration(border: Border.all(width: 1, color: Colors.indigo)),
                 child: Column(
                   children: <Widget>[
-                    Text('Treatment progress'),
+                    Text('Treatment progress', style: Theme.of(context).textTheme.bodyText1),
                     SizedBox(height: 5),
                     ProgressRing(
                         key: _progressBarKey,
@@ -64,10 +64,10 @@ class _StimulationState extends State<Stimulation> {
                 decoration: BoxDecoration(border: Border.all(width: 1, color: Colors.indigo)),
                 child: Column(
                   children: <Widget>[
-                    Text('Stimulation level: --'),
+                    Text('Stimulation level: --', style: Theme.of(context).textTheme.bodyText1),
                     Consumer(
                       builder: (context, watch, child) {
-                        return Text('IBI: ${Calculator.calculateIBI(watch(bpmServiceProvider))} ms');
+                        return Text('IBI: ${Calculator.calculateIBI(watch(bpmServiceProvider))} ms', style: Theme.of(context).textTheme.bodyText1);
                       },
                     ),
                   ],
@@ -87,7 +87,7 @@ class _StimulationState extends State<Stimulation> {
                             //TODO: BtService().cancelSubscriptions();
                           }
                         : null,
-                    child: Text('Next threshold\ndetermination')),
+                    child: Text('Next threshold\ndetermination', style: Theme.of(context).textTheme.bodyText1)),
               )
             ],
           ),
