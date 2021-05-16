@@ -11,8 +11,10 @@ class DeviceList extends StateNotifier<List<BluetoothDevice>> {
   DeviceList(List<BluetoothDevice> deviceList) : super(deviceList ?? []);
 
   void stopScanning() {
-    FlutterBlue.instance.stopScan();
-    _isScanning = false;
+    if (_isScanning) {
+      FlutterBlue.instance.stopScan();
+      _isScanning = false;
+    }
   }
 
   /// Scans the environment for bluetooth devices

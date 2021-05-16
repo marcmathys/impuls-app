@@ -8,23 +8,18 @@ class Login extends StatefulWidget {
 }
 
 class _LoginState extends State<Login> {
-  TextStyle style = TextStyle(fontFamily: 'Montserrat', fontSize: 20.0);
   TextEditingController _email;
   TextEditingController _password;
   final _formKey = GlobalKey<FormState>();
-  FirebaseHandler _handler;
+  FirebaseService _handler;
 
   @override
   void initState() {
     super.initState();
-    _handler = FirebaseHandler();
     _email = TextEditingController();
     _password = TextEditingController();
-    _handler.checkUserLogin().then((autoLogin) {
-      if (autoLogin) {
-        Navigator.of(context).pushNamed('/patient_select');
-      }
-    });
+    _handler = FirebaseService();
+    _handler.checkUserLogin();
   }
 
   @override
@@ -32,26 +27,6 @@ class _LoginState extends State<Login> {
     super.dispose();
     _email.dispose();
     _password.dispose();
-  }
-
-  void loginUser(BuildContext context) async {
-    if (_formKey.currentState.validate()) {
-      if (await _handler.signIn(_email.text, _password.text)) {
-        String statusMessage = await _handler.loadTherapist();
-        if (statusMessage == 'OK') {
-          Navigator.of(context).pushNamed('/patient_select');
-        } else {
-          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(statusMessage, style: Theme.of(context).textTheme.bodyText1)));
-        }
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text("User authentication failed.", style: Theme.of(context).textTheme.bodyText1),
-            duration: Duration(seconds: 5),
-          ),
-        );
-      }
-    }
   }
 
   Widget build(BuildContext context) {
@@ -71,7 +46,7 @@ class _LoginState extends State<Login> {
                     child: TextFormField(
                       controller: _email,
                       validator: (value) => (value.isEmpty) ? "Please enter email" : null,
-                      style: style,
+                      style: Theme.of(context).textTheme.bodyText1,
                       decoration: InputDecoration(
                         prefixIcon: Icon(Icons.email),
                         labelText: "Email",
@@ -84,7 +59,7 @@ class _LoginState extends State<Login> {
                     child: TextFormField(
                       controller: _password,
                       validator: (value) => (value.isEmpty) ? "Please enter password" : null,
-                      style: style,
+                      style: Theme.of(context).textTheme.bodyText1,
                       decoration: InputDecoration(
                         prefixIcon: Icon(Icons.lock),
                         labelText: "Password",
@@ -100,18 +75,17 @@ class _LoginState extends State<Login> {
                       borderRadius: BorderRadius.circular(30.0),
                       color: Colors.indigo,
                       child: MaterialButton(
-                        onPressed: () async {
-                          if (_email.text == 'admin' && _password.text == 'admin') {
-                            Navigator.of(context).pushNamed('/admin');
-                          } else {
-                            loginUser(context);
-                          }
-                        },
-                        child: Text(
-                          'Sign In',
-                          style: style.copyWith(color: Colors.white, fontWeight: FontWeight.bold),
-                        ),
-                      ),
+                          onPressed: () async {
+                            if (_email.text == 'admin' && _password.text == 'admin') {
+                              Navigator.of(context).pushNamed('/admin');
+                            } else {
+                              if (_formKey.currentState.validate()) {
+                                await _handler.signIn(_email.text, _password.text);
+                                _handler.loadTherapist();
+                              }
+                            }
+                          },
+                          child: Text('Sign In', style: Theme.of(context).textTheme.bodyText1)),
                     ),
                   ),
                 ],

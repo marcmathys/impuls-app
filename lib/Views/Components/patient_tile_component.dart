@@ -8,7 +8,7 @@ class PatientTile extends StatelessWidget {
   PatientTile(this.patient);
 
   final Patient patient;
-  final FirebaseHandler _handler = FirebaseHandler();
+  final FirebaseService _handler = FirebaseService();
 
   @override
   Widget build(BuildContext context) {

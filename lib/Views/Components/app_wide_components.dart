@@ -7,7 +7,7 @@ class Components {
   }
 
   AppBar appBar(BuildContext context, String title) {
-    FirebaseHandler _firebaseHandler = FirebaseHandler();
+    FirebaseService _firebaseHandler = FirebaseService();
 
     return AppBar(
       leading: Container(),

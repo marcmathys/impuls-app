@@ -3,13 +3,14 @@ import 'package:impulsrefactor/Entities/patient.dart';
 import 'package:impulsrefactor/Entities/session.dart';
 import 'package:impulsrefactor/Entities/therapist.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:get/get.dart';
 
-class FirebaseHandler {
-  static final FirebaseHandler _instance = FirebaseHandler._internal();
+class FirebaseService {
+  static final FirebaseService _instance = FirebaseService._internal();
 
-  factory FirebaseHandler() => _instance;
+  factory FirebaseService() => _instance;
 
-  FirebaseHandler._internal() {
+  FirebaseService._internal() {
     _auth = FirebaseAuth.instance;
   }
 
@@ -19,27 +20,20 @@ class FirebaseHandler {
   User get user => _user;
 
   /// A method that searches for an already logged-in user and logs that user in
-  Future<bool> checkUserLogin() async {
+  void checkUserLogin() async {
     User user = _auth.currentUser;
     if (user != null) {
       _user = user;
-      String statusMessage = await loadTherapist();
-      if (statusMessage == 'OK') {
-        return true;
-      } else {
-        return false;
-      }
+      loadTherapist();
     }
-    return false;
   }
 
-  Future<bool> signIn(String email, String password) async {
+  Future<void> signIn(String email, String password) async {
     try {
       UserCredential result = await _auth.signInWithEmailAndPassword(email: email, password: password);
       _user = result.user;
-      return _user == null ? false : true;
     } catch (e) {
-      return false;
+      Get.snackbar('Login failed', '');
     }
   }
 
@@ -52,9 +46,10 @@ class FirebaseHandler {
     /// TODO: Log out user if document['approved'] == false;
   }
 
-  Future<String> loadTherapist() async {
+  void loadTherapist() async {
     if (_user == null) {
-      return 'Therapist login failed!';
+      Get.snackbar('Login error', 'No Therapist loaded.');
+      return;
     }
 
     String path = 'therapists/${user.uid}';
@@ -74,14 +69,17 @@ class FirebaseHandler {
       therapist.phone = document.get('phone');
       therapist.uid = user.uid;
 
-      return 'OK';
+      Get.toNamed('/patient_select');
     } catch (exception) {
       if (exception is AssertionError) {
-        return 'Therapist with UID ${user.uid} not found!';
+        Get.snackbar('Login error', 'Therapist with UID ${user.uid} not found!');
+        return;
       } else if (exception is FirebaseException && exception.code == 'permission-denied') {
-        return 'Permission denied, access to Database is restricted!';
+        Get.snackbar('Permission error', 'Permission denied, access to Database is restricted!');
+        return;
       }
-      return 'An unexpected error occurred: $exception';
+      Get.snackbar('Unknown error', 'An unexpected error occurred: $exception');
+      return;
     }
   }
 
@@ -91,8 +89,7 @@ class FirebaseHandler {
       return;
     }
 
-    QuerySnapshot querySnapshot =
-        await FirebaseFirestore.instance.collection('sessions').where('patientUID', isEqualTo: patient.uid).orderBy('date').get();
+    QuerySnapshot querySnapshot = await FirebaseFirestore.instance.collection('sessions').where('patientUID', isEqualTo: patient.uid).orderBy('date').get();
 
     if (querySnapshot.docs.isNotEmpty) {
       querySnapshot.docs.forEach((DocumentSnapshot document) {

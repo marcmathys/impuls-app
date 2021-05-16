@@ -34,9 +34,9 @@ class BluetoothDevicePicker extends ConsumerWidget {
             if (isExpanded) {
               context.read(deviceListProvider.notifier).scanForDevices();
             }
-            /** else {
-                _flutterBlue.stopScan();
-                }**/
+             else {
+              context.read(deviceListProvider.notifier).stopScanning();
+                }
           },
           children: [
             Container(
