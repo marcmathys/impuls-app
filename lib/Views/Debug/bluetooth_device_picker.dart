@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_blue/flutter_blue.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:impulsrefactor/States/connected_device.dart';
 import 'package:impulsrefactor/States/device_list.dart';
@@ -14,7 +15,7 @@ class BluetoothDevicePicker extends ConsumerWidget {
         device != null
             ? Row(
                 children: [
-                  Text('Currently connected to: ${device?.id ?? 'none'} ${device?.name ?? ''}', style: Theme.of(context).textTheme.bodyText1),
+                  //TODO: Edit back in Text('Currently connected to: ${device?.id ?? 'none'} ${device?.name ?? ''}', style: Theme.of(context).textTheme.bodyText1),
                   ElevatedButton(
                     onPressed: () {
                       device.disconnect();
@@ -24,7 +25,7 @@ class BluetoothDevicePicker extends ConsumerWidget {
                   ),
                 ],
               )
-            : Text('No device connected!', style: Theme.of(context).textTheme.bodyText1),
+            : Text('No device connected!', style: Theme.of(context).textTheme.bodyText2),
         ExpansionTile(
           title: Text('Expand to search for devices', style: Theme.of(context).textTheme.bodyText1),
           initiallyExpanded: false,

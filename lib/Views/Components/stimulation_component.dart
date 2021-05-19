@@ -1,8 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:impulsrefactor/Helpers/byte_conversion.dart';
-import 'package:impulsrefactor/Helpers/calculator.dart';
-import 'package:impulsrefactor/States/bpm_service.dart';
-import 'package:impulsrefactor/States/ekg_service.dart';
 import 'package:impulsrefactor/States/session_step.dart';
 import 'package:impulsrefactor/States/session_state.dart';
 import 'package:impulsrefactor/States/stimulation_service.dart';
@@ -76,7 +73,7 @@ class _StimulationState extends State<Stimulation> {
             ],
           ),
         ),
-        EKGChart(),
+        //EKGChart(),
       ],
     );
   }

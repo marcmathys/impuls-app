@@ -74,7 +74,7 @@ class _PatientDetailState extends State<PatientDetail> {
                       },
                     )),
                 Flexible(
-                    flex: 1, child: ElevatedButton(onPressed: () => Get.toNamed('session_guide'), child: Text('Start new session', style: Theme.of(context).textTheme.bodyText1))),
+                    flex: 1, child: ElevatedButton(onPressed: () => Get.toNamed('/session_guide'), child: Text('Start new session', style: Theme.of(context).textTheme.bodyText1))),
               ],
             ),
             Divider(

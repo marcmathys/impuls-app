@@ -24,8 +24,8 @@ class ConnectedDevice extends StateNotifier<BluetoothDevice> {
 
     _connectionStateListener = device.state.listen((event) {
       if (event == BluetoothDeviceState.disconnected) {
-        _connectionStateListener.cancel();
-        Get.snackbar('Device Error', 'Device got disconnected');
+        state = null; //TODO: Remove, because it interferes with reconnecting!
+        Get.snackbar('', 'Device got disconnected');
       }
       if (event == BluetoothDeviceState.connected) {
         ref.read(errorServiceProvider.notifier).listenForErrors();

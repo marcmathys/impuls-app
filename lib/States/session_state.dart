@@ -28,31 +28,31 @@ class SessionState extends StateNotifier<Session> {
     if (rounds == 2) {
       stimRatingRound1.forEach((key, value) {
         int average = (value + stimRatingRound2[key]) ~/ 2;
-        if (ref.read(sessionProvider).stimRating1.isEmpty) {
-          ref.read(sessionProvider).stimRating1.add(average);
-        } else if (ref.read(sessionProvider).stimRating2.isEmpty) {
-          ref.read(sessionProvider).stimRating2.add(average);
-        } else if (ref.read(sessionProvider).stimRating3.isEmpty) {
-          ref.read(sessionProvider).stimRating3.add(average);
+        if (state.stimRating1.isEmpty) {
+          state.stimRating1.add(average);
+        } else if (state.stimRating2.isEmpty) {
+          state.stimRating2.add(average);
+        } else if (state.stimRating3.isEmpty) {
+          state.stimRating3.add(average);
         }
 
-        ref.read(sessionProvider).sensoryThreshold.addAll({stimRatingRound1[0], stimRatingRound2[0]});
-        ref.read(sessionProvider).painThreshold.addAll({stimRatingRound1[1], stimRatingRound2[1]});
-        ref.read(sessionProvider).toleranceThreshold.addAll({stimRatingRound1[10], stimRatingRound2[10]});
+        state.sensoryThreshold.addAll({stimRatingRound1[0], stimRatingRound2[0]});
+        state.painThreshold.addAll({stimRatingRound1[1], stimRatingRound2[1]});
+        state.toleranceThreshold.addAll({stimRatingRound1[10], stimRatingRound2[10]});
       });
     } else {
       stimRatingRound1.forEach((key, value) {
-        if (ref.read(sessionProvider).stimRating1.isEmpty) {
-          ref.read(sessionProvider).stimRating1.add(value);
-        } else if (ref.read(sessionProvider).stimRating2.isEmpty) {
-          ref.read(sessionProvider).stimRating2.add(value);
-        } else if (ref.read(sessionProvider).stimRating3.isEmpty) {
-          ref.read(sessionProvider).stimRating3.add(value);
+        if (state.stimRating1.isEmpty) {
+          state.stimRating1.add(value);
+        } else if (state.stimRating2.isEmpty) {
+          state.stimRating2.add(value);
+        } else if (state.stimRating3.isEmpty) {
+          state.stimRating3.add(value);
         }
 
-        ref.read(sessionProvider).sensoryThreshold.addAll({stimRatingRound1[0], stimRatingRound1[0]});
-        ref.read(sessionProvider).painThreshold.addAll({stimRatingRound1[1], stimRatingRound1[1]});
-        ref.read(sessionProvider).toleranceThreshold.addAll({stimRatingRound1[10], stimRatingRound1[10]});
+        state.sensoryThreshold.addAll({stimRatingRound1[0], stimRatingRound1[0]});
+        state.painThreshold.addAll({stimRatingRound1[1], stimRatingRound1[1]});
+        state.toleranceThreshold.addAll({stimRatingRound1[10], stimRatingRound1[10]});
       });
     }
     ref.read(sessionStepProvider.notifier).increment();

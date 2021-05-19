@@ -1,8 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:impulsrefactor/Entities/session.dart';
-import 'package:impulsrefactor/Entities/therapist.dart';
-import 'package:impulsrefactor/States/current_patient.dart';
 import 'package:impulsrefactor/States/session_step.dart';
 import 'package:impulsrefactor/States/session_state.dart';
 import 'package:impulsrefactor/Views/Components/app_wide_components.dart';
@@ -74,7 +71,7 @@ class _SessionGuideState extends State<SessionGuide> {
                             onPressed: () {
                               // TODO: context.read(sessionProvider).resetState();
                               // TODO: BtService().cancelSubscriptions();
-                              Get.toNamed('patient_select');
+                              Get.toNamed('/patient_select');
                             },
                             child: Text('Confirm', style: Theme.of(context).textTheme.bodyText1)),
                       ],
