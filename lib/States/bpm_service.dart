@@ -14,6 +14,10 @@ class BpmServiceState extends StateNotifier<double> {
 
   BpmServiceState(double bpm, this.read) : super(0.0);
 
+  bool isStreamRunning() {
+    return _bpmStream != null ? !_bpmStream.isPaused : false;
+  }
+
   void startBpmStream() async {
     BluetoothCharacteristic bpmCharacteristic = read(connectedDeviceProvider.notifier).characteristics[AppConstants.BPM_CHARACTERISTIC_UUID];
 

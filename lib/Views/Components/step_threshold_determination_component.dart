@@ -1,17 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:impulsrefactor/Helpers/byte_conversion.dart';
-import 'package:impulsrefactor/Helpers/calculator.dart';
 import 'package:impulsrefactor/Helpers/fitting_curve_calculator.dart';
-import 'package:impulsrefactor/States/bpm_service.dart';
-import 'package:impulsrefactor/States/ekg_service.dart';
+import 'package:impulsrefactor/States/session_state.dart';
 import 'package:impulsrefactor/States/stimulation_service.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class ThresholdDetermination extends StatefulWidget {
-  final Function(Map<int, int>, Map<int, int>, int round) _onDeterminationEnd;
   final bool isThirdDetermination;
 
-  ThresholdDetermination(this._onDeterminationEnd, this.isThirdDetermination);
+  ThresholdDetermination(this.isThirdDetermination);
 
   @override
   _ThresholdDeterminationState createState() => _ThresholdDeterminationState();
@@ -34,13 +31,6 @@ class _ThresholdDeterminationState extends State<ThresholdDetermination> {
     _roundInProgress = true;
     _stimulationLevel = 0;
     _stimLockout = false;
-    context.read(ekgServiceProvider.notifier).startDataStreams();
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
-    context.read(ekgServiceProvider.notifier).sendOffSignal();
   }
 
   void startNextRound() {
@@ -105,7 +95,9 @@ class _ThresholdDeterminationState extends State<ThresholdDetermination> {
                       ? () async {
                           int fittedValue = await FittingCurveCalculator.fitToCurve(_stimulationLevel + 200);
                           List<int> byteList = ByteConversion.convertIntToByteList(fittedValue);
-                          context.read(stimulationServiceProvider.notifier).sendStimulationBytes(byteList);
+                          if (byteList.isNotEmpty) {
+                            context.read(stimulationServiceProvider.notifier).sendStimulationBytes(byteList);
+                          }
 
                           setState(() {
                             _generalButtonLockout = false;
@@ -116,11 +108,6 @@ class _ThresholdDeterminationState extends State<ThresholdDetermination> {
                         }
                       : null,
                   child: Text('Stimulate with ${_stimulationLevel + 200} µA', style: Theme.of(context).textTheme.bodyText1),
-                ),
-                Consumer(
-                  builder: (context, watch, child) {
-                    return Text('IBI: ${Calculator.calculateIBI(watch(bpmServiceProvider))} ms', style: Theme.of(context).textTheme.bodyText1);
-                  },
                 ),
               ],
             ),
@@ -197,7 +184,7 @@ class _ThresholdDeterminationState extends State<ThresholdDetermination> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               ElevatedButton(
-                onPressed: _roundInProgress ? null : () => widget._onDeterminationEnd(_stimRatingRound1, _stimRatingRound2, _round),
+                onPressed: _roundInProgress ? null : () => context.read(sessionProvider.notifier).addThresholds(_stimRatingRound1, _stimRatingRound2, _round),
                 child: Text('Start therapy', style: Theme.of(context).textTheme.bodyText1),
               ),
               ElevatedButton(

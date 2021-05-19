@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter_blue/flutter_blue.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:get/get.dart';
 import 'package:impulsrefactor/States/connected_device.dart';
 import 'package:impulsrefactor/app_constants.dart';
 
@@ -18,12 +19,12 @@ class StimulationServiceState extends StateNotifier<List<int>> {
   /// Starts listening for values
   void sendStimulationBytes(List<int> bytes) async {
     if (read(connectedDeviceProvider) == null) {
-      print('Device is not connected!');
+      Get.snackbar('Connection error', 'Device is not connected');
       return;
     }
 
     if (!read(connectedDeviceProvider.notifier).characteristics.containsKey(AppConstants.STIMULATION_CHARACTERISTIC_UUID)) {
-      print('Characteristic Stimulation not found!');
+      Get.snackbar('Connection error', 'Characteristic Stimulation not found');
       return;
     }
 

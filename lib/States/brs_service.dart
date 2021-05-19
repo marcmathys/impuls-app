@@ -3,6 +3,7 @@ import 'dart:typed_data';
 
 import 'package:flutter_blue/flutter_blue.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:get/get.dart';
 import 'package:impulsrefactor/States/connected_device.dart';
 import 'package:impulsrefactor/app_constants.dart';
 
@@ -14,14 +15,18 @@ class BrsServiceProvider extends StateNotifier<int> {
 
   BrsServiceProvider(int brs, this.read) : super(0);
 
+  bool isStreamRunning() {
+    return _brsStream != null ? !_brsStream.isPaused : false;
+  }
+
   /// Sends "on" to the brs characteristic and starts listening for values
   void getBRSData() async {
     if (read(connectedDeviceProvider) == null) {
-      print('Device is not connected!');
+      Get.snackbar('Device Error', 'Device is not connected');
       return;
     }
     if (!read(connectedDeviceProvider.notifier).characteristics.containsKey(AppConstants.BRS_CHARACTERISTIC_UUID)) {
-      print('Characteristic Error Code not found!');
+      Get.snackbar('Device Error', 'Characteristic "Error Code" not found');
       return;
     }
 

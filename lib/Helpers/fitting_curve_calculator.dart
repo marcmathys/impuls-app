@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:flutter/gestures.dart';
+import 'package:get/get.dart';
 import 'package:impulsrefactor/Entities/fitting_point.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -23,8 +24,8 @@ class FittingCurveCalculator {
 
       return ((log(value) - firstCoefficient) / secondCoefficient).round();
     } else {
-      print('Fitting curve settings not found!');
-      return null;
+      Get.snackbar('Error', 'Fitting curve settings not found!');
+      return -1;
     }
   }
 }

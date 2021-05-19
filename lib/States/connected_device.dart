@@ -2,24 +2,20 @@ import 'dart:async';
 
 import 'package:flutter_blue/flutter_blue.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:get/get.dart';
+import 'package:impulsrefactor/States/error_service.dart';
 import 'package:impulsrefactor/app_constants.dart';
 
-final connectedDeviceProvider = StateNotifierProvider<ConnectedDevice, BluetoothDevice>((ref) => ConnectedDevice(null));
+final connectedDeviceProvider = StateNotifierProvider<ConnectedDevice, BluetoothDevice>((ref) => ConnectedDevice(null, ref));
 
 class ConnectedDevice extends StateNotifier<BluetoothDevice> {
-  ConnectedDevice(BluetoothDevice connectedDevice) : super(connectedDevice ?? null);
+  ProviderReference ref;
   StreamSubscription _connectionStateListener;
   Map<Guid, BluetoothCharacteristic> characteristics = {};
 
-  /// Disconnects the connected bluetooth device
-  void disconnectDevice() {
-    if (state == null) {
-      return;
-    }
-    state.disconnect();
-  }
+  ConnectedDevice(BluetoothDevice connectedDevice, this.ref) : super(connectedDevice ?? null);
 
-  Future<bool> connectDevice(BluetoothDevice device) async {
+  void connectDevice(BluetoothDevice device) async {
     if (state != null) {
       await state.disconnect();
     }
@@ -28,28 +24,23 @@ class ConnectedDevice extends StateNotifier<BluetoothDevice> {
 
     _connectionStateListener = device.state.listen((event) {
       if (event == BluetoothDeviceState.disconnected) {
-        print('State event: $event');
-        state = null;
         _connectionStateListener.cancel();
-        //TODO: Set a Variable in a state that, at another point in the code, triggers the message! (Via Consumer!) (Do the same for all instances of ScaffoldMessenger!)
-        //ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Device got disconnected', style: Theme.of(context).textTheme.bodyText1)));
+        Get.snackbar('Device Error', 'Device got disconnected');
+      }
+      if (event == BluetoothDeviceState.connected) {
+        ref.read(errorServiceProvider.notifier).listenForErrors();
+        Get.snackbar('', 'Device connected');
       }
     });
 
     state = device;
     await _getCharacteristicReferences();
-
-    if (state != null) {
-      return true;
-    } else {
-      return false;
-    }
   }
 
   /// Discovers all characteristics and tries to get references to all important ones. Saves them in a dictionary in the bluetooth state
   Future<void> _getCharacteristicReferences() async {
     if (state == null) {
-      print('Device is not connected!');
+      Get.snackbar('Device Error', 'Cannot get characteristics: No Device connected');
       return;
     }
 

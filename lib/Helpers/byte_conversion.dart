@@ -1,5 +1,6 @@
 import 'dart:typed_data';
 
+import 'package:get/get.dart';
 import 'package:impulsrefactor/Helpers/calculator.dart';
 
 class ByteConversion {
@@ -10,8 +11,9 @@ class ByteConversion {
 
   /// Integer value needs to be between 0 and 1023
   static List<int> convertIntToByteList(int value) {
-    if(value < 0 || value > 1023) {
-      throw FormatException('Value must be between 0 and 1023');
+    if (value < 0 || value > 1023) {
+      Get.snackbar('Format error', 'Value must be between 0 and 1023');
+      return [];
     }
 
     ByteData data = ByteData(3);

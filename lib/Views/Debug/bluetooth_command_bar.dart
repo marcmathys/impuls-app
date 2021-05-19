@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:impulsrefactor/Helpers/byte_conversion.dart';
 import 'package:impulsrefactor/States/bpm_service.dart';
 import 'package:impulsrefactor/States/brs_service.dart';
@@ -28,12 +29,11 @@ class _BluetoothCommandBarState extends State<BluetoothCommandBar> {
   }
 
   void sendBytesOnPressed() {
-    //_bluetoothService.sendStimulationBytes(context, [113, 117, 105, 116]); // Send stop
     try {
       List<int> octList = ByteConversion.stringToOct(_textController.value.text);
       context.read(stimulationServiceProvider.notifier).sendStimulationBytes(octList);
     } catch (_) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('The given numbers are in the wrong format! Example format: 111,110,109', style: Theme.of(context).textTheme.bodyText1)));
+      Get.snackbar('Format error', 'The given numbers are in the wrong format! Example format: 111,110,109');
     }
   }
 
@@ -68,18 +68,20 @@ class _BluetoothCommandBarState extends State<BluetoothCommandBar> {
                     context.read(ekgServiceProvider.notifier).startDataStreams();
                     context.read(bpmServiceProvider.notifier).resumeListenToBpm();
 
-                    ///TODO: setState assumes communication success!
-                    setState(() {
-                      ekgSwitch = !ekgSwitch;
-                    });
+                    if (context.read(ekgServiceProvider.notifier).isStreamRunning()) {
+                      setState(() {
+                        ekgSwitch = !ekgSwitch;
+                      });
+                    }
                   } else {
                     context.read(ekgServiceProvider.notifier).pauseListenToEkg();
                     context.read(bpmServiceProvider.notifier).pauseListenToBpm();
 
-                    ///TODO: setState assumes communication success!
-                    setState(() {
-                      ekgSwitch = !ekgSwitch;
-                    });
+                    if (context.read(ekgServiceProvider.notifier).isStreamRunning()) {
+                      setState(() {
+                        ekgSwitch = !ekgSwitch;
+                      });
+                    }
                   }
                 }),
           ],
@@ -94,17 +96,19 @@ class _BluetoothCommandBarState extends State<BluetoothCommandBar> {
                 if (value) {
                   context.read(brsServiceProvider.notifier).getBRSData();
 
-                  ///TODO: setState assumes communication success!
-                  setState(() {
-                    brsSwitch = !brsSwitch;
-                  });
+                  if (context.read(brsServiceProvider.notifier).isStreamRunning()) {
+                    setState(() {
+                      brsSwitch = !brsSwitch;
+                    });
+                  }
                 } else {
                   context.read(brsServiceProvider.notifier).sendOffSignal();
 
-                  ///TODO: setState assumes communication success!
-                  setState(() {
-                    brsSwitch = !brsSwitch;
-                  });
+                  if (!context.read(brsServiceProvider.notifier).isStreamRunning()) {
+                    setState(() {
+                      brsSwitch = !brsSwitch;
+                    });
+                  }
                 }
               },
             ),

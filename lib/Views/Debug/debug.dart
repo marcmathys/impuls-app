@@ -25,13 +25,8 @@ class _DebugState extends State<Debug> {
   }
 
   void backButtonPressed() {
-    /**BtState().resetState();
-        _bluetoothService.cancelSubscriptions();
-        _flutterBlue.isScanning.first.then((value) {
-        if (value) {
-        TODO: Das handelt doch schon der BTDevicePicker?: _flutterBlue.stopScan();
-        }
-        });**/
+    /** BtState().resetState();
+        _bluetoothService.cancelSubscriptions(); **/
   }
 
   Widget build(BuildContext context) {

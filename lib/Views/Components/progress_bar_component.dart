@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'dart:math' as Math;
 
 import 'package:flutter/scheduler.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:impulsrefactor/States/ekg_service.dart';
 
 class ProgressRing extends StatefulWidget {
   final Key key;
@@ -36,14 +38,14 @@ class ProgressRingState extends State<ProgressRing> with SingleTickerProviderSta
     super.dispose();
   }
 
-  void pauseAnimation() {
+  void pauseAnimation(BuildContext context) {
     _animationController.stop();
-    print('Paused!'); //TODO: Send pause signal to ESP!
+    context.read(ekgServiceProvider.notifier).pauseListenToEkg(); // TODO: Send off signal or just pause?
   }
 
-  void resumeAnimation() {
+  void resumeAnimation(BuildContext context) {
     _animationController.forward();
-    print('Resumed!'); //TODO: Send resume signal to ESP!
+    context.read(ekgServiceProvider.notifier).resumeListenToEkg(); // TODO: Send off signal or just pause?
   }
 
   @override
@@ -60,11 +62,8 @@ class ProgressRingState extends State<ProgressRing> with SingleTickerProviderSta
               builder: (BuildContext context, Widget child) {
                 return CustomPaint(
                   child: child,
-                  foregroundPainter: ProgressBarPainter(
-                      backgroundColor: widget.backgroundColor,
-                      foregroundColor: widget.foregroundColor,
-                      percentage: _animationController.value,
-                      onFinished: widget.onFinished),
+                  foregroundPainter:
+                      ProgressBarPainter(backgroundColor: widget.backgroundColor, foregroundColor: widget.foregroundColor, percentage: _animationController.value, onFinished: widget.onFinished),
                 );
               },
             ),
@@ -78,11 +77,8 @@ class ProgressRingState extends State<ProgressRing> with SingleTickerProviderSta
                   return Colors.transparent;
                 }),
               ),
-
-              //splashColor: Colors.transparent,
-              //highlightColor: Colors.transparent,
               onPressed: () {
-                _isPaused ? resumeAnimation() : pauseAnimation();
+                _isPaused ? resumeAnimation(context) : pauseAnimation(context);
                 setState(() {
                   _isPaused = !_isPaused;
                 });

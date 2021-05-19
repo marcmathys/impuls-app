@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:impulsrefactor/Entities/session.dart';
 import 'package:impulsrefactor/Entities/therapist.dart';
 import 'package:impulsrefactor/States/current_patient.dart';
@@ -21,47 +22,7 @@ class _SessionGuideState extends State<SessionGuide> {
   @override
   void initState() {
     super.initState();
-    Session session = Session();
-    session.confirmed = false;
-    session.date = DateTime.now();
-    session.patientUID = context.read(currentPatientProvider).uid;
-    session.therapistUIDs.add(Therapist().uid);
-    context.read(sessionProvider.notifier).setSession(session);
-  }
-
-  ///TODO: Why are the Thresholds List<int>?
-  void thresholdDeterminationComplete(Map<int, int> stimRatingRound1, Map<int, int> stimRatingRound2, int rounds) {
-    if (rounds == 2) {
-      stimRatingRound1.forEach((key, value) {
-        int average = (value + stimRatingRound2[key]) ~/ 2;
-        if (context.read(sessionProvider).stimRating1.isEmpty) {
-          context.read(sessionProvider).stimRating1.add(average);
-        } else if (context.read(sessionProvider).stimRating2.isEmpty) {
-          context.read(sessionProvider).stimRating2.add(average);
-        } else if (context.read(sessionProvider).stimRating3.isEmpty) {
-          context.read(sessionProvider).stimRating3.add(average);
-        }
-
-        context.read(sessionProvider).sensoryThreshold.addAll({stimRatingRound1[0], stimRatingRound2[0]});
-        context.read(sessionProvider).painThreshold.addAll({stimRatingRound1[1], stimRatingRound2[1]});
-        context.read(sessionProvider).toleranceThreshold.addAll({stimRatingRound1[10], stimRatingRound2[10]});
-      });
-    } else {
-      stimRatingRound1.forEach((key, value) {
-        if (context.read(sessionProvider).stimRating1.isEmpty) {
-          context.read(sessionProvider).stimRating1.add(value);
-        } else if (context.read(sessionProvider).stimRating2.isEmpty) {
-          context.read(sessionProvider).stimRating2.add(value);
-        } else if (context.read(sessionProvider).stimRating3.isEmpty) {
-          context.read(sessionProvider).stimRating3.add(value);
-        }
-
-        context.read(sessionProvider).sensoryThreshold.addAll({stimRatingRound1[0], stimRatingRound1[0]});
-        context.read(sessionProvider).painThreshold.addAll({stimRatingRound1[1], stimRatingRound1[1]});
-        context.read(sessionProvider).toleranceThreshold.addAll({stimRatingRound1[10], stimRatingRound1[10]});
-      });
-    }
-    context.read(sessionStepProvider.notifier).increment();
+    context.read(sessionProvider.notifier).startNewSession();
   }
 
   Widget _getCurrentStepWidget(int currentStep) {
@@ -70,19 +31,19 @@ class _SessionGuideState extends State<SessionGuide> {
         return Setup();
         break;
       case 1:
-        return ThresholdDetermination(thresholdDeterminationComplete, false);
+        return ThresholdDetermination(false);
         break;
       case 2:
         return Stimulation();
         break;
       case 3:
-        return ThresholdDetermination(thresholdDeterminationComplete, false);
+        return ThresholdDetermination(false);
         break;
       case 4:
         return Stimulation();
         break;
       case 5:
-        return ThresholdDetermination(thresholdDeterminationComplete, true);
+        return ThresholdDetermination(true);
         break;
       case 6:
         return Container(child: Center(child: Text('Done! (Temp screen)', style: Theme.of(context).textTheme.bodyText1)));
@@ -113,7 +74,7 @@ class _SessionGuideState extends State<SessionGuide> {
                             onPressed: () {
                               // TODO: context.read(sessionProvider).resetState();
                               // TODO: BtService().cancelSubscriptions();
-                              Navigator.of(context).popUntil(ModalRoute.withName('/patient_select'));
+                              Get.toNamed('patient_select');
                             },
                             child: Text('Confirm', style: Theme.of(context).textTheme.bodyText1)),
                       ],
@@ -121,7 +82,7 @@ class _SessionGuideState extends State<SessionGuide> {
             return false;
           },
           child: Consumer(
-            builder: ( context, watch, child) {
+            builder: (context, watch, child) {
               int currentStep = watch(sessionStepProvider);
 
               return Padding(

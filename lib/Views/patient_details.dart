@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:impulsrefactor/Entities/patient.dart';
 import 'package:impulsrefactor/Entities/session.dart';
 import 'package:impulsrefactor/States/current_patient.dart';
@@ -14,7 +15,7 @@ class PatientDetail extends StatefulWidget {
 }
 
 class _PatientDetailState extends State<PatientDetail> {
-  Session _currentSession;
+  Session _displaySession;
   Patient _patient;
 
   @override
@@ -28,7 +29,7 @@ class _PatientDetailState extends State<PatientDetail> {
     super.didChangeDependencies();
     _patient = context.read(currentPatientProvider);
     if (_patient.sessions.isNotEmpty) {
-      _currentSession = _patient.sessions.last;
+      _displaySession = _patient.sessions.last;
     }
   }
 
@@ -64,37 +65,38 @@ class _PatientDetailState extends State<PatientDetail> {
                 Flexible(
                     flex: 1,
                     child: DropdownButton(
-                      value: _currentSession,
+                      value: _displaySession,
                       items: buildDropdownMenuList(),
                       onChanged: (newValue) {
                         setState(() {
-                          _currentSession = newValue;
+                          _displaySession = newValue;
                         });
                       },
                     )),
                 Flexible(
-                    flex: 1,
-                    child: ElevatedButton(onPressed: () => Navigator.of(context).pushNamed('/session_guide'), child: Text('Start new session', style: Theme.of(context).textTheme.bodyText1))),
+                    flex: 1, child: ElevatedButton(onPressed: () => Get.toNamed('session_guide'), child: Text('Start new session', style: Theme.of(context).textTheme.bodyText1))),
               ],
             ),
             Divider(
               thickness: 2,
             ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: <Widget>[
-                Flexible(
-                  child: ThresholdChart(
-                    prepareThresholdData(_currentSession.sensoryThreshold),
-                    prepareThresholdData(_currentSession.painThreshold),
-                    prepareThresholdData(_currentSession.toleranceThreshold),
-                  ),
-                ),
-                Flexible(
-                  child: PainLevelChart(_currentSession.prePainRating, _currentSession.postPainRating),
-                ),
-              ],
-            ),
+            _displaySession != null
+                ? Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: <Widget>[
+                      Flexible(
+                        child: ThresholdChart(
+                          prepareThresholdData(_displaySession.sensoryThreshold),
+                          prepareThresholdData(_displaySession.painThreshold),
+                          prepareThresholdData(_displaySession.toleranceThreshold),
+                        ),
+                      ),
+                      Flexible(
+                        child: PainLevelChart(_displaySession.prePainRating, _displaySession.postPainRating),
+                      ),
+                    ],
+                  )
+                : Center(child: Text('No previous sessions found.')),
           ],
         ),
       ),

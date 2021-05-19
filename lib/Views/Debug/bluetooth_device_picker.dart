@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:impulsrefactor/States/connected_device.dart';
 import 'package:impulsrefactor/States/device_list.dart';
-import 'package:impulsrefactor/States/error_service.dart';
 
 class BluetoothDevicePicker extends ConsumerWidget {
   @override
@@ -25,18 +24,16 @@ class BluetoothDevicePicker extends ConsumerWidget {
                   ),
                 ],
               )
-            : Text(
-                'No device connected!', style: Theme.of(context).textTheme.bodyText1),
+            : Text('No device connected!', style: Theme.of(context).textTheme.bodyText1),
         ExpansionTile(
           title: Text('Expand to search for devices', style: Theme.of(context).textTheme.bodyText1),
           initiallyExpanded: false,
           onExpansionChanged: (isExpanded) {
             if (isExpanded) {
               context.read(deviceListProvider.notifier).scanForDevices();
-            }
-             else {
+            } else {
               context.read(deviceListProvider.notifier).stopScanning();
-                }
+            }
           },
           children: [
             Container(
@@ -46,15 +43,10 @@ class BluetoothDevicePicker extends ConsumerWidget {
                 itemCount: deviceList.length,
                 itemBuilder: (builderContext, index) {
                   return ListTile(
-                    title: Text('ID: ${deviceList.elementAt(index).id} ${deviceList.elementAt(index).name}', style: Theme.of(context).textTheme.bodyText1),
-                    onTap: () async {
-                      bool success = await context.read(connectedDeviceProvider.notifier).connectDevice(deviceList.elementAt(index));
-                      if (success) {
-                        context.read(errorServiceProvider.notifier).listenForErrors();
-                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Device successfully connected', style: Theme.of(context).textTheme.bodyText1)));
-                      }
-                    },
-                  );
+                      title: Text('ID: ${deviceList.elementAt(index).id} ${deviceList.elementAt(index).name}', style: Theme.of(context).textTheme.bodyText1),
+                      onTap: () {
+                        context.read(connectedDeviceProvider.notifier).connectDevice(deviceList.elementAt(index));
+                      });
                 },
               ),
             ),

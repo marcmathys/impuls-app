@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:impulsrefactor/Adminpanel/fitting_curve_info_window.dart';
 import 'package:impulsrefactor/Adminpanel/test_byte_array_bar.dart';
 import 'package:impulsrefactor/Entities/fitting_point.dart';
@@ -210,10 +211,12 @@ class _AdminScreenState extends State<AdminScreen> {
     try {
       int value = int.parse(_byteSendTextController.value.text);
       if (value < 0 || value > 1023) {
-        throw FormatException();
+        Get.snackbar('Format error', 'Value must be between 0 and 1023');
+        return;
       }
       if (context.read(connectedDeviceProvider) == null) {
-        throw Exception('No device connected.');
+        Get.snackbar('Format error', 'Value must be between 0 and 1023');
+        return;
       }
 
       String radixString = value.toString().padLeft(9, '0');
@@ -228,9 +231,9 @@ class _AdminScreenState extends State<AdminScreen> {
       confirmButtonLockout = false;
       setState(() {});
     } on FormatException {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Wrong number format', style: Theme.of(context).textTheme.bodyText2)));
+      Get.snackbar('Format error', 'Wrong number format');
     } catch (exception) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('$exception', style: Theme.of(context).textTheme.bodyText2)));
+      Get.snackbar('Unknown error', '$exception');
     }
   }
 
@@ -245,10 +248,12 @@ class _AdminScreenState extends State<AdminScreen> {
       confirmButtonLockout = true;
       setState(() {});
     } on FormatException {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Wrong number format of resistance or voltage', style: Theme.of(context).textTheme.bodyText2)));
+      Get.snackbar('Format error', 'Wrong number format of resistance or voltage');
     } on IntegerDivisionByZeroException {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Resistance must not be zero', style: Theme.of(context).textTheme.bodyText2)));
-    } catch (_) {}
+      Get.snackbar('Format error', 'Resistance must not be zero');
+    } catch (exception) {
+      Get.snackbar('Unknown error', '$exception');
+    }
   }
 
   String fittingPointsToString() {
@@ -260,7 +265,7 @@ class _AdminScreenState extends State<AdminScreen> {
     return points;
   }
 
-  void startFitting(BuildContext context) async {
+  void startFitting() async {
     List<FittingPoint> tmp = performDeepCopy(_fittingPoints);
     int resistance = int.parse(_resistance.value.text);
 
@@ -281,10 +286,7 @@ class _AdminScreenState extends State<AdminScreen> {
       await prefs.setString('fittingPointList', oldDataPoints);
       await prefs.setString('resistance', oldResistance);
     } else
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        duration: Duration(seconds: 10),
-        content: Text('An error occurred while trying to fit the curve!', style: Theme.of(context).textTheme.bodyText2),
-      ));
+      Get.snackbar('Error', 'An error occurred while trying to fit the curve');
   }
 
   List<FittingPoint> performDeepCopy(List<FittingPoint> listToCopy) {
@@ -367,7 +369,7 @@ class _AdminScreenState extends State<AdminScreen> {
               ),
               Center(
                 child: ElevatedButton(
-                  onPressed: _fittingPoints.isNotEmpty ? () => startFitting(context) : null,
+                  onPressed: _fittingPoints.isNotEmpty ? () => startFitting() : null,
                   child: Text('Start fitting with given points', style: Theme.of(context).textTheme.bodyText1),
                 ),
               ),

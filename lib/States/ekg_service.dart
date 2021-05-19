@@ -16,6 +16,10 @@ class EkgServiceState extends StateNotifier<List<MedicalData>> {
 
   EkgServiceState(List<MedicalData> data, this.read) : super([MedicalData(0, 0)]);
 
+  bool isStreamRunning() {
+    return _ekgStream != null ? !_ekgStream.isPaused : false;
+  }
+
   /// Send "on" to the ekg and bpm characteristic and starts listening for values
   void startDataStreams() async {
     if (read(connectedDeviceProvider) == null) {

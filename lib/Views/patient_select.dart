@@ -25,7 +25,7 @@ class _PatientSelectState extends State<PatientSelect> {
                 stream: FirebaseFirestore.instance.collection('patients').where('therapistUIDs', arrayContains: Therapist().uid).snapshots(),
                 builder: (context, snapshot) {
                   if (!snapshot.hasData) {
-                    return Text('Loading', style: Theme.of(context).textTheme.bodyText1);
+                    return Center(child: Text('Loading', style: Theme.of(context).textTheme.bodyText1));
                   }
                   return ListView.builder(
                     itemCount: snapshot.data.docs.length,

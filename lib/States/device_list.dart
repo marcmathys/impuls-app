@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter_blue/flutter_blue.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:get/get.dart';
 
 final deviceListProvider = StateNotifierProvider<DeviceList, List<BluetoothDevice>>((ref) => DeviceList([]));
 
@@ -26,10 +27,9 @@ class DeviceList extends StateNotifier<List<BluetoothDevice>> {
       _isScanning = false;
     }
 
-    /**TODO: Messenger?
-     * if (!await flutterBlue.isOn) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Bluetooth is turned off', style: Theme.of(context).textTheme.bodyText2)));
-        }**/
+     if (!await flutterBlue.isOn) {
+       Get.snackbar('Bluetooth error', 'Bluetooth is turned off');
+     }
 
     flutterBlue.startScan(timeout: Duration(seconds: 10));
     Timer(Duration(seconds: 10), () {

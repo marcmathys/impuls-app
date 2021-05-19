@@ -83,16 +83,10 @@ class _SetupState extends State<Setup> {
           ],
         ),
         ElevatedButton(
-          onPressed: _attachElectrodes && _turnedOnMachines && _prePainRating != null && _showFittingCurveErrorMessage == false
-              ? () => setupComplete()
-              : null,
+          onPressed: _attachElectrodes && _turnedOnMachines && _prePainRating != null && _showFittingCurveErrorMessage == false ? () => setupComplete() : null,
           child: Text('Begin Session', style: Theme.of(context).textTheme.bodyText1),
         ),
-        Visibility(
-            visible: _showFittingCurveErrorMessage ?? false,
-            child: Text(
-              'Error: No fitting curve configuration found. Please contact support.', style: Theme.of(context).textTheme.bodyText2
-            )),
+        Visibility(visible: _showFittingCurveErrorMessage ?? false, child: Text('Error: No fitting curve configuration found. Please contact support.', style: Theme.of(context).textTheme.bodyText2)),
         BluetoothDevicePicker(),
       ],
     );

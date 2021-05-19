@@ -22,16 +22,14 @@ class _StimulationState extends State<Stimulation> {
   void initState() {
     super.initState();
     _finished = false;
-    context.read(ekgServiceProvider.notifier).startDataStreams();
-    List<int> bytes = ByteConversion.convertThresholdsToByteList(
-        context.read(sessionProvider).sensoryThreshold, context.read(sessionProvider).painThreshold, context.read(sessionProvider).toleranceThreshold);
+    List<int> bytes =
+        ByteConversion.convertThresholdsToByteList(context.read(sessionProvider).sensoryThreshold, context.read(sessionProvider).painThreshold, context.read(sessionProvider).toleranceThreshold);
     context.read(stimulationServiceProvider.notifier).sendStimulationBytes(bytes);
   }
 
   @override
   void dispose() {
     super.dispose();
-    context.read(ekgServiceProvider.notifier).sendOffSignal();
   }
 
   Widget build(BuildContext context) {
@@ -61,19 +59,6 @@ class _StimulationState extends State<Stimulation> {
                 ),
               ),
               Container(
-                decoration: BoxDecoration(border: Border.all(width: 1, color: Colors.indigo)),
-                child: Column(
-                  children: <Widget>[
-                    Text('Stimulation level: --', style: Theme.of(context).textTheme.bodyText1),
-                    Consumer(
-                      builder: (context, watch, child) {
-                        return Text('IBI: ${Calculator.calculateIBI(watch(bpmServiceProvider))} ms', style: Theme.of(context).textTheme.bodyText1);
-                      },
-                    ),
-                  ],
-                ),
-              ),
-              Container(
                 height: double.infinity,
                 child: TextButton(
                     style: ButtonStyle(
@@ -84,7 +69,6 @@ class _StimulationState extends State<Stimulation> {
                     onPressed: _finished
                         ? () {
                             context.read(sessionStepProvider.notifier).increment();
-                            //TODO: BtService().cancelSubscriptions();
                           }
                         : null,
                     child: Text('Next threshold\ndetermination', style: Theme.of(context).textTheme.bodyText1)),
