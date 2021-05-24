@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:impulsrefactor/Services/firebase_service.dart';
 
@@ -12,7 +14,7 @@ class Components {
     return AppBar(
       leading: Container(),
       centerTitle: true,
-      title: Text(title, style: Theme.of(context).textTheme.bodyText1),
+      title: Text(title, style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
       actions: [
         Visibility(
           visible: showLogoutButton(context),

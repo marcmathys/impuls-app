@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:impulsrefactor/States/session_step.dart';
 import 'package:impulsrefactor/States/session_state.dart';
+import 'package:impulsrefactor/Style/themes.dart';
 import 'package:impulsrefactor/Views/Debug/bluetooth_device_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -50,7 +51,7 @@ class _SetupState extends State<Setup> {
                 });
               },
             ),
-            Text('Turn on machines', style: Theme.of(context).textTheme.bodyText1),
+            Text('Turn on machines', style: Themes.getDefaultTextStyle()),
           ],
         ),
         Row(
@@ -63,7 +64,7 @@ class _SetupState extends State<Setup> {
                 });
               },
             ),
-            Text('Attach Electrodes', style: Theme.of(context).textTheme.bodyText1),
+            Text('Attach Electrodes', style: Themes.getDefaultTextStyle()),
           ],
         ),
         Row(
@@ -71,7 +72,7 @@ class _SetupState extends State<Setup> {
             DropdownButton(
               value: _prePainRating,
               items: dropdownMenuItemList.map<DropdownMenuItem<int>>((int value) {
-                return DropdownMenuItem<int>(value: value, child: Text(value.toString(), style: Theme.of(context).textTheme.bodyText1));
+                return DropdownMenuItem<int>(value: value, child: Text(value.toString(), style: Themes.getDefaultTextStyle()));
               }).toList(),
               onChanged: (value) {
                 setState(() {
@@ -79,14 +80,14 @@ class _SetupState extends State<Setup> {
                 });
               },
             ),
-            Text('Enter patient initial pain rating', style: Theme.of(context).textTheme.bodyText1),
+            Text('Enter patient initial pain rating', style: Themes.getDefaultTextStyle()),
           ],
         ),
         ElevatedButton(
           onPressed: _attachElectrodes && _turnedOnMachines && _prePainRating != null && _showFittingCurveErrorMessage == false ? () => setupComplete() : null,
-          child: Text('Begin Session', style: Theme.of(context).textTheme.bodyText1),
+          child: Text('Begin Session', style: Themes.getButtonTextStyle()),
         ),
-        Visibility(visible: _showFittingCurveErrorMessage ?? false, child: Text('Error: No fitting curve configuration found. Please contact support.', style: Theme.of(context).textTheme.bodyText2)),
+        Visibility(visible: _showFittingCurveErrorMessage ?? false, child: Text('Error: No fitting curve configuration found. Please contact support.', style: Themes.getErrorTextStyle())),
         BluetoothDevicePicker(),
       ],
     );

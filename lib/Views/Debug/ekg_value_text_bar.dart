@@ -4,6 +4,7 @@ import 'package:impulsrefactor/States/bpm_service.dart';
 import 'package:impulsrefactor/States/brs_service.dart';
 import 'package:impulsrefactor/States/error_service.dart';
 import 'package:impulsrefactor/States/stimulation_service.dart';
+import 'package:impulsrefactor/Style/themes.dart';
 
 class EKGValueTextBar extends StatelessWidget {
   @override
@@ -14,19 +15,19 @@ class EKGValueTextBar extends StatelessWidget {
         children: [
           Consumer(builder: (context, watch, child) {
             String stimulationValue = watch(stimulationServiceProvider).toString();
-            return Text('Stimulation characteristic answer: $stimulationValue', style: Theme.of(context).textTheme.bodyText1);
+            return Text('Stimulation characteristic answer: $stimulationValue', style: Themes.getDefaultTextStyle());
           }),
           Consumer(builder: (context, watch, child) {
             String bpmValue = watch(bpmServiceProvider).toStringAsFixed(2);
-            return Text('Beats per minute: $bpmValue', style: Theme.of(context).textTheme.bodyText1);
+            return Text('Beats per minute: $bpmValue', style: Themes.getDefaultTextStyle());
           }),
           Consumer(builder: (context, watch, child) {
             String errorString = watch(errorServiceProvider).toString();
-            return Text('Error code: $errorString', style: Theme.of(context).textTheme.bodyText1);
+            return Text('Error code: $errorString', style: Themes.getDefaultTextStyle());
           }),
           Consumer(builder: (context, watch, child) {
             String brsValue = watch(brsServiceProvider).toString();
-            return Text('Baur Reflex Sensitivity: $brsValue', style: Theme.of(context).textTheme.bodyText1);
+            return Text('Baur Reflex Sensitivity: $brsValue', style: Themes.getDefaultTextStyle());
           }),
         ],
       ),

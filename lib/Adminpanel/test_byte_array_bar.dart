@@ -4,6 +4,7 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:impulsrefactor/States/stimulation_service.dart';
+import 'package:impulsrefactor/Style/themes.dart';
 
 class ByteArrayTestBar extends StatefulWidget {
   @override
@@ -38,10 +39,10 @@ class _ByteArrayTestBarState extends State<ByteArrayTestBar> {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        Text(currentSentValue, style: Theme.of(context).textTheme.bodyText1),
+        Text(currentSentValue, style: Themes.getDefaultTextStyle()),
         Row(
           children: [
-            Text('Send byte values 0 - 1023 to EKG. Format: 0|High|Low', style: Theme.of(context).textTheme.bodyText1),
+            Text('Send byte values 0 - 1023 to EKG. Format: 0|High|Low', style: Themes.getSmallTextStyle()),
             Switch(
                 value: zeroHighLow,
                 onChanged: (value) {

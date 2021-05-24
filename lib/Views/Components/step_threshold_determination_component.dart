@@ -4,6 +4,7 @@ import 'package:impulsrefactor/Helpers/fitting_curve_calculator.dart';
 import 'package:impulsrefactor/States/session_state.dart';
 import 'package:impulsrefactor/States/stimulation_service.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:impulsrefactor/Style/themes.dart';
 
 class ThresholdDetermination extends StatefulWidget {
   final bool isThirdDetermination;
@@ -107,15 +108,15 @@ class _ThresholdDeterminationState extends State<ThresholdDetermination> {
                           });
                         }
                       : null,
-                  child: Text('Stimulate with ${_stimulationLevel + 200} µA', style: Theme.of(context).textTheme.bodyText1),
+                  child: Text('Stimulate with ${_stimulationLevel + 200} µA', style: Themes.getButtonTextStyle()),
                 ),
               ],
             ),
           ),
-          Text('Pain rating', style: Theme.of(context).textTheme.bodyText1),
+          Text('Pain rating', style: Themes.getDefaultTextStyle()),
           Row(
             children: <Widget>[
-              TextButton(
+              ElevatedButton(
                 onPressed: _generalButtonLockout || _buttonLockouts[-1]
                     ? null
                     : () {
@@ -124,59 +125,59 @@ class _ThresholdDeterminationState extends State<ThresholdDetermination> {
                           _stimLockout = false;
                         });
                       },
-                child: Text('N/A', style: Theme.of(context).textTheme.bodyText1),
+                child: Text('N/A'),
               ),
-              TextButton(
+              ElevatedButton(
                 onPressed: _generalButtonLockout || _buttonLockouts[0] ? null : () => addStimulationLevel(0),
-                child: Text('0', style: Theme.of(context).textTheme.bodyText1),
+                child: Text('0'),
               ),
-              TextButton(
+              ElevatedButton(
                 onPressed: _generalButtonLockout || _buttonLockouts[1] ? null : () => addStimulationLevel(1),
-                child: Text('1', style: Theme.of(context).textTheme.bodyText1),
+                child: Text('1'),
               ),
-              TextButton(
+              ElevatedButton(
                 onPressed: _generalButtonLockout || _buttonLockouts[2] ? null : () => addStimulationLevel(2),
-                child: Text('2', style: Theme.of(context).textTheme.bodyText1),
+                child: Text('2'),
               ),
             ],
           ),
           Row(
             children: <Widget>[
-              TextButton(
+              ElevatedButton(
                 onPressed: _generalButtonLockout || _buttonLockouts[3] ? null : () => addStimulationLevel(3),
-                child: Text('3', style: Theme.of(context).textTheme.bodyText1),
+                child: Text('3'),
               ),
-              TextButton(
+              ElevatedButton(
                 onPressed: _generalButtonLockout || _buttonLockouts[4] ? null : () => addStimulationLevel(4),
-                child: Text('4', style: Theme.of(context).textTheme.bodyText1),
+                child: Text('4'),
               ),
-              TextButton(
+              ElevatedButton(
                 onPressed: _generalButtonLockout || _buttonLockouts[5] ? null : () => addStimulationLevel(5),
-                child: Text('5', style: Theme.of(context).textTheme.bodyText1),
+                child: Text('5'),
               ),
-              TextButton(
+              ElevatedButton(
                 onPressed: _generalButtonLockout || _buttonLockouts[6] ? null : () => addStimulationLevel(6),
-                child: Text('6', style: Theme.of(context).textTheme.bodyText1),
+                child: Text('6'),
               ),
             ],
           ),
           Row(
             children: <Widget>[
-              TextButton(
+              ElevatedButton(
                 onPressed: _generalButtonLockout || _buttonLockouts[7] ? null : () => addStimulationLevel(7),
-                child: Text('7', style: Theme.of(context).textTheme.bodyText1),
+                child: Text('7'),
               ),
-              TextButton(
+              ElevatedButton(
                 onPressed: _generalButtonLockout || _buttonLockouts[8] ? null : () => addStimulationLevel(8),
-                child: Text('8', style: Theme.of(context).textTheme.bodyText1),
+                child: Text('8'),
               ),
-              TextButton(
+              ElevatedButton(
                 onPressed: _generalButtonLockout || _buttonLockouts[9] ? null : () => addStimulationLevel(9),
-                child: Text('9', style: Theme.of(context).textTheme.bodyText1),
+                child: Text('9'),
               ),
-              TextButton(
+              ElevatedButton(
                 onPressed: _generalButtonLockout || _buttonLockouts[10] ? null : () => addStimulationLevel(10),
-                child: Text('10', style: Theme.of(context).textTheme.bodyText1),
+                child: Text('10'),
               ),
             ],
           ),
@@ -185,11 +186,11 @@ class _ThresholdDeterminationState extends State<ThresholdDetermination> {
             children: [
               ElevatedButton(
                 onPressed: _roundInProgress ? null : () => context.read(sessionProvider.notifier).addThresholds(_stimRatingRound1, _stimRatingRound2, _round),
-                child: Text('Start therapy', style: Theme.of(context).textTheme.bodyText1),
+                child: Text('Start therapy', style: Themes.getButtonTextStyle()),
               ),
               ElevatedButton(
                 onPressed: _round == 1 && _roundInProgress == false && widget.isThirdDetermination == false ? startNextRound : null,
-                child: Text('Start second round', style: Theme.of(context).textTheme.bodyText1),
+                child: Text('Start second round', style: Themes.getButtonTextStyle()),
               ),
             ],
           ),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:impulsrefactor/Style/themes.dart';
 
 class FittingCurveInfoWindow extends StatelessWidget {
   final String oldFirstCoefficient;
@@ -13,13 +14,11 @@ class FittingCurveInfoWindow extends StatelessWidget {
     return oldFirstCoefficient != null && oldSecondCoefficient != null && oldResistance != null && oldDataPoints != null
         ? Column(
             children: [
-              Text('Current formula: (log(x) - $oldFirstCoefficient) / $oldSecondCoefficient', style: Theme.of(context).textTheme.bodyText1),
+              Text('Current formula: (log(x) - $oldFirstCoefficient) / $oldSecondCoefficient', style: Themes.getSmallTextStyle()),
               SizedBox(height: 10),
-              Text('Used data points (Resistance $oldResistance Ohm):\n$oldDataPoints', style: Theme.of(context).textTheme.bodyText1),
+              Text('Used data points (Resistance $oldResistance Ohm):\n$oldDataPoints', style: Themes.getSmallTextStyle()),
             ],
           )
-        : Text(
-            'No previous fitting curve data found!', style: Theme.of(context).textTheme.bodyText2
-          );
+        : Text('No previous fitting curve data found!', style: Themes.getErrorTextStyle());
   }
 }

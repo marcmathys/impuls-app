@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:impulsrefactor/Services/firebase_service.dart';
+import 'package:impulsrefactor/Style/themes.dart';
 import 'package:impulsrefactor/Views/Components/app_wide_components.dart';
 
 class Login extends StatefulWidget {
@@ -46,7 +47,7 @@ class _LoginState extends State<Login> {
                     child: TextFormField(
                       controller: _email,
                       validator: (value) => (value.isEmpty) ? "Please enter email" : null,
-                      style: Theme.of(context).textTheme.bodyText1,
+                      style: Themes.getDefaultTextStyle(),
                       decoration: InputDecoration(
                         prefixIcon: Icon(Icons.email),
                         labelText: "Email",
@@ -59,7 +60,7 @@ class _LoginState extends State<Login> {
                     child: TextFormField(
                       controller: _password,
                       validator: (value) => (value.isEmpty) ? "Please enter password" : null,
-                      style: Theme.of(context).textTheme.bodyText1,
+                      style: Themes.getDefaultTextStyle(),
                       decoration: InputDecoration(
                         prefixIcon: Icon(Icons.lock),
                         labelText: "Password",
@@ -70,23 +71,18 @@ class _LoginState extends State<Login> {
                   ),
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                    child: Material(
-                      elevation: 5.0,
-                      borderRadius: BorderRadius.circular(30.0),
-                      color: Colors.indigo,
-                      child: MaterialButton(
-                          onPressed: () async {
-                            if (_email.text == 'admin' && _password.text == 'admin') {
-                              Navigator.of(context).pushNamed('/admin');
-                            } else {
-                              if (_formKey.currentState.validate()) {
-                                await _handler.signIn(_email.text, _password.text);
-                                _handler.loadTherapist();
-                              }
+                    child: ElevatedButton(
+                        onPressed: () async {
+                          if (_email.text == 'admin' && _password.text == 'admin') {
+                            Navigator.of(context).pushNamed('/admin');
+                          } else {
+                            if (_formKey.currentState.validate()) {
+                              await _handler.signIn(_email.text, _password.text);
+                              _handler.loadTherapist();
                             }
-                          },
-                          child: Text('Sign In', style: Theme.of(context).textTheme.bodyText1)),
-                    ),
+                          }
+                        },
+                        child: Text('Sign In')),
                   ),
                 ],
               ),

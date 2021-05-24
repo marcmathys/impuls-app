@@ -5,6 +5,7 @@ import 'package:impulsrefactor/States/bpm_service.dart';
 import 'package:impulsrefactor/States/brs_service.dart';
 import 'package:impulsrefactor/States/ekg_service.dart';
 import 'package:impulsrefactor/States/stimulation_service.dart';
+import 'package:impulsrefactor/Style/themes.dart';
 import 'package:impulsrefactor/Views/Components/ekg_chart_component.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -53,14 +54,14 @@ class _BluetoothCommandBarState extends State<BluetoothCommandBar> {
               onPressed: () {
                 sendBytesOnPressed();
               },
-              child: Text('Send Bytes', style: Theme.of(context).textTheme.bodyText1),
+              child: Text('Send Bytes', style: Themes.getButtonTextStyle()),
             ),
           ],
         ),
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text('Start EKG and BPM data stream', style: Theme.of(context).textTheme.bodyText1),
+            Text('Start EKG and BPM data stream', style: Themes.getDefaultTextStyle()),
             Switch(
                 value: ekgSwitch,
                 onChanged: (value) {
@@ -89,7 +90,7 @@ class _BluetoothCommandBarState extends State<BluetoothCommandBar> {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text('Get BRS data', style: Theme.of(context).textTheme.bodyText1),
+            Text('Get BRS data', style: Themes.getDefaultTextStyle()),
             Switch(
               value: brsSwitch,
               onChanged: (value) {

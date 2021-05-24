@@ -21,12 +21,8 @@ class ImpulsMain extends StatelessWidget {
     return GetMaterialApp(
       theme: ThemeData(
         primaryColor: Colors.indigo,
-        buttonColor: Colors.blue,
+        buttonColor: Colors.red,
         fontFamily: 'Montserrat',
-        textTheme: TextTheme(
-            bodyText1: TextStyle(fontSize: 20), // Standard Text
-            bodyText2: TextStyle(fontSize: 30, color: Colors.red, fontWeight: FontWeight.bold) // Error messages
-            ),
       ),
       title: 'Impuls',
       debugShowCheckedModeBanner: false,

@@ -9,6 +9,7 @@ import 'package:impulsrefactor/Entities/fitting_point.dart';
 import 'package:impulsrefactor/Helpers/fitting_curve_calculator.dart';
 import 'package:impulsrefactor/States/connected_device.dart';
 import 'package:impulsrefactor/States/stimulation_service.dart';
+import 'package:impulsrefactor/Style/themes.dart';
 import 'package:impulsrefactor/Views/Components/app_wide_components.dart';
 import 'package:impulsrefactor/Views/Debug/bluetooth_device_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -113,18 +114,18 @@ class _AdminScreenState extends State<AdminScreen> {
     return StatefulBuilder(
       builder: (context, setState) => AlertDialog(
         actions: [
-          TextButton(
+          ElevatedButton(
               onPressed: () {
                 fittingPointsUpdate.clear();
                 setState(() {});
               },
               child: Icon(Icons.delete)),
-          TextButton(
+          ElevatedButton(
               onPressed: () {
                 Navigator.of(context).pop();
               },
               child: Icon(Icons.cancel)),
-          TextButton(
+          ElevatedButton(
               onPressed: () {
                 _fittingPoints.clear();
                 _fittingPoints.addAll(performDeepCopy(fittingPointsUpdate));
@@ -149,8 +150,8 @@ class _AdminScreenState extends State<AdminScreen> {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceAround,
                       children: [
-                        Text(fittingPointsUpdate.elementAt(index).x.toString(), style: Theme.of(context).textTheme.bodyText1),
-                        Text(fittingPointsUpdate.elementAt(index).y.toString(), style: Theme.of(context).textTheme.bodyText1),
+                        Text(fittingPointsUpdate.elementAt(index).x.toString(), style: Themes.getDefaultTextStyle()),
+                        Text(fittingPointsUpdate.elementAt(index).y.toString(), style: Themes.getDefaultTextStyle()),
                       ],
                     ),
                   ),
@@ -171,19 +172,19 @@ class _AdminScreenState extends State<AdminScreen> {
 
     return AlertDialog(
       actions: [
-        TextButton(
+        ElevatedButton(
             onPressed: () {
               points.removeAt(index);
               Navigator.pop(context);
               setState(() {});
             },
             child: Icon(Icons.delete)),
-        TextButton(
+        ElevatedButton(
             onPressed: () {
               Navigator.of(context).pop();
             },
             child: Icon(Icons.cancel)),
-        TextButton(
+        ElevatedButton(
             onPressed: () {
               points.elementAt(index).x = int.parse(_editXValueController.text);
               points.elementAt(index).y = double.parse(_editYValueController.text);
@@ -308,7 +309,7 @@ class _AdminScreenState extends State<AdminScreen> {
           padding: const EdgeInsets.all(8.0),
           child: ListView(
             children: [
-              Text('Send Bytes to ESP for the voltage fitting process.', style: Theme.of(context).textTheme.bodyText1),
+              Text('Send Bytes to ESP for the voltage fitting process.', style: Themes.getDefaultTextStyle()),
               TextField(
                 style: _currentPoint?.x != null ? TextStyle(color: Colors.grey) : TextStyle(),
                 controller: _resistance,
@@ -327,7 +328,7 @@ class _AdminScreenState extends State<AdminScreen> {
                     width: MediaQuery.of(context).size.width / 4,
                     child: ElevatedButton(
                       onPressed: () => sendBytesToESP(context),
-                      child: Text('Send', style: Theme.of(context).textTheme.bodyText1),
+                      child: Text('Send', style: Themes.getButtonTextStyle()),
                     ),
                   ),
                 ],
@@ -346,7 +347,7 @@ class _AdminScreenState extends State<AdminScreen> {
                     width: MediaQuery.of(context).size.width / 4,
                     child: ElevatedButton(
                       onPressed: confirmButtonLockout ? null : () => saveAmpsOnPressed(context),
-                      child: Text('Confirm', style: Theme.of(context).textTheme.bodyText1),
+                      child: Text('Confirm', style: Themes.getButtonTextStyle()),
                     ),
                   ),
                 ],
@@ -357,20 +358,20 @@ class _AdminScreenState extends State<AdminScreen> {
                     await showDialog(context: context, builder: (context) => showFittingPointListDialog());
                     setState(() {});
                   },
-                  child: Text(fittingPointsToString(), textAlign: TextAlign.start, style: Theme.of(context).textTheme.bodyText1)),
+                  child: Text(fittingPointsToString(), textAlign: TextAlign.start, style: Themes.getDefaultTextStyle())),
               Center(
                 child: ElevatedButton(
                   onPressed: () => setState(() {
                     _fittingPoints.clear();
                     _fittingPoints.addAll(performDeepCopy(_testingPoints));
                   }),
-                  child: Text('Load test data set', style: Theme.of(context).textTheme.bodyText1),
+                  child: Text('Load test data set', style: Themes.getButtonTextStyle()),
                 ),
               ),
               Center(
                 child: ElevatedButton(
                   onPressed: _fittingPoints.isNotEmpty ? () => startFitting() : null,
-                  child: Text('Start fitting with given points', style: Theme.of(context).textTheme.bodyText1),
+                  child: Text('Start fitting with given points', style: Themes.getButtonTextStyle()),
                 ),
               ),
               ByteArrayTestBar(),

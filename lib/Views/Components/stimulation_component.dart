@@ -3,6 +3,7 @@ import 'package:impulsrefactor/Helpers/byte_conversion.dart';
 import 'package:impulsrefactor/States/session_step.dart';
 import 'package:impulsrefactor/States/session_state.dart';
 import 'package:impulsrefactor/States/stimulation_service.dart';
+import 'package:impulsrefactor/Style/themes.dart';
 import 'package:impulsrefactor/Views/Components/ekg_chart_component.dart';
 import 'package:impulsrefactor/Views/Components/progress_bar_component.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -41,7 +42,7 @@ class _StimulationState extends State<Stimulation> {
                 decoration: BoxDecoration(border: Border.all(width: 1, color: Colors.indigo)),
                 child: Column(
                   children: <Widget>[
-                    Text('Treatment progress', style: Theme.of(context).textTheme.bodyText1),
+                    Text('Treatment progress', style: Themes.getDefaultTextStyle()),
                     SizedBox(height: 5),
                     ProgressRing(
                         key: _progressBarKey,
@@ -68,7 +69,7 @@ class _StimulationState extends State<Stimulation> {
                             context.read(sessionStepProvider.notifier).increment();
                           }
                         : null,
-                    child: Text('Next threshold\ndetermination', style: Theme.of(context).textTheme.bodyText1)),
+                    child: Text('Next threshold\ndetermination', style: Themes.getButtonTextStyle())),
               )
             ],
           ),
