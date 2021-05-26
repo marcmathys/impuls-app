@@ -58,7 +58,7 @@ class _StimulationState extends State<Stimulation> {
               ),
               Container(
                 height: double.infinity,
-                child: TextButton(
+                child: ElevatedButton(
                     style: ButtonStyle(
                       foregroundColor: MaterialStateProperty.resolveWith<Color>(
                         (Set<MaterialState> states) => states.contains(MaterialState.disabled) ? Colors.black : Colors.blue,

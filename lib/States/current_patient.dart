@@ -9,4 +9,8 @@ class CurrentPatient extends StateNotifier<Patient> {
   setPatient(Patient patient) {
     state = patient;
   }
+
+  unsetPatient() {
+    state = null;
+  }
 }

@@ -41,7 +41,7 @@ class _AdminScreenState extends State<AdminScreen> {
 
   //TODO: Remove debug lists!
   List<FittingPoint> _testingPoints = [
-    FittingPoint(32, 198.5),
+    /**FittingPoint(32, 198.5),
     FittingPoint(64, 162.1),
     FittingPoint(96, 133.3),
     FittingPoint(128, 109.1),
@@ -78,7 +78,51 @@ class _AdminScreenState extends State<AdminScreen> {
     FittingPoint(927, 1.0),
     FittingPoint(959, 0.8),
     FittingPoint(991, 0.8),
-    FittingPoint(1023, 0.7),
+    FittingPoint(1023, 0.7), **/
+
+    FittingPoint(0, 234.5),
+    FittingPoint(20, 206.5),
+    FittingPoint(40, 179.5),
+    FittingPoint(60, 158.0),
+    FittingPoint(80, 140.5),
+    FittingPoint(100, 123.5),
+    FittingPoint(120, 111.0),
+    FittingPoint(140, 98.5),
+    FittingPoint(160, 89.0),
+    FittingPoint(180, 79.5),
+    FittingPoint(200, 70.5),
+    FittingPoint(220, 63.5),
+    FittingPoint(240, 57.0),
+    FittingPoint(260, 51.5),
+    FittingPoint(280, 45.5),
+    FittingPoint(300, 41.5),
+    FittingPoint(320, 37.0),
+    FittingPoint(340, 33.0),
+    FittingPoint(360, 29.0),
+    FittingPoint(380, 25.0),
+    FittingPoint(400, 23.0),
+    FittingPoint(420, 20.5),
+    FittingPoint(440, 18.0),
+    FittingPoint(460, 16.0),
+    FittingPoint(480, 14.0),
+    FittingPoint(500, 12.5),
+    FittingPoint(520, 10.5),
+    FittingPoint(540, 9.5),
+    FittingPoint(560, 8.0),
+    FittingPoint(580, 7.0),
+    FittingPoint(600, 6.0),
+    FittingPoint(620, 5.5),
+    FittingPoint(640, 4.7),
+    FittingPoint(660, 4.1),
+    FittingPoint(680, 3.5),
+    FittingPoint(700, 3.1),
+    FittingPoint(750, 2.2),
+    FittingPoint(800, 1.6),
+    FittingPoint(850, 1.2),
+    FittingPoint(900, 1.0),
+    FittingPoint(950, 0.8),
+    FittingPoint(1000, 0.6),
+    FittingPoint(1023, 0.5),
   ];
 
   @override
@@ -358,7 +402,7 @@ class _AdminScreenState extends State<AdminScreen> {
                     await showDialog(context: context, builder: (context) => showFittingPointListDialog());
                     setState(() {});
                   },
-                  child: Text(fittingPointsToString(), textAlign: TextAlign.start, style: Themes.getDefaultTextStyle())),
+                  child: Text(fittingPointsToString(), textAlign: TextAlign.start, style: Themes.getSmallTextStyle())),
               Center(
                 child: ElevatedButton(
                   onPressed: () => setState(() {

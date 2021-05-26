@@ -4,24 +4,32 @@ import 'package:impulsrefactor/Entities/therapist.dart';
 import 'package:impulsrefactor/States/current_patient.dart';
 import 'package:impulsrefactor/States/session_step.dart';
 
-final sessionProvider = StateNotifierProvider<SessionState, Session>((ref) => SessionState(null, ref));
+final sessionProvider = StateNotifierProvider<SessionState, Session>((ref) => SessionState(ref));
 
 class SessionState extends StateNotifier<Session> {
   ProviderReference ref;
 
-  SessionState(Session session, this.ref) : super(null);
-
-  void setSession(Session session) {
-    state = session;
+  SessionState(this.ref) : super(null) {
+    state = Session();
+    state.confirmed = false;
+    state.date = DateTime.now();
+    state.patientUID = ref.read(currentPatientProvider).uid;
+    state.therapistUIDs.add(Therapist().uid);
   }
 
-  void startNewSession() {
+  void resetSession() {
     Session session = Session();
     session.confirmed = false;
     session.date = DateTime.now();
     session.patientUID = ref.read(currentPatientProvider).uid;
     session.therapistUIDs.add(Therapist().uid);
     state = session;
+  }
+
+  void abandonSession() {
+    resetSession();
+    ref.read(currentPatientProvider.notifier).unsetPatient();
+    ref.read(sessionStepProvider.notifier).resetStep();
   }
 
   void addThresholds(Map<int, int> stimRatingRound1, Map<int, int> stimRatingRound2, int rounds) {
@@ -57,10 +65,4 @@ class SessionState extends StateNotifier<Session> {
     }
     ref.read(sessionStepProvider.notifier).increment();
   }
-
-/** TODO void resetState() {
-    currentPatient = null;
-    currentSession = null;
-    _currentStep = 0;
-    }**/
 }

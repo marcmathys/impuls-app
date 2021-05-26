@@ -17,12 +17,6 @@ class SessionGuide extends StatefulWidget {
 class _SessionGuideState extends State<SessionGuide> {
   String title = 'Session';
 
-  @override
-  void initState() {
-    super.initState();
-    context.read(sessionProvider.notifier).startNewSession();
-  }
-
   Widget _getCurrentStepWidget(int currentStep) {
     switch (currentStep) {
       case 0:
@@ -58,25 +52,23 @@ class _SessionGuideState extends State<SessionGuide> {
       body: SafeArea(
         child: WillPopScope(
           onWillPop: () async {
-            showDialog(
-                context: context,
-                builder: (context) => AlertDialog(
-                      title: Text('Do you want to return to the patient selection screen?', style: Themes.getHeadingTextStyle()),
-                      actions: [
-                        TextButton(
-                            onPressed: () {
-                              Navigator.of(context).pop();
-                            },
-                            child: Text('Abort', style: Themes.getButtonTextStyle())),
-                        TextButton(
-                            onPressed: () {
-                              // TODO: context.read(sessionProvider).resetState();
-                              // TODO: BtService().cancelSubscriptions();
-                              Get.toNamed('/patient_select');
-                            },
-                            child: Text('Confirm', style: Themes.getButtonTextStyle())),
-                      ],
-                    ));
+            Get.dialog(AlertDialog(
+              title: Text('Do you want to return to the patient selection screen?', style: Themes.getHeadingTextStyle()),
+              actions: [
+                TextButton(
+                    onPressed: () {
+                      Get.back();
+                    },
+                    child: Text('Abort', style: Themes.getButtonTextStyle())),
+                TextButton(
+                    onPressed: () {
+                      Get.until((route) => Get.currentRoute == '/patient_select');
+                      // TODO: BtService().cancelSubscriptions();
+                      context.read(sessionProvider.notifier).abandonSession();
+                    },
+                    child: Text('Confirm', style: Themes.getButtonTextStyle())),
+              ],
+            ));
             return false;
           },
           child: Consumer(

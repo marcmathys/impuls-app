@@ -8,4 +8,8 @@ class SessionStep extends StateNotifier<int> {
   void increment() => state++;
 
   void decrement() => state--;
+
+  void resetStep() {
+    state = 0;
+  }
 }
