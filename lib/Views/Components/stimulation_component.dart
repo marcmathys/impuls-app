@@ -74,7 +74,7 @@ class _StimulationState extends State<Stimulation> {
             ],
           ),
         ),
-        //EKGChart(),
+        EKGChart(),
       ],
     );
   }

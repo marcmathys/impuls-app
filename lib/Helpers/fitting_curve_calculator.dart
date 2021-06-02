@@ -16,6 +16,7 @@ class FittingCurveCalculator {
     return solve;
   }
 
+  /// Fitting curve currently removed in favor of a lookup list
   static Future<int> fitToCurve(int value) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     if (prefs.containsKey('fittingCurveFirstCoefficient') && prefs.containsKey('fittingCurveSecondCoefficient')) {

@@ -26,11 +26,19 @@ class ByteConversion {
     int htt = Calculator.calculateMeanOfList(painThreshold).toInt();
     int tt = Calculator.calculateMeanOfList(toleranceThreshold).toInt();
 
-    ByteData data = ByteData(7);
-    data.setInt16(1, dt, Endian.big);
-    data.setInt16(3, htt, Endian.big);
-    data.setInt16(5, tt, Endian.big);
-    return data.buffer.asUint8List().toList();
+
+
+    /**ByteData data = ByteData(7);
+    data.setUint16(1, dt, Endian.big);
+    data.setUint16(3, htt, Endian.big);
+    data.setUint16(5, tt, Endian.big);**/
+    //TODO: Reinstate. Commented out because of fitting curve uncertainties and we need to test: return data.buffer.asUint8List().toList();
+    //Is the toList useless?
+    ByteData tmpBytes = ByteData(7);
+    tmpBytes.setUint16(1, 0, Endian.big);
+    tmpBytes.setUint16(3, 256, Endian.big);
+    tmpBytes.setUint16(5, 512, Endian.big);
+    return tmpBytes.buffer.asInt8List().toList();
   }
 
   /// Ths method converts a string to an array of integers.

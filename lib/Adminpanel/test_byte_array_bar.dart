@@ -14,7 +14,8 @@ class ByteArrayTestBar extends StatefulWidget {
 class _ByteArrayTestBarState extends State<ByteArrayTestBar> {
   bool zeroHighLow = false;
   Timer zeroHighLowTimer;
-  String currentSentValue = '';
+  String currentSentValueAutomatic = '';
+  int currentValueManual = 0;
 
   /// The correct one!
   void testFittingCurveZeroHighLow() {
@@ -26,7 +27,7 @@ class _ByteArrayTestBarState extends State<ByteArrayTestBar> {
 
       context.read(stimulationServiceProvider.notifier).sendStimulationBytes(data.buffer.asUint8List().toList());
       setState(() {
-        currentSentValue = 'Value sent: $currentValue - array: ${data.buffer.asUint8List().toList()} (0|H|L)';
+        currentSentValueAutomatic = 'Value sent: $currentValue - array: ${data.buffer.asUint8List().toList()} (0|H|L)';
       });
       currentValue++;
 
@@ -36,32 +37,58 @@ class _ByteArrayTestBarState extends State<ByteArrayTestBar> {
     });
   }
 
+  sendSingleValue() {
+    ByteData data = ByteData(3);
+    data.setInt16(1, currentValueManual, Endian.big);
+
+    context.read(stimulationServiceProvider.notifier).sendStimulationBytes(data.buffer.asUint8List().toList());
+    setState(() {
+      currentValueManual += 1;
+    });
+  }
+
   Widget build(BuildContext context) {
     return Column(
       children: [
-        Text(currentSentValue, style: Themes.getDefaultTextStyle()),
+        Text(currentSentValueAutomatic, style: Themes.getDefaultTextStyle()),
         Row(
           children: [
             Text('Send byte values 0 - 1023 to EKG. Format: 0|High|Low', style: Themes.getSmallTextStyle()),
             Switch(
-                value: zeroHighLow,
-                onChanged: (value) {
-                  if (value) {
-                    testFittingCurveZeroHighLow();
+              value: zeroHighLow,
+              onChanged: (value) {
+                if (value) {
+                  testFittingCurveZeroHighLow();
 
-                    setState(() {
-                      zeroHighLow = !zeroHighLow;
-                    });
-                  } else {
-                    zeroHighLowTimer.cancel();
+                  setState(() {
+                    zeroHighLow = !zeroHighLow;
+                  });
+                } else {
+                  zeroHighLowTimer.cancel();
 
-                    setState(() {
-                      zeroHighLow = !zeroHighLow;
-                      zeroHighLowTimer = null;
-                    });
-                  }
-                }),
+                  setState(() {
+                    zeroHighLow = !zeroHighLow;
+                    zeroHighLowTimer = null;
+                  });
+                }
+              },
+            ),
           ],
+        ),
+        Row(
+          children: [
+            Text('Manually send values. Current: $currentValueManual'),
+            SizedBox(width: 10),
+            ElevatedButton(
+                onPressed: () => setState(() {
+                      currentValueManual = 0;
+                    }),
+                child: Text('Reset current value')),
+          ],
+        ),
+        Padding(
+          padding: const EdgeInsets.all(80.0),
+          child: SizedBox(height: 200, width: 200, child: ElevatedButton(onPressed: sendSingleValue, child: Text('Send value'))),
         ),
       ],
     );

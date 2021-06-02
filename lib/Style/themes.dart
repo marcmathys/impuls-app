@@ -9,6 +9,10 @@ class Themes {
     return TextStyle(fontSize: 12);
   }
 
+  static TextStyle getLargeTextStyle() {
+    return TextStyle(fontSize: 20);
+  }
+
   static TextStyle getButtonTextStyle() {
     return TextStyle(fontSize: 14);
   }

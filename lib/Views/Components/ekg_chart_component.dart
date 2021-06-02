@@ -15,7 +15,7 @@ class EKGChartState extends State<EKGChart> {
   @override
   void initState() {
     super.initState();
-    context.read(ekgServiceProvider.notifier).startDataStreams();
+    //context.read(ekgServiceProvider.notifier).startDataStreams();
   }
 
   @override
@@ -25,27 +25,38 @@ class EKGChartState extends State<EKGChart> {
   }
 
   Widget build(BuildContext context) {
-    return Consumer(
-      builder: (context, watch, child) {
-        List<MedicalData> data = watch(ekgServiceProvider);
+    return Column(
+      children: [
+        Consumer(
+          builder: (context, watch, child) {
+            List<MedicalData> data = watch(ekgServiceProvider);
 
-        return SfCartesianChart(
-          legend: Legend(isVisible: true),
-          primaryXAxis: NumericAxis(),
-          primaryYAxis: NumericAxis(),
-          series: <ChartSeries<MedicalData, num>>[
-            LineSeries<MedicalData, num>(
-              dataSource: data,
-              onRendererCreated: (ChartSeriesController controller) => _controller = controller,
-              name: 'EKG',
-              xValueMapper: (MedicalData medicalData, _) => medicalData.xAxis,
-              yValueMapper: (MedicalData medicalData, _) => medicalData.ekgPoint,
-              animationDuration: 0,
-              dataLabelSettings: DataLabelSettings(isVisible: false, labelAlignment: ChartDataLabelAlignment.top),
-            ),
-          ],
-        );
-      },
+            return SfCartesianChart(
+              legend: Legend(isVisible: true),
+              primaryXAxis: NumericAxis(),
+              primaryYAxis: NumericAxis(),
+              series: <ChartSeries<MedicalData, num>>[
+                LineSeries<MedicalData, num>(
+                  dataSource: data,
+                  onRendererCreated: (ChartSeriesController controller) => _controller = controller,
+                  name: 'EKG',
+                  xValueMapper: (MedicalData medicalData, _) => medicalData.xAxis,
+                  yValueMapper: (MedicalData medicalData, _) => medicalData.ekgPoint,
+                  animationDuration: 0,
+                  dataLabelSettings: DataLabelSettings(isVisible: false, labelAlignment: ChartDataLabelAlignment.top),
+                ),
+              ],
+            );
+          },
+        ),
+        SizedBox(height: 10),
+        ElevatedButton(onPressed: () => context.read(ekgServiceProvider.notifier).sendOffSignal(), child: Text('Stop EKG')),
+        ElevatedButton(onPressed: () => context.read(ekgServiceProvider.notifier).startDataStreams(), child: Text('Start EKG'))
+
+        /**context.read(ekgServiceProvider.notifier).isStreamRunning()
+            ? ElevatedButton(onPressed: () => context.read(ekgServiceProvider.notifier).sendOffSignal(), child: Text('Stop EKG'))
+            : ElevatedButton(onPressed: () => context.read(ekgServiceProvider.notifier).startDataStreams(), child: Text('Start EKG')),**/
+      ],
     );
   }
 }
