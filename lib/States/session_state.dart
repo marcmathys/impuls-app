@@ -36,6 +36,8 @@ class SessionState extends StateNotifier<Session> {
     if (rounds == 2) {
       stimRatingRound1.forEach((key, value) {
         int average = (value + stimRatingRound2[key]) ~/ 2;
+
+        //TODO: This is wrong. Needs parameter to clarify which rating is being added.
         if (state.stimRating1.isEmpty) {
           state.stimRating1.add(average);
         } else if (state.stimRating2.isEmpty) {

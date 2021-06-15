@@ -10,9 +10,9 @@ class Session {
   String patientUID;
   int postPainRating;
   List<int> sensoryThreshold = [];
-  List<int> stimRating1 = [];
-  List<int> stimRating2 = [];
-  List<int> stimRating3 = [];
+  List<int> stimRating1 = []; // Round 1
+  List<int> stimRating2 = []; // Round 2
+  List<int> stimRating3 = []; // Round 3
   List<String> therapistUIDs = [];
   List<int> toleranceThreshold = [];
   String uid;

@@ -1,7 +1,6 @@
 import 'dart:typed_data';
 
 import 'package:get/get.dart';
-import 'package:impulsrefactor/Helpers/calculator.dart';
 
 class ByteConversion {
   static double bpmByteConversion(List<int> bluetoothData) {
@@ -22,23 +21,23 @@ class ByteConversion {
   }
 
   static List<int> convertThresholdsToByteList(List<int> sensoryThreshold, List<int> painThreshold, List<int> toleranceThreshold) {
-    int dt = Calculator.calculateMeanOfList(sensoryThreshold).toInt();
-    int htt = Calculator.calculateMeanOfList(painThreshold).toInt();
-    int tt = Calculator.calculateMeanOfList(toleranceThreshold).toInt();
+    int sensory = sensoryThreshold[0] + sensoryThreshold[1] ~/2;
+    int pain = painThreshold[0] + painThreshold[1] ~/2;
+    int tolerance = toleranceThreshold[0] + toleranceThreshold[1] ~/2;
 
+    int dt = sensory;
+    int htt = pain + (tolerance - pain) ~/ 2;
+    int tt = (pain + (tolerance - pain) * 0.75).round();
 
-
-    /**ByteData data = ByteData(7);
-    data.setUint16(1, dt, Endian.big);
+    ByteData data = ByteData(7);
+    /**data.setUint16(1, dt, Endian.big);
     data.setUint16(3, htt, Endian.big);
     data.setUint16(5, tt, Endian.big);**/
     //TODO: Reinstate. Commented out because of fitting curve uncertainties and we need to test: return data.buffer.asUint8List().toList();
-    //Is the toList useless?
-    ByteData tmpBytes = ByteData(7);
-    tmpBytes.setUint16(1, 0, Endian.big);
-    tmpBytes.setUint16(3, 256, Endian.big);
-    tmpBytes.setUint16(5, 512, Endian.big);
-    return tmpBytes.buffer.asInt8List().toList();
+    data.setUint16(1, 0, Endian.big);
+    data.setUint16(3, 256, Endian.big);
+    data.setUint16(5, 512, Endian.big);
+    return data.buffer.asInt8List().toList();
   }
 
   /// Ths method converts a string to an array of integers.
