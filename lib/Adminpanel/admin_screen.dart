@@ -1,4 +1,5 @@
 import 'dart:math';
+import 'dart:typed_data';
 
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -194,8 +195,8 @@ class _AdminScreenState extends State<AdminScreen> {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceAround,
                       children: [
-                        Text(fittingPointsUpdate.elementAt(index).x.toString(), style: Themes.getDefaultTextStyle()),
-                        Text(fittingPointsUpdate.elementAt(index).y.toString(), style: Themes.getDefaultTextStyle()),
+                        Text(fittingPointsUpdate.elementAt(index).decimalValue.toString(), style: Themes.getDefaultTextStyle()),
+                        Text(fittingPointsUpdate.elementAt(index).volt.toString(), style: Themes.getDefaultTextStyle()),
                       ],
                     ),
                   ),
@@ -211,8 +212,8 @@ class _AdminScreenState extends State<AdminScreen> {
   }
 
   AlertDialog showFittingPointEditDialog(List<FittingPoint> points, int index) {
-    _editXValueController.text = points.elementAt(index).x.toString();
-    _editYValueController.text = points.elementAt(index).y.toString();
+    _editXValueController.text = points.elementAt(index).decimalValue.toString();
+    _editYValueController.text = points.elementAt(index).volt.toString();
 
     return AlertDialog(
       actions: [
@@ -230,8 +231,8 @@ class _AdminScreenState extends State<AdminScreen> {
             child: Icon(Icons.cancel)),
         ElevatedButton(
             onPressed: () {
-              points.elementAt(index).x = int.parse(_editXValueController.text);
-              points.elementAt(index).y = double.parse(_editYValueController.text);
+              points.elementAt(index).decimalValue = int.parse(_editXValueController.text);
+              points.elementAt(index).volt = double.parse(_editYValueController.text);
               Navigator.of(context).pop();
             },
             child: Icon(Icons.check)),
@@ -264,14 +265,11 @@ class _AdminScreenState extends State<AdminScreen> {
         return;
       }
 
-      String radixString = value.toString().padLeft(9, '0');
-      List<int> octList = [
-        int.parse(radixString.substring(0, 3)),
-        int.parse(radixString.substring(3, 6)),
-        int.parse(radixString.substring(6, 9)),
-      ];
-      context.read(stimulationServiceProvider.notifier).sendStimulationBytes(octList);
-      _currentPoint.x = value;
+      ByteData data = ByteData(3);
+      data.setInt16(1, value, Endian.big);
+
+      context.read(stimulationServiceProvider.notifier).sendStimulationBytes(data.buffer.asUint8List().toList());
+      _currentPoint.decimalValue = value;
       enterVoltageFocusNode.requestFocus();
       confirmButtonLockout = false;
       setState(() {});
@@ -284,7 +282,7 @@ class _AdminScreenState extends State<AdminScreen> {
 
   void saveAmpsOnPressed(BuildContext context) {
     try {
-      _currentPoint.y = double.parse(_measuredVoltageTextController.text);
+      _currentPoint.volt = double.parse(_measuredVoltageTextController.text);
       _fittingPoints.add(_currentPoint);
       _byteSendTextController.clear();
       _measuredVoltageTextController.clear();
@@ -304,7 +302,7 @@ class _AdminScreenState extends State<AdminScreen> {
   String fittingPointsToString() {
     String points = '';
     _fittingPoints.forEach((point) {
-      points = points + '(${point.x.toString()}, ${point.y.toStringAsFixed(2)}) ';
+      points = points + '(${point.decimalValue.toString()}, ${point.volt.toStringAsFixed(2)}) ';
     });
 
     return points;
@@ -315,7 +313,7 @@ class _AdminScreenState extends State<AdminScreen> {
     int resistance = int.parse(_resistance.value.text);
 
     tmp.forEach((point) {
-      point.y = log((point.y / resistance) * 1000000);
+      point.volt = log((point.volt / resistance) * 1000000);
     });
     PolynomialFit result = await FittingCurveCalculator.calculate(tmp);
 
@@ -338,7 +336,7 @@ class _AdminScreenState extends State<AdminScreen> {
     List<FittingPoint> copy = [];
 
     listToCopy.forEach((fittingPoint) {
-      copy.add(FittingPoint(fittingPoint.x, fittingPoint.y));
+      copy.add(FittingPoint(fittingPoint.decimalValue, fittingPoint.volt));
     });
 
     return copy;
@@ -355,7 +353,7 @@ class _AdminScreenState extends State<AdminScreen> {
             children: [
               Text('Send Bytes to ESP for the voltage fitting process.', style: Themes.getDefaultTextStyle()),
               TextField(
-                style: _currentPoint?.x != null ? TextStyle(color: Colors.grey) : TextStyle(),
+                style: _currentPoint?.decimalValue != null ? TextStyle(color: Colors.grey) : TextStyle(),
                 controller: _resistance,
                 decoration: InputDecoration(labelText: 'Enter resistance'),
               ),

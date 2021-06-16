@@ -7,8 +7,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class FittingCurveCalculator {
   static Future<PolynomialFit> calculate(List<FittingPoint> points) async {
-    List<double> xValues = points.map((point) => point.x.toDouble()).toList();
-    List<double> yValues = points.map((point) => point.y).toList();
+    List<double> xValues = points.map((point) => point.decimalValue.toDouble()).toList();
+    List<double> yValues = points.map((point) => point.volt).toList();
 
     LeastSquaresSolver leastSquaresSolver = LeastSquaresSolver(xValues, yValues, List.generate(xValues.length, (index) => 1));
     PolynomialFit solve = leastSquaresSolver.solve(1);

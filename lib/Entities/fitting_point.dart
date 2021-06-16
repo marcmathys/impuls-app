@@ -1,6 +1,6 @@
 class FittingPoint {
-  int x;
-  double y;
+  int decimalValue;
+  double volt;
 
-  FittingPoint(this.x, this.y);
+  FittingPoint(this.decimalValue, this.volt);
 }
