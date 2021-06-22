@@ -32,39 +32,68 @@ class SessionState extends StateNotifier<Session> {
     ref.read(sessionStepProvider.notifier).resetStep();
   }
 
-  void addThresholds(Map<int, int> stimRatingRound1, Map<int, int> stimRatingRound2, int rounds) {
-    if (rounds == 2) {
-      stimRatingRound1.forEach((key, value) {
-        int average = (value + stimRatingRound2[key]) ~/ 2;
+  /// We only save the first value of the stimRatingRounds for the database,
+  /// but we need some of the later values for the thresholds.
+  /// This methods iterates through stimRatingRound1, takes the first values of each list of the current button pressed (0-10)
+  /// and averages them with the corresponding value of stimRatingRound2.
+  /// If a value was skipped, it averages with itself
+  ///
+  /// The thresholds are set in this method as follows:
+  ///
+  /// sensoryThreshold: First value of 0
+  /// painThreshold: Final value of 1
+  /// toleranceThreshold: First value of 10 (it's only one value)
+  ///
+  /// It is inefficient, but readable!
+  void addRatingAndThresholds(Map<int, List<int>> stimRatingRound1, Map<int, List<int>> stimRatingRound2, int rounds, int determinationNumber) {
+    Map<int, int> stimRatingAdjusted;
 
-        //TODO: This is wrong. Needs parameter to clarify which rating is being added.
-        if (state.stimRating1.isEmpty) {
-          state.stimRating1.add(average);
-        } else if (state.stimRating2.isEmpty) {
-          state.stimRating2.add(average);
-        } else if (state.stimRating3.isEmpty) {
-          state.stimRating3.add(average);
-        }
-
-        state.sensoryThreshold.addAll({stimRatingRound1[0], stimRatingRound2[0]});
-        state.painThreshold.addAll({stimRatingRound1[1], stimRatingRound2[1]});
-        state.toleranceThreshold.addAll({stimRatingRound1[10], stimRatingRound2[10]});
-      });
-    } else {
-      stimRatingRound1.forEach((key, value) {
-        if (state.stimRating1.isEmpty) {
-          state.stimRating1.add(value);
-        } else if (state.stimRating2.isEmpty) {
-          state.stimRating2.add(value);
-        } else if (state.stimRating3.isEmpty) {
-          state.stimRating3.add(value);
-        }
-
-        state.sensoryThreshold.addAll({stimRatingRound1[0], stimRatingRound1[0]});
-        state.painThreshold.addAll({stimRatingRound1[1], stimRatingRound1[1]});
-        state.toleranceThreshold.addAll({stimRatingRound1[10], stimRatingRound1[10]});
-      });
+    if (rounds == 1) {
+      stimRatingRound2 = stimRatingRound1;
     }
-    ref.read(sessionStepProvider.notifier).increment();
+
+    /// In this step, we guarantee that every value is set. If one value isn't set, we just set it as the previous one.
+    /// 0, 1 and 10 must be set!
+    /// We utilize a loop for cleaner access to the previous value.
+    for (int key = 0; key <= 10; key++) {
+      if (stimRatingRound1[key].isEmpty) {
+        stimRatingRound1[key] = stimRatingRound1[key - 1];
+      }
+    }
+
+    for (int key = 0; key <= 10; key++) {
+      if (stimRatingRound2[key].isEmpty) {
+        stimRatingRound2[key] = stimRatingRound2[key - 1];
+      }
+    }
+
+    /// Now we can average the values
+    for (int key = 0; key <= 10; key++) {
+      int average = (stimRatingRound1[key].first + stimRatingRound2[key].first) ~/ 2;
+      stimRatingAdjusted[key] = average;
+    }
+
+    if (determinationNumber == 1) {
+      state.stimRating1.addAll(stimRatingAdjusted.values);
+    } else if (determinationNumber == 2) {
+      state.stimRating2.addAll(stimRatingAdjusted.values);
+    } else {
+      state.stimRating3.addAll(stimRatingAdjusted.values);
+    }
+
+    /// And now we can add the thresholds:
+    /// Reminder that they have 5 values;
+    /// 1 + 2 from the first stimulation,
+    /// 3 + 4 from the second and
+    /// 5 from the final one, since this one is always only one round.
+    if (determinationNumber == 3) {
+      state.sensoryThreshold.addAll({stimRatingRound1[0].first});
+      state.painThreshold.addAll({stimRatingRound1[1].last});
+      state.toleranceThreshold.addAll({stimRatingRound1[10].first});
+    } else {
+      state.sensoryThreshold.addAll({stimRatingRound1[0].first, stimRatingRound2[0].first});
+      state.painThreshold.addAll({stimRatingRound1[1].last, stimRatingRound2[1].last});
+      state.toleranceThreshold.addAll({stimRatingRound1[10].first, stimRatingRound2[10].first});
+    }
   }
 }

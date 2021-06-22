@@ -9,6 +9,10 @@ import 'package:impulsrefactor/Views/Components/progress_bar_component.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class Stimulation extends StatefulWidget {
+  final int stimulationNumber; //first or second
+
+  Stimulation(this.stimulationNumber);
+
   _StimulationState createState() => _StimulationState();
 }
 
@@ -19,9 +23,23 @@ class _StimulationState extends State<Stimulation> {
   @override
   void initState() {
     super.initState();
+
     _finished = false;
-    List<int> bytes =
-        ByteConversion.convertThresholdsToByteList(context.read(sessionProvider).sensoryThreshold, context.read(sessionProvider).painThreshold, context.read(sessionProvider).toleranceThreshold);
+    List<int> sensory;
+    List<int> pain;
+    List<int> tolerance;
+
+    if (widget.stimulationNumber == 1) {
+      sensory = context.read(sessionProvider).sensoryThreshold.getRange(0, 2).toList();
+      pain = context.read(sessionProvider).painThreshold.getRange(0, 2).toList();
+      tolerance = context.read(sessionProvider).toleranceThreshold.getRange(0, 2).toList();
+    } else {
+      sensory = context.read(sessionProvider).sensoryThreshold.getRange(2, 4).toList();
+      pain = context.read(sessionProvider).painThreshold.getRange(2, 4).toList();
+      tolerance = context.read(sessionProvider).toleranceThreshold.getRange(2, 4).toList();
+    }
+
+    List<int> bytes = ByteConversion.convertThresholdsToByteList(sensory, pain, tolerance);
     context.read(stimulationServiceProvider.notifier).sendStimulationBytes(bytes);
   }
 

@@ -23,19 +23,19 @@ class _SessionGuideState extends State<SessionGuide> {
         return Setup();
         break;
       case 1:
-        return ThresholdDetermination(false);
+        return ThresholdDetermination(1);
         break;
       case 2:
         return Stimulation();
         break;
       case 3:
-        return ThresholdDetermination(false);
+        return ThresholdDetermination(2);
         break;
       case 4:
         return Stimulation();
         break;
       case 5:
-        return ThresholdDetermination(true);
+        return ThresholdDetermination(3);
         break;
       case 6:
         return Container(child: Center(child: Text('Done! (Temp screen)', style: Themes.getErrorTextStyle())));

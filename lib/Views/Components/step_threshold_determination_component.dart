@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:impulsrefactor/Helpers/byte_conversion.dart';
-import 'package:impulsrefactor/Helpers/fitting_curve_calculator.dart';
 import 'package:impulsrefactor/States/session_state.dart';
+import 'package:impulsrefactor/States/session_step.dart';
 import 'package:impulsrefactor/States/stimulation_service.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:impulsrefactor/Style/themes.dart';
 import 'package:impulsrefactor/app_constants.dart';
 
 class ThresholdDetermination extends StatefulWidget {
-  final bool isThirdDetermination;
+  final int determinationNumber; //first, second or third
 
-  ThresholdDetermination(this.isThirdDetermination);
+  ThresholdDetermination(this.determinationNumber);
 
   @override
   _ThresholdDeterminationState createState() => _ThresholdDeterminationState();
@@ -21,8 +21,8 @@ class _ThresholdDeterminationState extends State<ThresholdDetermination> {
   bool _roundInProgress;
   int _stimulationLevel;
   bool _stimLockout;
-  Map<int, int> _stimRatingRound1 = {0: 0, 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0, 10: 0};
-  Map<int, int> _stimRatingRound2 = {0: 0, 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0, 10: 0};
+  Map<int, List<int>> _stimRatingRound1 = {0: [], 1: [], 2: [], 3: [], 4: [], 5: [], 6: [], 7: [], 8: [], 9: [], 10: []};
+  Map<int, List<int>> _stimRatingRound2 = {0: [], 1: [], 2: [], 3: [], 4: [], 5: [], 6: [], 7: [], 8: [], 9: [], 10: []};
   Map<int, bool> _buttonLockouts = {-1: false, 0: false, 1: false, 2: false, 3: false, 4: false, 5: false, 6: false, 7: false, 8: false, 9: false, 10: false};
   bool _generalButtonLockout = true;
 
@@ -58,13 +58,9 @@ class _ThresholdDeterminationState extends State<ThresholdDetermination> {
 
   addStimulationLevel(int buttonPressed) {
     if (_round == 1) {
-      if (_stimRatingRound1[buttonPressed] == 0) {
-        _stimRatingRound1[buttonPressed] = _stimulationLevel;
-      }
+      _stimRatingRound1[buttonPressed].add(_stimulationLevel);
     } else {
-      if (_stimRatingRound2[buttonPressed] == 0) {
-        _stimRatingRound2[buttonPressed] = _stimulationLevel;
-      }
+      _stimRatingRound2[buttonPressed].add(_stimulationLevel);
     }
 
     if (buttonPressed == 10) {
@@ -187,11 +183,16 @@ class _ThresholdDeterminationState extends State<ThresholdDetermination> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               ElevatedButton(
-                onPressed: _roundInProgress ? null : () => context.read(sessionProvider.notifier).addThresholds(_stimRatingRound1, _stimRatingRound2, _round),
+                onPressed: _roundInProgress
+                    ? null
+                    : () {
+                        context.read(sessionProvider.notifier).addRatingAndThresholds(_stimRatingRound1, _stimRatingRound2, _round, widget.determinationNumber);
+                        context.read(sessionStepProvider.notifier).increment();
+                      },
                 child: Text('Start therapy', style: Themes.getButtonTextStyle()),
               ),
               ElevatedButton(
-                onPressed: _round == 1 && _roundInProgress == false && widget.isThirdDetermination == false ? startNextRound : null,
+                onPressed: _round == 1 && _roundInProgress == false && widget.determinationNumber == 3 ? startNextRound : null,
                 child: Text('Start second round', style: Themes.getButtonTextStyle()),
               ),
             ],

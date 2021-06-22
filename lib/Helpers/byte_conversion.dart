@@ -33,7 +33,7 @@ class ByteConversion {
     /**data.setUint16(1, dt, Endian.big);
     data.setUint16(3, htt, Endian.big);
     data.setUint16(5, tt, Endian.big);**/
-    //TODO: Reinstate. Commented out because of fitting curve uncertainties and we need to test: return data.buffer.asUint8List().toList();
+    //TODO: Reinstate. Commented out because of fitting curve uncertainties and we need to test
     data.setUint16(1, 0, Endian.big);
     data.setUint16(3, 256, Endian.big);
     data.setUint16(5, 512, Endian.big);
