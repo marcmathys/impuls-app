@@ -6,6 +6,8 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:impulsrefactor/Adminpanel/fitting_curve_info_window.dart';
 import 'package:impulsrefactor/Adminpanel/test_byte_array_bar.dart';
+import 'package:impulsrefactor/Entities/fitting_curve.dart';
+import 'package:impulsrefactor/Entities/fitting_lookup_table.dart';
 import 'package:impulsrefactor/Entities/fitting_point.dart';
 import 'package:impulsrefactor/Helpers/fitting_curve_calculator.dart';
 import 'package:impulsrefactor/States/connected_device.dart';
@@ -29,13 +31,12 @@ class _AdminScreenState extends State<AdminScreen> {
   TextEditingController _resistance;
   TextEditingController _editXValueController;
   TextEditingController _editYValueController;
+  TextEditingController _microAmpereController;
   List<FittingPoint> _fittingPoints = [];
   FittingPoint _currentPoint;
   FocusNode enterStimulationValue;
   FocusNode enterVoltageFocusNode;
   String oldDataPoints;
-  String oldFirstCoefficient;
-  String oldSecondCoefficient;
   String oldResistance;
   bool confirmButtonLockout = true;
   SharedPreferences prefs;
@@ -43,43 +44,43 @@ class _AdminScreenState extends State<AdminScreen> {
   //TODO: Remove debug lists!
   List<FittingPoint> _testingPoints = [
     /**FittingPoint(32, 198.5),
-    FittingPoint(64, 162.1),
-    FittingPoint(96, 133.3),
-    FittingPoint(128, 109.1),
-    FittingPoint(160, 90.8),
-    FittingPoint(192, 76.2),
-    FittingPoint(224, 63.9),
-    FittingPoint(255, 54.2),
-    FittingPoint(256, 53.9),
-    FittingPoint(287, 45.8),
-    FittingPoint(288, 45.0),
-    FittingPoint(319, 38.3),
-    FittingPoint(320, 37.7),
-    FittingPoint(351, 32.0),
-    FittingPoint(352, 31.7),
-    FittingPoint(383, 26.5),
-    FittingPoint(384, 26.2),
-    FittingPoint(415, 21.8),
-    FittingPoint(416, 21.5),
-    FittingPoint(447, 18.0),
-    FittingPoint(479, 14.7),
-    FittingPoint(511, 11.9),
-    FittingPoint(543, 9.7),
-    FittingPoint(575, 7.9),
-    FittingPoint(607, 6.4),
-    FittingPoint(639, 5.2),
-    FittingPoint(671, 4.2),
-    FittingPoint(703, 3.4),
-    FittingPoint(735, 2.8),
-    FittingPoint(767, 2.3),
-    FittingPoint(799, 1.9),
-    FittingPoint(831, 1.6),
-    FittingPoint(863, 1.3),
-    FittingPoint(895, 1.1),
-    FittingPoint(927, 1.0),
-    FittingPoint(959, 0.8),
-    FittingPoint(991, 0.8),
-    FittingPoint(1023, 0.7), **/
+        FittingPoint(64, 162.1),
+        FittingPoint(96, 133.3),
+        FittingPoint(128, 109.1),
+        FittingPoint(160, 90.8),
+        FittingPoint(192, 76.2),
+        FittingPoint(224, 63.9),
+        FittingPoint(255, 54.2),
+        FittingPoint(256, 53.9),
+        FittingPoint(287, 45.8),
+        FittingPoint(288, 45.0),
+        FittingPoint(319, 38.3),
+        FittingPoint(320, 37.7),
+        FittingPoint(351, 32.0),
+        FittingPoint(352, 31.7),
+        FittingPoint(383, 26.5),
+        FittingPoint(384, 26.2),
+        FittingPoint(415, 21.8),
+        FittingPoint(416, 21.5),
+        FittingPoint(447, 18.0),
+        FittingPoint(479, 14.7),
+        FittingPoint(511, 11.9),
+        FittingPoint(543, 9.7),
+        FittingPoint(575, 7.9),
+        FittingPoint(607, 6.4),
+        FittingPoint(639, 5.2),
+        FittingPoint(671, 4.2),
+        FittingPoint(703, 3.4),
+        FittingPoint(735, 2.8),
+        FittingPoint(767, 2.3),
+        FittingPoint(799, 1.9),
+        FittingPoint(831, 1.6),
+        FittingPoint(863, 1.3),
+        FittingPoint(895, 1.1),
+        FittingPoint(927, 1.0),
+        FittingPoint(959, 0.8),
+        FittingPoint(991, 0.8),
+        FittingPoint(1023, 0.7), **/
 
     FittingPoint(0, 234.5),
     FittingPoint(20, 206.5),
@@ -134,17 +135,15 @@ class _AdminScreenState extends State<AdminScreen> {
     _editYValueController = TextEditingController();
     _measuredVoltageTextController = TextEditingController();
     _resistance = TextEditingController(text: '10000');
+    _microAmpereController = TextEditingController();
     _currentPoint = FittingPoint(null, null);
     enterStimulationValue = FocusNode();
     enterVoltageFocusNode = FocusNode();
+
     SharedPreferences.getInstance().then((preferences) {
       this.prefs = preferences;
       if (prefs.containsKey('fittingPointList')) {
         oldDataPoints = prefs.getString('fittingPointList');
-      }
-      if (prefs.containsKey('fittingCurveFirstCoefficient') && prefs.containsKey('fittingCurveSecondCoefficient')) {
-        oldFirstCoefficient = prefs.getDouble('fittingCurveFirstCoefficient').toStringAsFixed(3);
-        oldSecondCoefficient = prefs.getDouble('fittingCurveSecondCoefficient').toStringAsFixed(3);
       }
       if (prefs.containsKey('resistance')) {
         oldResistance = prefs.getString('resistance');
@@ -154,7 +153,7 @@ class _AdminScreenState extends State<AdminScreen> {
   }
 
   StatefulBuilder showFittingPointListDialog() {
-    List<FittingPoint> fittingPointsUpdate = performDeepCopy(_fittingPoints);
+    List<FittingPoint> fittingPointsUpdate = FittingCurveCalculator.performDeepCopy(_fittingPoints);
 
     return StatefulBuilder(
       builder: (context, setState) => AlertDialog(
@@ -173,7 +172,7 @@ class _AdminScreenState extends State<AdminScreen> {
           ElevatedButton(
               onPressed: () {
                 _fittingPoints.clear();
-                _fittingPoints.addAll(performDeepCopy(fittingPointsUpdate));
+                _fittingPoints.addAll(FittingCurveCalculator.performDeepCopy(fittingPointsUpdate));
                 Navigator.of(context).pop();
               },
               child: Icon(Icons.check)),
@@ -261,7 +260,7 @@ class _AdminScreenState extends State<AdminScreen> {
         return;
       }
       if (context.read(connectedDeviceProvider) == null) {
-        Get.snackbar('Format error', 'Value must be between 0 and 1023');
+        Get.snackbar('Device error', 'No device connected');
         return;
       }
 
@@ -280,10 +279,28 @@ class _AdminScreenState extends State<AdminScreen> {
     }
   }
 
-  void saveAmpsOnPressed(BuildContext context) {
+  void addToFittingCurve() {
     try {
       _currentPoint.volt = double.parse(_measuredVoltageTextController.text);
       _fittingPoints.add(_currentPoint);
+      _byteSendTextController.clear();
+      _measuredVoltageTextController.clear();
+      _currentPoint = FittingPoint(null, null);
+      enterStimulationValue.requestFocus();
+      confirmButtonLockout = true;
+      setState(() {});
+    } on FormatException {
+      Get.snackbar('Format error', 'Wrong number format of resistance or voltage');
+    } on IntegerDivisionByZeroException {
+      Get.snackbar('Format error', 'Resistance must not be zero');
+    } catch (exception) {
+      Get.snackbar('Unknown error', '$exception');
+    }
+  }
+
+  addToLookupTableButtonPressed() {
+    try {
+      LookupTable.setLookupTableValue(_microAmpereController.text, int.parse(_byteSendTextController.text));
       _byteSendTextController.clear();
       _measuredVoltageTextController.clear();
       _currentPoint = FittingPoint(null, null);
@@ -309,7 +326,7 @@ class _AdminScreenState extends State<AdminScreen> {
   }
 
   void startFitting() async {
-    List<FittingPoint> tmp = performDeepCopy(_fittingPoints);
+    List<FittingPoint> tmp = FittingCurveCalculator.performDeepCopy(_fittingPoints);
     int resistance = int.parse(_resistance.value.text);
 
     tmp.forEach((point) {
@@ -319,27 +336,29 @@ class _AdminScreenState extends State<AdminScreen> {
 
     if (result != null) {
       setState(() {
-        oldFirstCoefficient = result.coefficients.first.toStringAsFixed(3);
-        oldSecondCoefficient = result.coefficients.elementAt(1).toStringAsFixed(3);
         oldDataPoints = fittingPointsToString();
         oldResistance = _resistance.text;
       });
-      await prefs.setDouble('fittingCurveFirstCoefficient', result.coefficients.first);
-      await prefs.setDouble('fittingCurveSecondCoefficient', result.coefficients.elementAt(1));
+      await FittingCurve.setFittingCurveCoefficient(result.coefficients);
       await prefs.setString('fittingPointList', oldDataPoints);
       await prefs.setString('resistance', oldResistance);
     } else
       Get.snackbar('Error', 'An error occurred while trying to fit the curve');
   }
 
-  List<FittingPoint> performDeepCopy(List<FittingPoint> listToCopy) {
-    List<FittingPoint> copy = [];
+  editMicroAmpereTextField(String voltageValue) {
+    int value = int.parse(voltageValue);
+    int resistance = 0;
 
-    listToCopy.forEach((fittingPoint) {
-      copy.add(FittingPoint(fittingPoint.decimalValue, fittingPoint.volt));
+    if (_resistance.text.isEmpty || _resistance.text == '0') {
+      resistance = 1;
+    } else {
+      resistance = int.parse(_resistance.text);
+    }
+
+    setState(() {
+      _microAmpereController.text = (value * 1000000 / resistance).toStringAsFixed(0);
     });
-
-    return copy;
   }
 
   @override
@@ -355,6 +374,7 @@ class _AdminScreenState extends State<AdminScreen> {
               TextField(
                 style: _currentPoint?.decimalValue != null ? TextStyle(color: Colors.grey) : TextStyle(),
                 controller: _resistance,
+                keyboardType: TextInputType.number,
                 decoration: InputDecoration(labelText: 'Enter resistance'),
               ),
               Row(
@@ -362,7 +382,12 @@ class _AdminScreenState extends State<AdminScreen> {
                   Expanded(
                     child: TextField(
                       controller: _byteSendTextController,
-                      onChanged: (newValue) => setState(() => confirmButtonLockout = true),
+                      onChanged: (newValue) {
+                        if (newValue != '') {
+                          setState(() => confirmButtonLockout = true);
+                        }
+                      },
+                      keyboardType: TextInputType.number,
                       decoration: InputDecoration(labelText: 'Enter stimulation as decimal (0-1023)'),
                     ),
                   ),
@@ -375,25 +400,48 @@ class _AdminScreenState extends State<AdminScreen> {
                   ),
                 ],
               ),
+              Divider(thickness: 2),
               Row(
                 children: [
                   Expanded(
                     child: TextField(
+                      controller: _measuredVoltageTextController,
+                      onChanged: (voltageValue) => editMicroAmpereTextField(voltageValue),
                       focusNode: enterVoltageFocusNode,
                       readOnly: confirmButtonLockout,
-                      controller: _measuredVoltageTextController,
-                      decoration: InputDecoration(labelText: 'Enter measured voltage as floating point'),
+                      keyboardType: TextInputType.number,
+                      decoration: InputDecoration(labelText: 'Measured voltage as floating point'),
                     ),
                   ),
                   Container(
-                    width: MediaQuery.of(context).size.width / 4,
+                    width: MediaQuery.of(context).size.width * 0.4,
                     child: ElevatedButton(
-                      onPressed: confirmButtonLockout ? null : () => saveAmpsOnPressed(context),
-                      child: Text('Confirm', style: Themes.getButtonTextStyle()),
+                      onPressed: confirmButtonLockout ? null : () => addToFittingCurve(),
+                      child: Text('Add to fitting curve', style: Themes.getButtonTextStyle()),
                     ),
                   ),
                 ],
               ),
+              Row(
+                children: [
+                  Expanded(
+                    child: TextField(
+                      controller: _microAmpereController,
+                      readOnly: confirmButtonLockout,
+                      keyboardType: TextInputType.number,
+                      decoration: InputDecoration(labelText: 'Resulting µA'),
+                    ),
+                  ),
+                  Container(
+                    width: MediaQuery.of(context).size.width * 0.4,
+                    child: ElevatedButton(
+                      onPressed: confirmButtonLockout ? null : () => addToLookupTableButtonPressed(),
+                      child: Text('Add to lookup table', style: Themes.getButtonTextStyle()),
+                    ),
+                  ),
+                ],
+              ),
+              Divider(thickness: 2),
               SizedBox(height: 8),
               GestureDetector(
                   onTap: () async {
@@ -405,7 +453,7 @@ class _AdminScreenState extends State<AdminScreen> {
                 child: ElevatedButton(
                   onPressed: () => setState(() {
                     _fittingPoints.clear();
-                    _fittingPoints.addAll(performDeepCopy(_testingPoints));
+                    _fittingPoints.addAll(FittingCurveCalculator.performDeepCopy(_testingPoints));
                   }),
                   child: Text('Load test data set', style: Themes.getButtonTextStyle()),
                 ),
@@ -417,7 +465,8 @@ class _AdminScreenState extends State<AdminScreen> {
                 ),
               ),
               ByteArrayTestBar(),
-              FittingCurveInfoWindow(oldFirstCoefficient, oldSecondCoefficient, oldResistance, oldDataPoints),
+              FittingCurveInfoWindow(
+                  FittingCurve.getFittingCurveCoefficients()[0].toStringAsFixed(3), FittingCurve.getFittingCurveCoefficients()[0].toStringAsFixed(3), oldResistance, oldDataPoints),
               Divider(thickness: 2),
               BluetoothDevicePicker(),
             ],

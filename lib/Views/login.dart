@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:impulsrefactor/Entities/fitting_curve.dart';
+import 'package:impulsrefactor/Entities/fitting_lookup_table.dart';
 import 'package:impulsrefactor/Services/firebase_service.dart';
+import 'package:impulsrefactor/States/fitting_curve_resistance.dart';
 import 'package:impulsrefactor/Style/themes.dart';
 import 'package:impulsrefactor/Views/Components/app_wide_components.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class Login extends StatefulWidget {
   @override
@@ -21,6 +25,8 @@ class _LoginState extends State<Login> {
     _password = TextEditingController();
     _handler = FirebaseService();
     _handler.checkUserLogin();
+    FittingCurve.loadFittingCurve();
+    LookupTable.loadLookupTable();
   }
 
   @override

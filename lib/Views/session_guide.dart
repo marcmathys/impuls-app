@@ -26,13 +26,13 @@ class _SessionGuideState extends State<SessionGuide> {
         return ThresholdDetermination(1);
         break;
       case 2:
-        return Stimulation();
+        return Stimulation(1);
         break;
       case 3:
         return ThresholdDetermination(2);
         break;
       case 4:
-        return Stimulation();
+        return Stimulation(2);
         break;
       case 5:
         return ThresholdDetermination(3);

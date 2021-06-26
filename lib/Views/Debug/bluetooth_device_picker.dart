@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_blue/flutter_blue.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:impulsrefactor/States/connected_device.dart';
 import 'package:impulsrefactor/States/device_list.dart';

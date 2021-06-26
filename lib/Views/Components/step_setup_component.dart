@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:impulsrefactor/Entities/fitting_curve.dart';
 import 'package:impulsrefactor/States/session_step.dart';
 import 'package:impulsrefactor/States/session_state.dart';
 import 'package:impulsrefactor/Style/themes.dart';
@@ -16,29 +17,22 @@ class _SetupState extends State<Setup> {
   bool _turnedOnMachines = false;
   List<int> dropdownMenuItemList = List.generate(11, (index) => index);
   int _prePainRating;
-  bool _showFittingCurveErrorMessage;
+  bool _showFittingCurveErrorMessage = false;
+
+  @override
+  void initState() {
+     super.initState();
+     if(FittingCurve.getFittingCurveCoefficients() == null) {
+       _showFittingCurveErrorMessage = true;
+     }
+  }
 
   void setupComplete() {
     context.read(sessionProvider).prePainRating = _prePainRating;
     context.read(sessionStepProvider.notifier).increment();
   }
 
-  checkFittingCurveCoefficients() {
-    SharedPreferences.getInstance().then((prefs) {
-      if (prefs.containsKey('fittingCurveFirstCoefficient') && prefs.containsKey('fittingCurveSecondCoefficient')) {
-        _showFittingCurveErrorMessage = false;
-      } else {
-        _showFittingCurveErrorMessage = true;
-        setState(() {});
-      }
-    });
-  }
-
   Widget build(BuildContext context) {
-    if (_showFittingCurveErrorMessage == null) {
-      checkFittingCurveCoefficients();
-    }
-
     return Column(
       children: <Widget>[
         Row(

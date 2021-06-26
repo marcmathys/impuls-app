@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:impulsrefactor/Entities/fitting_lookup_table.dart';
 import 'package:impulsrefactor/Helpers/byte_conversion.dart';
+import 'package:impulsrefactor/Helpers/fitting_curve_calculator.dart';
 import 'package:impulsrefactor/States/session_state.dart';
 import 'package:impulsrefactor/States/session_step.dart';
 import 'package:impulsrefactor/States/stimulation_service.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:impulsrefactor/Style/themes.dart';
-import 'package:impulsrefactor/app_constants.dart';
 
 class ThresholdDetermination extends StatefulWidget {
   final int determinationNumber; //first, second or third
@@ -91,8 +92,11 @@ class _ThresholdDeterminationState extends State<ThresholdDetermination> {
                 ElevatedButton(
                   onPressed: _roundInProgress && !_stimLockout
                       ? () async {
-                          //int fittedValue = await FittingCurveCalculator.fitToCurve(_stimulationLevel + 200);
-                          int fittedValue = AppConstants.valueLookupTable[_stimulationLevel + 200];
+                          int fittedValue = 0;
+                          fittedValue = LookupTable.getLookupTableValue((_stimulationLevel + 200).toString());
+                          if (fittedValue == null) {
+                            fittedValue = await FittingCurveCalculator.fitToCurve(_stimulationLevel + 200);
+                          }
                           List<int> byteList = ByteConversion.convertIntToByteList(fittedValue);
                           if (byteList.isNotEmpty) {
                             context.read(stimulationServiceProvider.notifier).sendStimulationBytes(byteList);

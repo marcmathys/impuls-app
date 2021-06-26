@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:flutter/gestures.dart';
 import 'package:get/get.dart';
+import 'package:impulsrefactor/Entities/fitting_curve.dart';
 import 'package:impulsrefactor/Entities/fitting_point.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -16,17 +17,24 @@ class FittingCurveCalculator {
     return solve;
   }
 
-  /// Fitting curve currently removed in favor of a lookup list
-  static Future<int> fitToCurve(int value) async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    if (prefs.containsKey('fittingCurveFirstCoefficient') && prefs.containsKey('fittingCurveSecondCoefficient')) {
-      double firstCoefficient = prefs.getDouble('fittingCurveFirstCoefficient');
-      double secondCoefficient = prefs.getDouble('fittingCurveSecondCoefficient');
+  static int fitToCurve(int value) {
+    List<double> fittingCurve = FittingCurve.getFittingCurveCoefficients();
 
-      return ((log(value) - firstCoefficient) / secondCoefficient).round();
+    if (fittingCurve != null) {
+      return ((log(value) - fittingCurve[0]) / fittingCurve[1]).round();
     } else {
       Get.snackbar('Error', 'Fitting curve settings not found!');
       return -1;
     }
+  }
+
+  static List<FittingPoint> performDeepCopy(List<FittingPoint> listToCopy) {
+    List<FittingPoint> copy = [];
+
+    listToCopy.forEach((fittingPoint) {
+      copy.add(FittingPoint(fittingPoint.decimalValue, fittingPoint.volt));
+    });
+
+    return copy;
   }
 }
