@@ -285,6 +285,7 @@ class _AdminScreenState extends State<AdminScreen> {
       _fittingPoints.add(_currentPoint);
       _byteSendTextController.clear();
       _measuredVoltageTextController.clear();
+      _microAmpereController.clear();
       _currentPoint = FittingPoint(null, null);
       enterStimulationValue.requestFocus();
       confirmButtonLockout = true;
@@ -303,6 +304,7 @@ class _AdminScreenState extends State<AdminScreen> {
       LookupTable.setLookupTableValue(_microAmpereController.text, int.parse(_byteSendTextController.text));
       _byteSendTextController.clear();
       _measuredVoltageTextController.clear();
+      _microAmpereController.clear();
       _currentPoint = FittingPoint(null, null);
       enterStimulationValue.requestFocus();
       confirmButtonLockout = true;
@@ -325,6 +327,54 @@ class _AdminScreenState extends State<AdminScreen> {
     return points;
   }
 
+  Column fittingPointsToColumn() {
+    String decimal = 'Decimal';
+    String volt = 'Volt';
+
+    _fittingPoints.forEach((point) {
+      decimal = '$decimal\n${point.decimalValue.toString()}';
+      volt = '$volt\n${point.volt.toStringAsFixed(2)}';
+    });
+
+    return Column(
+      children: [
+        Text('Fitting points'),
+        SizedBox(height: 5),
+        Row(
+          children: [
+            Text(decimal, textAlign: TextAlign.start, style: Themes.getSmallTextStyle()),
+            VerticalDivider(thickness: 3.0),
+            Text(volt, textAlign: TextAlign.start, style: Themes.getSmallTextStyle()),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Column lookupTableToColumn() {
+    String microAmpere = 'µA';
+    String integer = 'Integer value';
+
+    LookupTable.getLookupTable().forEach((key, value) {
+      microAmpere = '$microAmpere\n$key';
+      integer = '$integer\n$value';
+    });
+
+    return Column(
+      children: [
+        Text('Lookup Table'),
+        SizedBox(height: 5),
+        Row(
+          children: [
+            Text(microAmpere, textAlign: TextAlign.start, style: Themes.getSmallTextStyle()),
+            VerticalDivider(thickness: 3.0),
+            Text(integer, textAlign: TextAlign.start, style: Themes.getSmallTextStyle()),
+          ],
+        ),
+      ],
+    );
+  }
+
   void startFitting() async {
     List<FittingPoint> tmp = FittingCurveCalculator.performDeepCopy(_fittingPoints);
     int resistance = int.parse(_resistance.value.text);
@@ -339,7 +389,10 @@ class _AdminScreenState extends State<AdminScreen> {
         oldDataPoints = fittingPointsToString();
         oldResistance = _resistance.text;
       });
-      await FittingCurve.setFittingCurveCoefficient(result.coefficients);
+      Map<String, double> coefficients = {};
+      coefficients['first'] = result.coefficients[0];
+      coefficients['second'] = result.coefficients[1];
+      await FittingCurve.setFittingCurveCoefficient(coefficients);
       await prefs.setString('fittingPointList', oldDataPoints);
       await prefs.setString('resistance', oldResistance);
     } else
@@ -372,7 +425,6 @@ class _AdminScreenState extends State<AdminScreen> {
             children: [
               Text('Send Bytes to ESP for the voltage fitting process.', style: Themes.getDefaultTextStyle()),
               TextField(
-                style: _currentPoint?.decimalValue != null ? TextStyle(color: Colors.grey) : TextStyle(),
                 controller: _resistance,
                 keyboardType: TextInputType.number,
                 decoration: InputDecoration(labelText: 'Enter resistance'),
@@ -443,12 +495,23 @@ class _AdminScreenState extends State<AdminScreen> {
               ),
               Divider(thickness: 2),
               SizedBox(height: 8),
-              GestureDetector(
-                  onTap: () async {
-                    await showDialog(context: context, builder: (context) => showFittingPointListDialog());
-                    setState(() {});
-                  },
-                  child: Text(fittingPointsToString(), textAlign: TextAlign.start, style: Themes.getSmallTextStyle())),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  GestureDetector(
+                    onTap: () => null,
+                    child: lookupTableToColumn(),
+                  ),
+                  GestureDetector(
+                    onTap: () async {
+                      await showDialog(context: context, builder: (context) => showFittingPointListDialog());
+                      setState(() {});
+                    },
+                    child: fittingPointsToColumn(),
+                  ),
+                ],
+              ),
               Center(
                 child: ElevatedButton(
                   onPressed: () => setState(() {
@@ -466,7 +529,7 @@ class _AdminScreenState extends State<AdminScreen> {
               ),
               ByteArrayTestBar(),
               FittingCurveInfoWindow(
-                  FittingCurve.getFittingCurveCoefficients()[0].toStringAsFixed(3), FittingCurve.getFittingCurveCoefficients()[0].toStringAsFixed(3), oldResistance, oldDataPoints),
+                  FittingCurve.getFittingCurveCoefficients()['first'].toStringAsFixed(3), FittingCurve.getFittingCurveCoefficients()['second'].toStringAsFixed(3), oldResistance, oldDataPoints),
               Divider(thickness: 2),
               BluetoothDevicePicker(),
             ],

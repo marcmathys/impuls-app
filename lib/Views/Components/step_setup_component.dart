@@ -4,7 +4,6 @@ import 'package:impulsrefactor/States/session_step.dart';
 import 'package:impulsrefactor/States/session_state.dart';
 import 'package:impulsrefactor/Style/themes.dart';
 import 'package:impulsrefactor/Views/Debug/bluetooth_device_picker.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class Setup extends StatefulWidget {

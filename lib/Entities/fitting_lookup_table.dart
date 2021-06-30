@@ -14,6 +14,10 @@ class LookupTable {
     await saveLookupTable();
   }
 
+  static Map<String, int> getLookupTable() {
+    return _valueLookupTable;
+  }
+
   static int getLookupTableValue(String microAmpere) {
     //TODO: Implement range search?
     return _valueLookupTable[microAmpere];
@@ -22,7 +26,7 @@ class LookupTable {
   static Future<void> loadLookupTable() async {
     var prefs = await SharedPreferences.getInstance();
     if (prefs.containsKey('lookupTable')) {
-      _valueLookupTable = json.decode(prefs.getString('lookupTable'));
+      _valueLookupTable = Map<String, int>.from(json.decode(prefs.getString('lookupTable')));
     }
   }
 

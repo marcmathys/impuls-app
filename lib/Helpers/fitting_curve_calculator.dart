@@ -4,7 +4,6 @@ import 'package:flutter/gestures.dart';
 import 'package:get/get.dart';
 import 'package:impulsrefactor/Entities/fitting_curve.dart';
 import 'package:impulsrefactor/Entities/fitting_point.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class FittingCurveCalculator {
   static Future<PolynomialFit> calculate(List<FittingPoint> points) async {
@@ -18,10 +17,10 @@ class FittingCurveCalculator {
   }
 
   static int fitToCurve(int value) {
-    List<double> fittingCurve = FittingCurve.getFittingCurveCoefficients();
+    Map<String, double> fittingCurve = FittingCurve.getFittingCurveCoefficients();
 
     if (fittingCurve != null) {
-      return ((log(value) - fittingCurve[0]) / fittingCurve[1]).round();
+      return ((log(value) - fittingCurve['first']) / fittingCurve['second']).round();
     } else {
       Get.snackbar('Error', 'Fitting curve settings not found!');
       return -1;

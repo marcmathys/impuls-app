@@ -95,7 +95,7 @@ class _ThresholdDeterminationState extends State<ThresholdDetermination> {
                           int fittedValue = 0;
                           fittedValue = LookupTable.getLookupTableValue((_stimulationLevel + 200).toString());
                           if (fittedValue == null) {
-                            fittedValue = await FittingCurveCalculator.fitToCurve(_stimulationLevel + 200);
+                            fittedValue = FittingCurveCalculator.fitToCurve(_stimulationLevel + 200);
                           }
                           List<int> byteList = ByteConversion.convertIntToByteList(fittedValue);
                           if (byteList.isNotEmpty) {
