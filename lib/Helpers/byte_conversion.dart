@@ -37,7 +37,7 @@ class ByteConversion {
     data.setUint16(1, 0, Endian.big);
     data.setUint16(3, 256, Endian.big);
     data.setUint16(5, 512, Endian.big);
-    return data.buffer.asInt8List().toList();
+    return data.buffer.asUint8List().toList();
   }
 
   /// Ths method converts a string to an array of integers.

@@ -24,7 +24,7 @@ class _ThresholdDeterminationState extends State<ThresholdDetermination> {
   bool _stimLockout;
   Map<int, List<int>> _stimRatingRound1 = {0: [], 1: [], 2: [], 3: [], 4: [], 5: [], 6: [], 7: [], 8: [], 9: [], 10: []};
   Map<int, List<int>> _stimRatingRound2 = {0: [], 1: [], 2: [], 3: [], 4: [], 5: [], 6: [], 7: [], 8: [], 9: [], 10: []};
-  Map<int, bool> _buttonLockouts = {-1: false, 0: false, 1: false, 2: false, 3: false, 4: false, 5: false, 6: false, 7: false, 8: false, 9: false, 10: false};
+  Map<int, bool> _buttonLockouts = {-1: false, 0: false, 1: true, 2: true, 3: true, 4: true, 5: true, 6: true, 7: true, 8: true, 9: true, 10: true};
   bool _generalButtonLockout = true;
 
   @override
@@ -43,7 +43,7 @@ class _ThresholdDeterminationState extends State<ThresholdDetermination> {
       _stimulationLevel = 0;
       _stimLockout = false;
       _generalButtonLockout = true;
-      _buttonLockouts = {-1: false, 0: false, 1: false, 2: false, 3: false, 4: false, 5: false, 6: false, 7: false, 8: false, 9: false, 10: false};
+      _buttonLockouts = {-1: false, 0: false, 1: true, 2: true, 3: true, 4: true, 5: true, 6: true, 7: true, 8: true, 9: true, 10: true};
     });
   }
 
@@ -62,6 +62,18 @@ class _ThresholdDeterminationState extends State<ThresholdDetermination> {
       _stimRatingRound1[buttonPressed].add(_stimulationLevel);
     } else {
       _stimRatingRound2[buttonPressed].add(_stimulationLevel);
+    }
+
+    /// Guarantees that there is always a value for 0 and 1
+    if(buttonPressed == 0) {
+      _buttonLockouts[1] = false;
+    }
+
+    /// With a value for 0 and 1 set, we can enable all other buttons. Lower buttons will be disabled later on in this method
+    if(buttonPressed == 1) {
+      _buttonLockouts.forEach((key, value) {
+        _buttonLockouts[key] = false;
+      });
     }
 
     if (buttonPressed == 10) {
@@ -196,7 +208,7 @@ class _ThresholdDeterminationState extends State<ThresholdDetermination> {
                 child: Text('Start therapy', style: Themes.getButtonTextStyle()),
               ),
               ElevatedButton(
-                onPressed: _round == 1 && _roundInProgress == false && widget.determinationNumber == 3 ? startNextRound : null,
+                onPressed: _round == 1 && _roundInProgress == false && widget.determinationNumber != 3 ? startNextRound : null,
                 child: Text('Start second round', style: Themes.getButtonTextStyle()),
               ),
             ],

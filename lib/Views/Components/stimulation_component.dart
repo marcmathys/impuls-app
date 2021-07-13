@@ -51,9 +51,9 @@ class _StimulationState extends State<Stimulation> {
   Widget build(BuildContext context) {
     return Column(
       children: <Widget>[
-        SizedBox(
-          height: MediaQuery.of(context).size.height / 9,
+        IntrinsicHeight(
           child: Row(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: <Widget>[
               Container(
@@ -71,24 +71,22 @@ class _StimulationState extends State<Stimulation> {
                         onFinished: () => setState(() {
                               _finished = true;
                             })),
+                    SizedBox(height: 5),
                   ],
                 ),
               ),
-              Container(
-                height: double.infinity,
-                child: ElevatedButton(
-                    style: ButtonStyle(
-                      foregroundColor: MaterialStateProperty.resolveWith<Color>(
-                        (Set<MaterialState> states) => states.contains(MaterialState.disabled) ? Colors.black : Colors.blue,
-                      ),
+              ElevatedButton(
+                  style: ButtonStyle(
+                    backgroundColor: MaterialStateProperty.resolveWith<Color>(
+                      (Set<MaterialState> states) => states.contains(MaterialState.disabled) ? Colors.black : Colors.blue,
                     ),
-                    onPressed: _finished
-                        ? () {
-                            context.read(sessionStepProvider.notifier).increment();
-                          }
-                        : null,
-                    child: Text('Next threshold\ndetermination', style: Themes.getButtonTextStyle())),
-              )
+                  ),
+                  onPressed: _finished
+                      ? () {
+                          context.read(sessionStepProvider.notifier).increment();
+                        }
+                      : null,
+                  child: Text('Next threshold\ndetermination', style: Themes.getButtonTextStyle()))
             ],
           ),
         ),

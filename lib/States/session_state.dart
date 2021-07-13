@@ -46,7 +46,7 @@ class SessionState extends StateNotifier<Session> {
   ///
   /// It is inefficient, but readable!
   void addRatingAndThresholds(Map<int, List<int>> stimRatingRound1, Map<int, List<int>> stimRatingRound2, int rounds, int determinationNumber) {
-    Map<int, int> stimRatingAdjusted;
+    Map<int, int> stimRatingAdjusted = {};
 
     if (rounds == 1) {
       stimRatingRound2 = stimRatingRound1;
@@ -91,9 +91,9 @@ class SessionState extends StateNotifier<Session> {
       state.painThreshold.addAll({stimRatingRound1[1].last});
       state.toleranceThreshold.addAll({stimRatingRound1[10].first});
     } else {
-      state.sensoryThreshold.addAll({stimRatingRound1[0].first, stimRatingRound2[0].first});
-      state.painThreshold.addAll({stimRatingRound1[1].last, stimRatingRound2[1].last});
-      state.toleranceThreshold.addAll({stimRatingRound1[10].first, stimRatingRound2[10].first});
+      state.sensoryThreshold.addAll([stimRatingRound1[0].first, stimRatingRound2[0].first]);
+      state.painThreshold.addAll([stimRatingRound1[1].last, stimRatingRound2[1].last]);
+      state.toleranceThreshold.addAll([stimRatingRound1[10].first, stimRatingRound2[10].first]);
     }
   }
 }

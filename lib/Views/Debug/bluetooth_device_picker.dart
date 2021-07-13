@@ -14,6 +14,7 @@ class BluetoothDevicePicker extends ConsumerWidget {
       children: [
         device != null
             ? Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
                   Text('Currently connected to: ${device?.id ?? 'none'} ${device?.name ?? ''}', style: Themes.getSmallTextStyle()),
                   ElevatedButton(
@@ -37,19 +38,16 @@ class BluetoothDevicePicker extends ConsumerWidget {
             }
           },
           children: [
-            Container(
-              height: MediaQuery.of(context).size.height / 2,
-              child: ListView.builder(
-                shrinkWrap: true,
-                itemCount: deviceList.length,
-                itemBuilder: (builderContext, index) {
-                  return ListTile(
-                      title: Text('ID: ${deviceList.elementAt(index).id} ${deviceList.elementAt(index).name}', style: Themes.getDefaultTextStyle()),
-                      onTap: () {
-                        context.read(connectedDeviceProvider.notifier).connectDevice(deviceList.elementAt(index));
-                      });
-                },
-              ),
+            ListView.builder(
+              shrinkWrap: true,
+              itemCount: deviceList.length,
+              itemBuilder: (builderContext, index) {
+                return ListTile(
+                    title: Text('ID: ${deviceList.elementAt(index).id} ${deviceList.elementAt(index).name}', style: Themes.getDefaultTextStyle()),
+                    onTap: () {
+                      context.read(connectedDeviceProvider.notifier).connectDevice(deviceList.elementAt(index));
+                    });
+              },
             ),
           ],
         ),
